@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Migration\" />
+    <Folder Include="Factory\" />
+    <Folder Include="Sql\" />
+    <Folder Include="Repository\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Instagram.Domain\Instagram.Domain.csproj" />
+    <ProjectReference Include="..\Instagram.Models\Instagram.Models.csproj" />
+  </ItemGroup>
+
+</Project>
