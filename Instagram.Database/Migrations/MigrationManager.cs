@@ -3,7 +3,7 @@ using FluentMigrator.Runner;
 using Instagram.Database.Factory;
 using Microsoft.Extensions.Configuration;
 
-namespace Instagram.Database.Migration
+namespace Instagram.Database.Migrations
 {
     public class MigrationManager : IMigrationManager
     {

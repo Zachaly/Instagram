@@ -1,6 +1,6 @@
 ﻿using FluentMigrator.Runner;
 using Instagram.Database.Factory;
-using Instagram.Database.Migration;
+using Instagram.Database.Migrations;
 
 namespace Instagram.Api.Infrastructure
 {
@@ -14,7 +14,7 @@ namespace Instagram.Api.Infrastructure
                 .ConfigureRunner(c =>
                 {
                     c.AddSqlServer2016();
-                    c.WithGlobalConnectionString(config.GetConnectionString("DatabaseConnection"));
+                    c.WithGlobalConnectionString(config.GetConnectionString("SqlConnection"));
                     c.ScanIn(typeof(MigrationManager).Assembly).For.Migrations();
                 });
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Instagram.Database.Migration
+namespace Instagram.Database.Migrations
 {
     public interface IMigrationManager
     {
