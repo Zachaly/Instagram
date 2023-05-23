@@ -7,9 +7,11 @@ namespace Instagram.Application
 {
     public class UserService : IUserService
     {
-        public UserService(IUserFactory userFactory, IUserRepository userRepository, IResponseFactory responseFactory)
-        {
+        private readonly IUserRepository _userRepository;
 
+        public UserService(IUserRepository userRepository)
+        {
+            _userRepository = userRepository;
         }
 
         public Task<IEnumerable<UserModel>> GetAsync(GetUserRequest request)

@@ -6,6 +6,6 @@ namespace Instagram.Application.Abstraction
     {
         Task<string> HashPasswordAsync(string password);
         Task<bool> VerifyPasswordAsync(string password, string hash);
-        Task<bool> GenerateTokenAsync(User user);
+        Task<string> GenerateTokenAsync(User user);
     }
 }

@@ -1,6 +1,6 @@
-﻿using Instagram.Application.Abstraction;
+﻿using FluentValidation.Results;
+using Instagram.Application.Abstraction;
 using Instagram.Models.Response;
-using System.ComponentModel.DataAnnotations;
 
 namespace Instagram.Application
 {

@@ -16,12 +16,15 @@ namespace Instagram.Application.Command
         private readonly IUserFactory _userFactory;
         private readonly IUserRepository _userRepository;
         private readonly IAuthService _authService;
+        private readonly IResponseFactory _responseFactory;
 
-        public RegisterHandler(IUserFactory userFactory, IUserRepository userRepository, IAuthService authService)
+        public RegisterHandler(IUserFactory userFactory, IUserRepository userRepository,
+            IAuthService authService, IResponseFactory responseFactory)
         {
             _userFactory = userFactory;
             _userRepository = userRepository;
             _authService = authService;
+            _responseFactory = responseFactory;
         }
 
         public Task<ResponseModel> Handle(RegisterCommand request, CancellationToken cancellationToken)

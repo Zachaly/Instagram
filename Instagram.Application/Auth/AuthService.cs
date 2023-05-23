@@ -11,7 +11,7 @@ namespace Instagram.Application
 
         }
 
-        public Task<bool> GenerateTokenAsync(User user)
+        public Task<string> GenerateTokenAsync(User user)
         {
             throw new NotImplementedException();
         }

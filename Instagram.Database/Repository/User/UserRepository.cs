@@ -15,7 +15,7 @@ namespace Instagram.Database.Repository
             DefaultOrderBy = "Id";
         }
 
-        public Task<User> GetEntityByLoginAsync(string login)
+        public Task<User> GetEntityByEmailAsync(string email)
         {
             throw new NotImplementedException();
         }
