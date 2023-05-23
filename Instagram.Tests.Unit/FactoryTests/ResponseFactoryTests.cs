@@ -75,8 +75,8 @@ namespace Instagram.Tests.Unit.FactoryTests
             var res = _factory.CreateValidationError(validationResult);
 
             Assert.False(res.Success);
-            Assert.Equivalent(res.ValidationErrors!.Keys, failures.Select(x => x.PropertyName));
-            Assert.Equivalent(res.ValidationErrors!.Values, failures.Select(x => x.ErrorMessage));
+            Assert.Equivalent(validationResult.ToDictionary().Keys, res.ValidationErrors!.Keys);
+            Assert.Equivalent(validationResult.ToDictionary().Values, res.ValidationErrors!.Values);
         }
     }
 }

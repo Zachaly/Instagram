@@ -7,33 +7,38 @@ namespace Instagram.Application
     public class ResponseFactory : IResponseFactory
     {
         public ResponseModel CreateFailure(string errorMessage)
-        {
-            throw new NotImplementedException();
-        }
+            => new ResponseModel
+            {
+                Error = errorMessage,
+                Success = false
+            };
 
         public DataResponseModel<TData> CreateFailure<TData>(string errorMessage)
-        {
-            throw new NotImplementedException();
-        }
+            => new DataResponseModel<TData> 
+            {
+                Error = errorMessage,
+                Success = false,
+                Data = default
+            };
 
         public ResponseModel CreateSuccess()
-        {
-            throw new NotImplementedException();
-        }
+            => new ResponseModel { Success = true };
 
         public ResponseModel CreateSuccess(long newEntityId)
-        {
-            throw new NotImplementedException();
-        }
+            => new ResponseModel { Success = true, NewEntityId = newEntityId };
 
         public DataResponseModel<TData> CreateSuccess<TData>(TData data)
-        {
-            throw new NotImplementedException();
-        }
+            => new DataResponseModel<TData>
+            {
+                Success = true,
+                Data = data
+            };
 
         public ResponseModel CreateValidationError(ValidationResult validationResult)
-        {
-            throw new NotImplementedException();
-        }
+            => new ResponseModel
+            {
+                Success = false,
+                ValidationErrors = validationResult.ToDictionary()
+            };
     }
 }

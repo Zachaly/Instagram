@@ -27,9 +27,19 @@ namespace Instagram.Application.Command
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> Handle(RegisterCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseModel> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if((await _userRepository.GetEntityByEmailAsync(request.Email)) is not null)
+            {
+                return _responseFactory.CreateFailure("Email already taken!");
+            }
+
+            var passwordHash = await _authService.HashPasswordAsync(request.Password);
+            var user = _userFactory.Create(request, passwordHash);
+
+            await _userRepository.InsertAsync(user);
+
+            return _responseFactory.CreateSuccess();
         }
     }
 }

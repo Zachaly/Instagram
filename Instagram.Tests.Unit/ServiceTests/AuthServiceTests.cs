@@ -17,6 +17,7 @@ namespace Instagram.Tests.Unit.ServiceTests
             _config.SetupGet(x => x[It.Is<string>(s => s == "Auth:Audience")]).Returns("https://localhost");
             _config.SetupGet(x => x[It.Is<string>(s => s == "Auth:Issuer")]).Returns("https://localhost");
             _config.SetupGet(x => x[It.Is<string>(s => s == "Auth:SecretKey")]).Returns("supersecretkeyloooooooooooooooooooooooooooooooong");
+            _config.SetupGet(x => x[It.Is<string>(s => s == "EncryptionKey")]).Returns(new string('a', 24));
             _service = new AuthService(_config.Object);
         }
 

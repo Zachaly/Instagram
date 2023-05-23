@@ -13,6 +13,7 @@ namespace Instagram.Application.Command
 
     public class LoginHandler : IRequestHandler<LoginCommand, DataResponseModel<LoginResponse>>
     {
+        const string FailMessage = "Invalid password or email!";
         private readonly IUserRepository _userRepository;
         private readonly IAuthService _authService;
         private readonly IUserFactory _userFactory;
@@ -27,9 +28,22 @@ namespace Instagram.Application.Command
             _responseFactory = responseFactory;
         }
 
-        public Task<DataResponseModel<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
+        public async Task<DataResponseModel<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.GetEntityByEmailAsync(request.Email);
+            if(user is null)
+            {
+                return _responseFactory.CreateFailure<LoginResponse>(FailMessage);
+            }
+
+            if(!(await _authService.VerifyPasswordAsync(request.Password, user.PasswordHash)))
+            {
+                return _responseFactory.CreateFailure<LoginResponse>(FailMessage);
+            }
+
+            var token = await _authService.GenerateTokenAsync(user);
+
+            return _responseFactory.CreateSuccess(_userFactory.CreateLoginResponse(user.Id, token, user.Email));
         }
     }
 }
