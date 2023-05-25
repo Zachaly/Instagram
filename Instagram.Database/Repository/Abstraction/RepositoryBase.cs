@@ -15,7 +15,13 @@ namespace Instagram.Database.Repository.Abstraction
 
         public virtual Task DeleteByIdAsync(long id)
         {
-            throw new NotImplementedException();
+            var param = new { Id = id };
+            var query = _sqlQueryBuilder
+                .BuildDelete(Table)
+                .Where(param)
+                .Build();
+
+            return QueryAsync(query, param);
         }
 
         public virtual Task<TModel> GetByIdAsync(long id)

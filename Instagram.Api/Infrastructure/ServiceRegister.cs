@@ -14,7 +14,7 @@ namespace Instagram.Api.Infrastructure
                 .ConfigureRunner(c =>
                 {
                     c.AddSqlServer2016();
-                    c.WithGlobalConnectionString(config.GetConnectionString("SqlConnection"));
+                    c.WithGlobalConnectionString(config["ConnectionStrings:SqlConnection"]);
                     c.ScanIn(typeof(MigrationManager).Assembly).For.Migrations();
                 });
         }

@@ -6,8 +6,8 @@ namespace Instagram.Database.Sql
     {
         private readonly StringBuilder _template;
         private readonly string _table;
-        private readonly StringBuilder _where = new StringBuilder("WHERE ");
-        private readonly StringBuilder _orderBy = new StringBuilder("ORDER BY ");
+        private readonly StringBuilder _where = new StringBuilder("");
+        private readonly StringBuilder _orderBy = new StringBuilder("");
 
         public SqlBuilderQuery(string template, string table)
         {
@@ -25,6 +25,10 @@ namespace Instagram.Database.Sql
 
         public ISqlBuilderQuery OrderBy(string orderBy)
         {
+            if(_orderBy.ToString() == "")
+            {
+                _orderBy.Append("ORDER BY");
+            }
             _orderBy.Append($" [{_table}].[{orderBy}]");
 
             return this;
@@ -38,12 +42,14 @@ namespace Instagram.Database.Sql
             foreach(var prop in props)
             {
                 string where = "";
-                if(index == 0 || index == props.Count() - 1)
+                if(index == 0)
                 {
+                    _where.Append("WHERE ");
                     where = $"[{_table}].[{prop}] = @{prop} ";
-                } else
+                }
+                else
                 {
-                    where = $"AND [{_table}].[{prop} ] = @ {prop} ";
+                    where = $"AND [{_table}].[{prop}] = @{prop} ";
                 }
                 _where.Append(where);
                 index++;

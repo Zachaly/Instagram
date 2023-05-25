@@ -21,7 +21,7 @@ namespace Instagram.Database.Repository.Abstraction
             _connectionFactory = connectionFactory;
         }
 
-        public Task<IEnumerable<TModel>> GetAsync(TGetRequest request)
+        public virtual Task<IEnumerable<TModel>> GetAsync(TGetRequest request)
         {
             var query = _sqlQueryBuilder
                 .BuildSelect<TModel>(Table)
@@ -32,7 +32,7 @@ namespace Instagram.Database.Repository.Abstraction
             return QueryManyAsync<TModel>(query, request);
         }
 
-        public Task InsertAsync(TEntity entity)
+        public virtual Task InsertAsync(TEntity entity)
         {
             var query = _sqlQueryBuilder
                 .BuildInsert(Table, entity)

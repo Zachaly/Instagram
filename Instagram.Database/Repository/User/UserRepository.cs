@@ -7,12 +7,12 @@ using Instagram.Models.User.Request;
 
 namespace Instagram.Database.Repository
 {
-    internal class UserRepository : RepositoryBase<User, UserModel, GetUserRequest>, IUserRepository
+    public class UserRepository : RepositoryBase<User, UserModel, GetUserRequest>, IUserRepository
     {
         public UserRepository(ISqlQueryBuilder sqlQueryBuilder, IConnectionFactory connectionFactory) : base(sqlQueryBuilder, connectionFactory)
         {
             Table = "User";
-            DefaultOrderBy = "[Id]";
+            DefaultOrderBy = "Id";
         }
 
         public Task<User> GetEntityByEmailAsync(string email)

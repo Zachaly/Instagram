@@ -10,7 +10,7 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             List<string> dbNames;
 
-            using(var connection = new SqlConnection(MasterConnection))
+            using(var connection = new SqlConnection(Constants.MasterConnection))
             {
                 dbNames = connection.Query<string>("SELECT name FROM sys.databases").ToList();
             }
