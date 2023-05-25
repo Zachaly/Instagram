@@ -4,5 +4,6 @@
     {
         string Build();
         ISqlBuilderQuery Where<TRequest>(TRequest request);
+        ISqlBuilderQuery OrderBy(string orderBy);
     }
 }

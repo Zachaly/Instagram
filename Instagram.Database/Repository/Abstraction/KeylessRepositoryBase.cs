@@ -1,4 +1,5 @@
-﻿using Instagram.Database.Factory;
+﻿using Dapper;
+using Instagram.Database.Factory;
 using Instagram.Database.Sql;
 using Instagram.Domain.Entity;
 using Instagram.Models;
@@ -14,7 +15,6 @@ namespace Instagram.Database.Repository.Abstraction
         protected string Table { get; set; }
         protected string DefaultOrderBy { get; set; }
 
-
         protected KeylessRepositoryBase(ISqlQueryBuilder sqlQueryBuilder, IConnectionFactory connectionFactory)
         {
             _sqlQueryBuilder = sqlQueryBuilder;
@@ -23,12 +23,46 @@ namespace Instagram.Database.Repository.Abstraction
 
         public Task<IEnumerable<TModel>> GetAsync(TGetRequest request)
         {
-            throw new NotImplementedException();
+            var query = _sqlQueryBuilder
+                .BuildSelect<TModel>(Table)
+                .Where(request)
+                .OrderBy(DefaultOrderBy)
+                .Build();
+
+            return QueryManyAsync<TModel>(query, request);
         }
 
         public Task InsertAsync(TEntity entity)
         {
-            throw new NotImplementedException();
+            var query = _sqlQueryBuilder
+                .BuildInsert(Table, entity)
+                .Build();
+
+            return QueryAsync(query, entity);
+        }
+
+        protected async Task<T> QuerySingleAsync<T>(string query, object param = null)
+        {
+            using(var connection = _connectionFactory.CreateConnection())
+            {
+                return await connection.QuerySingleOrDefaultAsync<T>(query, param);
+            }
+        }
+
+        protected async Task<IEnumerable<T>> QueryManyAsync<T>(string query, object param = null)
+        {
+            using(var connection = _connectionFactory.CreateConnection())
+            {
+                return await connection.QueryAsync<T>(query, param);
+            }
+        }
+
+        protected async Task QueryAsync(string query, object param = null)
+        {
+            using(var connection = _connectionFactory.CreateConnection())
+            {
+                await connection.QueryAsync(query, param);
+            }
         }
     }
 }

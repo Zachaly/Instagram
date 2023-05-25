@@ -12,12 +12,18 @@ namespace Instagram.Database.Repository
         public UserRepository(ISqlQueryBuilder sqlQueryBuilder, IConnectionFactory connectionFactory) : base(sqlQueryBuilder, connectionFactory)
         {
             Table = "User";
-            DefaultOrderBy = "Id";
+            DefaultOrderBy = "[Id]";
         }
 
         public Task<User> GetEntityByEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            var param = new { Email = email };
+            var query = _sqlQueryBuilder
+                .BuildSelect<User>(Table)
+                .Where(param)
+                .Build();
+
+            return QuerySingleAsync<User>(query, param);
         }
     }
 }

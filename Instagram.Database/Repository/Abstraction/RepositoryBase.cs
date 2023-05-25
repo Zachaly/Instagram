@@ -13,19 +13,29 @@ namespace Instagram.Database.Repository.Abstraction
         {
         }
 
-        public Task DeleteByIdAsync(long id)
+        public virtual Task DeleteByIdAsync(long id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TModel> GetByIdAsync(long id)
+        public virtual Task<TModel> GetByIdAsync(long id)
         {
-            throw new NotImplementedException();
+            var param = new { Id = id };
+            var query = _sqlQueryBuilder
+                .BuildSelect<TModel>(Table)
+                .Where(param)
+                .Build();
+
+            return QuerySingleAsync<TModel>(query, param);
         }
 
-        Task<long> IRepositoryBase<TEntity, TModel, TGetRequest>.InsertAsync(TEntity entity)
+        public override Task<long> InsertAsync(TEntity entity)
         {
-            throw new NotImplementedException();
+            var query = _sqlQueryBuilder
+                .BuildInsert(Table, entity)
+                .Build();
+
+            return QuerySingleAsync<long>(query, entity);
         }
     }
 }
