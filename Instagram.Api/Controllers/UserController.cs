@@ -1,0 +1,82 @@
+﻿using Instagram.Api.Infrastructure;
+using Instagram.Application.Abstraction;
+using Instagram.Application.Command;
+using Instagram.Models.Response;
+using Instagram.Models.User;
+using Instagram.Models.User.Request;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Instagram.Api.Controllers
+{
+    [Route("/api/user")]
+    public class UserController : ControllerBase
+    {
+        private readonly IUserService _userService;
+        private readonly IMediator _mediator;
+
+        public UserController(IUserService userService, IMediator mediator)
+        {
+            _userService = userService;
+            _mediator = mediator;
+        }
+
+        /// <summary>
+        /// Returns list of users with data specified in request
+        /// </summary>
+        /// <response code="200">List of users</response>
+        [HttpGet]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<IEnumerable<UserModel>>> GetAsync([FromQuery] GetUserRequest request)
+        {
+            var res = await _userService.GetAsync(request);
+
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Returns user with specified id
+        /// </summary>
+        /// <response code="200">User data</response>
+        /// <response code="404">No user with given id</response>
+        [HttpGet("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<UserModel>> GetByIdAsync(long id)
+        {
+            var res = await _userService.GetByIdAsync(id);
+
+            return ResponseModelExtentions.ReturnOkOrNotFound(res);
+        }
+
+        /// <summary>
+        /// Adds new user to database with data specified in request
+        /// </summary>
+        /// <response code="201">User successfully created</response>
+        /// <response code="400">Invalid user data</response>
+        [HttpPost]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<ResponseModel>> RegisterAsync(RegisterCommand command)
+        {
+            var res = await _mediator.Send(command);
+
+            return res.ReturnCreatedOrBadRequest("/api/user/");
+        }
+
+        /// <summary>
+        /// Authorizes user with data given in request
+        /// </summary>
+        /// <response code="200">Authorization data</response>
+        /// <response code="400">Invalid login data</response>
+        [HttpPost("login")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<DataResponseModel<LoginResponse>>> LoginAsync(LoginCommand command)
+        {
+            var res = await _mediator.Send(command);
+
+            return res.ReturnOkOrBadRequest();
+        }
+    }
+}

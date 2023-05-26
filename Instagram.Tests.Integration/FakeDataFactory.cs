@@ -9,7 +9,7 @@ namespace Instagram.Tests.Integration
         public static List<User> GenerateUsers(int count)
             => new Faker<User>()
                 .RuleFor(u => u.Email, f => f.Internet.Email())
-                .RuleFor(u => u.Nickname, f => f.Random.Word())
+                .RuleFor(u => u.Nickname, f => f.Random.AlphaNumeric(10))
                 .RuleFor(u => u.PasswordHash, _ => "Hash")
                 .RuleFor(u => u.Bio, _ => "")
                 .RuleFor(u => u.Gender, f => f.PickRandom<Gender>())

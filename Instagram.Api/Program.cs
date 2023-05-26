@@ -1,6 +1,8 @@
 using FluentMigrator.Runner;
 using Instagram.Api.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 
+[assembly: ApiController]
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,6 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.RegisterDatabase(builder.Configuration);
+builder.Services.RegisterApplication();
+builder.Services.ConfigureSwagger();
 
 var app = builder.Build().MigrateDatabase();
 

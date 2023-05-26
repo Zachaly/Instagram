@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Instagram.Tests.Integration.ApiTests.Infrastructure;
 using System.Data.SqlClient;
 
 namespace Instagram.Tests.Integration.ApiTests

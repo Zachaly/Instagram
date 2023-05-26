@@ -1,10 +1,9 @@
 ﻿using Dapper;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
-namespace Instagram.Tests.Integration.ApiTests
+namespace Instagram.Tests.Integration.ApiTests.Infrastructure
 {
     public class ApiTest : IDisposable
     {
@@ -30,15 +29,31 @@ namespace Instagram.Tests.Integration.ApiTests
                     });
                 });
             });
-            
+
             _httpClient = webFactory.CreateClient();
+        }
+
+        protected IEnumerable<T> GetFromDatabase<T>(string query, object param = null)
+        {
+            using(var connection = new SqlConnection(Constants.ConnectionString))
+            {
+                return connection.Query<T>(query, param);
+            }
+        }
+
+        protected void ExecuteQuery(string query, object param = null)
+        {
+            using (var connection = new SqlConnection(Constants.ConnectionString))
+            {
+                connection.Query(query, param);
+            }
         }
 
         public void Dispose()
         {
-            using(var connection = new SqlConnection(Constants.ConnectionString))
+            using (var connection = new SqlConnection(Constants.ConnectionString))
             {
-                foreach(var query in _truncateQueries)
+                foreach (var query in _truncateQueries)
                 {
                     connection.Query(query);
                 }
