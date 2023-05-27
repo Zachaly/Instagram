@@ -16,9 +16,9 @@ namespace Instagram.Database.Factory
         }
 
         public IDbConnection CreateConnection()
-            => new SqlConnection(_configuration.GetConnectionString("DatabaseConnection"));
+            => new SqlConnection(_configuration["ConnectionStrings:SqlConnection"]);
 
         public IDbConnection CreateMasterConnection()
-            => new SqlConnection(_configuration.GetConnectionString("MasterConnection"));
+            => new SqlConnection(_configuration["ConnectionStrings:MasterConnection"]);
     }
 }

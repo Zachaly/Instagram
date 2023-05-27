@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Instagram.Tests.Integration.ApiTests.Infrastructure;
 using System.Data.SqlClient;
 
 namespace Instagram.Tests.Integration.ApiTests
@@ -10,7 +11,7 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             List<string> dbNames;
 
-            using(var connection = new SqlConnection(MasterConnection))
+            using(var connection = new SqlConnection(Constants.MasterConnection))
             {
                 dbNames = connection.Query<string>("SELECT name FROM sys.databases").ToList();
             }

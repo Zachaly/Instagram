@@ -1,4 +1,4 @@
-﻿using Instagram.Database.Migration;
+﻿using Instagram.Database.Migrations;
 
 namespace Instagram.Api.Infrastructure
 {
