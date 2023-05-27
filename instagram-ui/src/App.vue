@@ -2,8 +2,9 @@
   <router-view></router-view>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 </script>
 
 <style>
+@import url('../node_modules/spectre.css');
 </style>

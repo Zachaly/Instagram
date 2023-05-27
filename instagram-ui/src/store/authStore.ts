@@ -1,8 +1,25 @@
+import LoginResponse from "@/models/LoginResponse";
 import { defineStore } from "pinia";
-import { ref } from 'vue'
+import { Ref, ref } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
-    const authorized = ref(false)
+    const isAuthorized = ref(false)
+    const authInfo: Ref<LoginResponse> = ref({
+        userId: 0,
+        authToken: '',
+        email: ''
+    })
 
-    return { authorized }
+    const authorize = (response: LoginResponse) => {
+        if (!response.authToken) {
+            isAuthorized.value = false
+        } else {
+            authInfo.value = response
+            isAuthorized.value = true
+        }
+
+        return isAuthorized.value
+    }
+
+    return { isAuthorized, authorize }
 })  
