@@ -28,7 +28,12 @@ namespace Instagram.Database.Repository
 
         public Task UpdateAsync(UpdateUserRequest request)
         {
-            throw new NotImplementedException();
+            var query = _sqlQueryBuilder
+                .BuildUpdate(Table, request)
+                .Where(new { Id = request.Id })
+                .Build();
+
+            return QueryAsync(query, request);
         }
     }
 }
