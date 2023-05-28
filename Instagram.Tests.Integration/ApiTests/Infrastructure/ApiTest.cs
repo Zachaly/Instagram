@@ -1,6 +1,10 @@
 ﻿using Dapper;
+using Instagram.Models.User;
+using Instagram.Models.User.Request;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Instagram.Tests.Integration.ApiTests.Infrastructure
@@ -47,6 +51,30 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
             {
                 connection.Query(query, param);
             }
+        }
+
+        protected async Task Authorize()
+        {
+            var registerRequest = new RegisterRequest
+            {
+                Email = "email@email.com",
+                Gender = 0,
+                Name = "name",
+                Nickname = "nickname",
+                Password = "password",
+            };
+            await _httpClient.PostAsJsonAsync("/api/user", registerRequest);
+
+            var loginRequest = new LoginRequest
+            {
+                Email = registerRequest.Email,
+                Password = registerRequest.Password,
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("/api/user/login", loginRequest);
+            var content = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer", content.AuthToken);
         }
 
         public void Dispose()

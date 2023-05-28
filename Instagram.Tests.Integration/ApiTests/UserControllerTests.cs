@@ -4,6 +4,7 @@ using Instagram.Domain.Entity;
 using Instagram.Domain.Enum;
 using Instagram.Models.Response;
 using Instagram.Models.User;
+using Instagram.Models.User.Request;
 using Instagram.Tests.Integration.ApiTests.Infrastructure;
 using System.Net;
 using System.Net.Http.Json;
@@ -228,6 +229,34 @@ namespace Instagram.Tests.Integration.ApiTests
             var response = await _httpClient.GetAsync($"{Endpoint}/2137");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_Success()
+        {
+            await Authorize();
+
+            foreach (var user in FakeDataFactory.GenerateUsers(5))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
+                ExecuteQuery(query, user);
+            }
+
+            var users = GetFromDatabase<User>("SELECT * FROM [User]");
+            var userToUpdate = users.Last();
+
+            var request = new UpdateUserRequest
+            {
+                Id = userToUpdate.Id,
+                Bio = "new bio",
+            };
+
+            var response = await _httpClient.PatchAsJsonAsync(Endpoint, request);
+
+            var updatedUsers = GetFromDatabase<User>("SELECT * FROM [User]");
+
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            Assert.Contains(updatedUsers, user => user.Id == request.Id && user.Bio == request.Bio);
         }
     }
 }

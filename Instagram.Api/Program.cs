@@ -16,6 +16,8 @@ builder.Services.RegisterDatabase(builder.Configuration);
 builder.Services.RegisterApplication();
 builder.Services.ConfigureSwagger();
 
+builder.ConfigureAuthorization();
+
 var app = builder.Build().MigrateDatabase();
 
 // Configure the HTTP request pipeline.
