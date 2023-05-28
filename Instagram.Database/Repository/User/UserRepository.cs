@@ -25,5 +25,10 @@ namespace Instagram.Database.Repository
 
             return QuerySingleAsync<User>(query, param);
         }
+
+        public Task UpdateAsync(UpdateUserRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

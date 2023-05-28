@@ -56,5 +56,10 @@ namespace Instagram.Database.Sql
 
             return new SqlBuilderQuery(select.ToString(), table);
         }
+
+        public ISqlBuilderQuery BuildUpdate<TRequest>(string table, TRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
