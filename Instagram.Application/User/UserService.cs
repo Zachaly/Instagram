@@ -27,9 +27,18 @@ namespace Instagram.Application
             return _userRepository.GetByIdAsync(id);
         }
 
-        public Task<ResponseModel> UpdateAsync(UpdateUserRequest request)
+        public async Task<ResponseModel> UpdateAsync(UpdateUserRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _userRepository.UpdateAsync(request);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }

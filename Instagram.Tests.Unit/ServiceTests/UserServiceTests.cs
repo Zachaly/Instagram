@@ -77,5 +77,28 @@ namespace Instagram.Tests.Unit.ServiceTests
             Assert.Equal(request.Bio, user.Bio);
         }
 
+        [Fact]
+        public async Task UpdateAsync_ExceptionThrown_Failure()
+        {
+            const string Error = "Error";
+            _userRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateUserRequest>()))
+                .Callback((UpdateUserRequest request) =>
+                {
+                    throw new Exception(Error);
+                });
+
+            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
+                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+
+            var request = new UpdateUserRequest
+            {
+                Bio = "new bio"
+            };
+
+            var res = await _service.UpdateAsync(request);
+
+            Assert.False(res.Success);
+            Assert.Equal(Error, res.Error);
+        }
     }
 }
