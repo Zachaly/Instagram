@@ -1,5 +1,8 @@
 ﻿using Instagram.Application;
+using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
+using Instagram.Domain.Entity;
+using Instagram.Models.Response;
 using Instagram.Models.User;
 using Instagram.Models.User.Request;
 using Moq;
@@ -9,13 +12,14 @@ namespace Instagram.Tests.Unit.ServiceTests
     public class UserServiceTests
     {
         private readonly Mock<IUserRepository> _userRepository;
+        private readonly Mock<IResponseFactory> _responseFactory;
         private readonly UserService _service;
 
         public UserServiceTests()
         {
             _userRepository = new Mock<IUserRepository>();
-
-            _service = new UserService(_userRepository.Object);
+            _responseFactory = new Mock<IResponseFactory>();
+            _service = new UserService(_userRepository.Object, _responseFactory.Object);
         }
 
         [Fact]
@@ -46,6 +50,31 @@ namespace Instagram.Tests.Unit.ServiceTests
             var res = await _service.GetByIdAsync(0);
 
             Assert.Equivalent(user, res);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_Success()
+        {
+            var user = new User { Id = 1, Bio = "Bio" };
+
+            _userRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateUserRequest>()))
+                .Callback((UpdateUserRequest request) =>
+                {
+                    user.Bio = request.Bio;
+                });
+
+            _responseFactory.Setup(x => x.CreateSuccess())
+                .Returns(new ResponseModel { Success = true });
+
+            var request = new UpdateUserRequest
+            {
+                Bio = "new bio"
+            };
+
+            var res = await _service.UpdateAsync(request);
+
+            Assert.True(res.Success);
+            Assert.Equal(request.Bio, user.Bio);
         }
 
     }
