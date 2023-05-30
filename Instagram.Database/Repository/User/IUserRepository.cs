@@ -8,5 +8,6 @@ namespace Instagram.Database.Repository
     public interface IUserRepository : IRepositoryBase<User, UserModel, GetUserRequest>
     {
         Task<User> GetEntityByEmailAsync(string email);
+        Task UpdateAsync(UpdateUserRequest request);
     }
 }

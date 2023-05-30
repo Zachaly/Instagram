@@ -159,5 +159,28 @@ namespace Instagram.Tests.Integration.DatabaseTests
             Assert.Equal(testUser.Gender, res.Gender);
             Assert.Equal(testUser.Bio, res.Bio);
         }
+
+        [Fact]
+        public async Task UpdateAsync_UpdatesCorrectUser()
+        {
+            foreach (var user in FakeDataFactory.GenerateUsers(5))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
+                ExecuteQuery(query, user);
+            }
+
+            var users = GetFromDatabase<User>("SELECT * FROM [User]");
+
+            var userToUpdate = users.First();
+
+            var request = new UpdateUserRequest { Id = userToUpdate.Id, Name = "New name of the user", Bio = "New bio" };
+
+            await _repository.UpdateAsync(request);
+
+            var updatedUsers = GetFromDatabase<User>("SELECT * FROM [User]");
+
+            Assert.Contains(updatedUsers, user => user.Id == request.Id && user.Name == request.Name && user.Bio == request.Bio);
+            Assert.Equal(users.Count(), updatedUsers.Count());
+        }
     }
 }

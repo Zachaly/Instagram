@@ -39,12 +39,22 @@ namespace Instagram.Database.Sql
             var props = typeof(TRequest).GetProperties().Where(prop => prop.GetValue(request) is not null).Select(prop => prop.Name);
 
             int index = 0;
+
+            if (!props.Any())
+            {
+                return this;
+            }
+
+            if (!_where.ToString().Contains("WHERE"))
+            {
+                _where.Append("WHERE ");
+            }
+
             foreach(var prop in props)
             {
                 string where = "";
                 if(index == 0)
                 {
-                    _where.Append("WHERE ");
                     where = $"[{_table}].[{prop}] = @{prop} ";
                 }
                 else

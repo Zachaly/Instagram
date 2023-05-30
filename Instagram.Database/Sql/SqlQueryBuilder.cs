@@ -56,5 +56,36 @@ namespace Instagram.Database.Sql
 
             return new SqlBuilderQuery(select.ToString(), table);
         }
+
+        public ISqlBuilderQuery BuildUpdate<TRequest>(string table, TRequest request)
+        {
+            var update = new StringBuilder($"UPDATE [{table}] /**set**/ /**where**/");
+
+            var props = typeof(TRequest)
+                .GetProperties()
+                .Where(prop => prop.GetValue(request) is not null && prop.Name != "Id")
+                .Select(prop => prop.Name);
+
+            var columns = new StringBuilder("");
+
+            int index = 0;
+            foreach (var prop in props)
+            {
+                var coma = "";
+                if (index != 0)
+                {
+                    coma = ",";
+                } else
+                {
+                    columns.Append("SET ");
+                }
+                columns.Append($"{coma} [{table}].[{prop}]=@{prop}");
+                index++;
+            }
+
+            update.Replace("/**set**/", columns.ToString());
+
+            return new SqlBuilderQuery(update.ToString(), table);
+        }
     }
 }

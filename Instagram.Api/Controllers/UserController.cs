@@ -5,6 +5,7 @@ using Instagram.Models.Response;
 using Instagram.Models.User;
 using Instagram.Models.User.Request;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Instagram.Api.Controllers
@@ -77,6 +78,22 @@ namespace Instagram.Api.Controllers
             var res = await _mediator.Send(command);
 
             return res.ReturnOkOrBadRequest();
+        }
+
+        /// <summary>
+        /// Updates specified user with data given in request
+        /// </summary>
+        /// <response code="204">User updated successfully</response>
+        /// <response code="400">Invalid request data</response>
+        [HttpPatch]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [Authorize]
+        public async Task<ActionResult<ResponseModel>> UpdateAsync(UpdateUserRequest request)
+        {
+            var res = await _userService.UpdateAsync(request);
+
+            return res.ReturnNoContentOrBadRequest();
         }
     }
 }

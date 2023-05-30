@@ -25,5 +25,15 @@ namespace Instagram.Database.Repository
 
             return QuerySingleAsync<User>(query, param);
         }
+
+        public Task UpdateAsync(UpdateUserRequest request)
+        {
+            var query = _sqlQueryBuilder
+                .BuildUpdate(Table, request)
+                .Where(new { Id = request.Id })
+                .Build();
+
+            return QueryAsync(query, request);
+        }
     }
 }

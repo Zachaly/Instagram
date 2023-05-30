@@ -1,23 +1,19 @@
 <template>
-    <div class="container">
-        <div class="columns">
-            <div class="column col-4 col-mx-auto col-my-auto">
-                <div>
-                    <h2>Login</h2>
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input class="form-input" v-model="request.email" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input class="form-input" type="password" v-model="request.password" />
-                    </div>
-                    <button class="btn btn-success" @click="login">Login</button>
-                    <div>
-                        <h5>Do not have an account? <router-link to="/register" class="btn btn-link">Register</router-link>
-                        </h5>
-                    </div>
-                </div>
+    <div class="columns is-centered">
+        <div class="column is-4">
+            <h2 class="title">Login</h2>
+            <div class="control">
+                <label class="label">Email</label>
+                <input class="input" v-model="request.email" />
+            </div>
+            <div class="control">
+                <label class="label">Password</label>
+                <input class="input" type="password" v-model="request.password" />
+            </div>
+            <button class="button is-success" @click="login">Login</button>
+            <div class="control">
+                <h5>Do not have an account?</h5>
+                <router-link to="/register" class="button is-link">Register</router-link>
             </div>
         </div>
     </div>
