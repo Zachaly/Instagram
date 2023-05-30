@@ -6,5 +6,6 @@
 </script>
 
 <style>
-@import url('../node_modules/spectre.css');
+@import url('../node_modules/bulma/css/bulma.css');
+@import url('../node_modules/bulmaswatch/cyborg/bulmaswatch.min.css');
 </style>
