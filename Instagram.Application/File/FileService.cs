@@ -15,19 +15,48 @@ namespace Instagram.Application
             _defaultFileName = configuration["File:Default"]!;
         }
 
+        private FileStream ReadFile(string path, string name)
+            => File.OpenRead(Path.Join(path, name));
+
         public Task<FileStream> GetProfilePictureAsync(string fileName)
         {
-            throw new NotImplementedException();
+            if(string.IsNullOrWhiteSpace(fileName))
+            {
+                return Task.FromResult(ReadFile(_profilePicturePath, _defaultFileName));
+            }
+
+            return Task.FromResult(ReadFile(_profilePicturePath, fileName));
         }
 
         public Task RemoveProfilePictureAsync(string fileName)
         {
-            throw new NotImplementedException();
+            if(string.IsNullOrWhiteSpace(fileName) || fileName == _defaultFileName) 
+            {
+                return Task.CompletedTask;
+            }
+
+            File.Delete(Path.Join(_profilePicturePath, fileName));
+
+            return Task.CompletedTask;
         }
 
-        public Task<string> SaveProfilePictureAsync(IFormFile file)
+        public async Task<string> SaveProfilePictureAsync(IFormFile file)
         {
-            throw new NotImplementedException();
+            if(file is null)
+            {
+                return _defaultFileName;
+            }
+
+            var newName = $"{Guid.NewGuid()}.png";
+
+            var path = Path.Combine(_profilePicturePath, newName);
+
+            using(var stream = File.Create(path))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return newName;
         }
     }
 }
