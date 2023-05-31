@@ -15,17 +15,17 @@ namespace Instagram.Application
             _defaultFileName = configuration["File:Default"]!;
         }
 
-        public Task<FileStream> GetProfilePicture(string fileName)
+        public Task<FileStream> GetProfilePictureAsync(string fileName)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveProfilePicture(string fileName)
+        public Task RemoveProfilePictureAsync(string fileName)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> SaveProfilePicture(IFormFile file)
+        public Task<string> SaveProfilePictureAsync(IFormFile file)
         {
             throw new NotImplementedException();
         }

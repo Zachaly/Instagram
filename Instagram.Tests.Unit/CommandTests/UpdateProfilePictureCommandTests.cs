@@ -31,7 +31,7 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string NewFileName = "file";
 
-            _fileService.Setup(x => x.SaveProfilePicture(It.IsAny<IFormFile>())).ReturnsAsync(NewFileName);
+            _fileService.Setup(x => x.SaveProfilePictureAsync(It.IsAny<IFormFile>())).ReturnsAsync(NewFileName);
 
             var user = new User { ProfilePicture = null };
 
@@ -61,8 +61,8 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string NewFileName = "file";
 
-            _fileService.Setup(x => x.RemoveProfilePicture(It.IsAny<string>()));
-            _fileService.Setup(x => x.SaveProfilePicture(It.IsAny<IFormFile>())).ReturnsAsync(NewFileName);
+            _fileService.Setup(x => x.RemoveProfilePictureAsync(It.IsAny<string>()));
+            _fileService.Setup(x => x.SaveProfilePictureAsync(It.IsAny<IFormFile>())).ReturnsAsync(NewFileName);
 
             var user = new User { ProfilePicture = "prof" };
 
@@ -109,7 +109,7 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "error";
 
-            _fileService.Setup(x => x.RemoveProfilePicture(It.IsAny<string>()))
+            _fileService.Setup(x => x.RemoveProfilePictureAsync(It.IsAny<string>()))
                 .Callback(() => throw new Exception(Error));
 
             var user = new User { ProfilePicture = "prof" };
