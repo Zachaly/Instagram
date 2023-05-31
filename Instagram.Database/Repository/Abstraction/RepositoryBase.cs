@@ -35,6 +35,17 @@ namespace Instagram.Database.Repository.Abstraction
             return QuerySingleAsync<TModel>(query, param);
         }
 
+        public Task<TEntity> GetEntityByIdAsync(long id)
+        {
+            var param = new { Id = id };
+            var query = _sqlQueryBuilder
+                .BuildSelect<TEntity>(Table)
+                .Where(param)
+                .Build();
+
+            return QuerySingleAsync<TEntity>(query, param);
+        }
+
         public override Task<long> InsertAsync(TEntity entity)
         {
             var query = _sqlQueryBuilder

@@ -10,5 +10,6 @@ namespace Instagram.Database.Repository.Abstraction
         new Task<long> InsertAsync(TEntity entity);
         Task<TModel> GetByIdAsync(long id);
         Task DeleteByIdAsync(long id);
+        Task<TEntity> GetEntityByIdAsync(long id);
     }
 }
