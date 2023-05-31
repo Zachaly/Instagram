@@ -11,5 +11,6 @@ namespace Instagram.Domain.Entity
         public string Bio { get; set; }
         public string PasswordHash { get; set; }
         public Gender Gender { get; set; }
+        public string? ProfilePicture { get; set; }
     }
 }
