@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Instagram.Application\Instagram.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\image\profile\" />
+  </ItemGroup>
+
 </Project>

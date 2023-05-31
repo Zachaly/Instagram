@@ -47,6 +47,8 @@ namespace Instagram.Application
                 return _defaultFileName;
             }
 
+            Directory.CreateDirectory(_profilePicturePath);
+
             var newName = $"{Guid.NewGuid()}.png";
 
             var path = Path.Combine(_profilePicturePath, newName);
