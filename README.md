@@ -15,7 +15,7 @@
    - Pinia
    - Vue Router
    - Axios
-   - Spectre.css
+   - Bulma
  # Database
  Application uses Sql Server. <br>
  Migrations are applied on API startup and database is also created if it does not exist, so you only have to change connection strings in `appsettings.json`
