@@ -2,6 +2,11 @@
     <div class="card">
         <div class="card-content">
             <div class="media">
+                <div class="media-left">
+                    <figure class="image is-64x64">
+                        <img :src="`${API_URL}/image/profile/${user.id}`" alt="" class="is-rounded">
+                    </figure>
+                </div>
                 <div class="media-content">
                     <p class="title">{{ user.nickname }}</p>
                     <p class="subtitle"> {{ user.name }}</p>
@@ -20,6 +25,7 @@
 <script setup lang="ts">
 import UserModel from '@/models/UserModel';
 import { useAuthStore } from '@/store/authStore';
+import { API_URL } from '@/constants';
 
 const props = defineProps<{
     user: UserModel

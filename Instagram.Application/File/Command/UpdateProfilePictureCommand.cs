@@ -11,7 +11,7 @@ namespace Instagram.Application.Command
     public class UpdateProfilePictureCommand : IRequest<ResponseModel>
     {
         public long UserId { get; set; }
-        public IFormFile File { get; set; }
+        public IFormFile? File { get; set; }
     }
 
     public class UpdateProfilePictureHandler : IRequestHandler<UpdateProfilePictureCommand, ResponseModel>

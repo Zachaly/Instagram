@@ -24,7 +24,7 @@ namespace Instagram.Application.Command
         {
             var user = await _userRepository.GetEntityByIdAsync(request.UserId);
 
-            return await _fileService.GetProfilePictureAsync(user.ProfilePicture ?? "");
+            return await _fileService.GetProfilePictureAsync(user?.ProfilePicture ?? "");
         }
     }
 }

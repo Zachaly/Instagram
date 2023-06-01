@@ -14,7 +14,7 @@ namespace Instagram.Database.Migrations
         {
             Alter.Table("User")
                 .AddColumn("ProfilePicture")
-                .AsAnsiString(40) // GUID string length
+                .AsAnsiString(40) // GUID string length + extension
                 .Nullable();
         }
     }
