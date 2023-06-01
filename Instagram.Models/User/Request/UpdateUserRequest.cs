@@ -9,5 +9,6 @@ namespace Instagram.Models.User.Request
         public string? Nickname { get; set; }
         public string? Bio { get; set; }
         public Gender? Gender { get; set; }
+        public string? ProfilePicture { get; set; }
     }
 }
