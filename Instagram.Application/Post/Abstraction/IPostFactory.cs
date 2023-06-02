@@ -5,6 +5,6 @@ namespace Instagram.Application.Abstraction
 {
     public interface IPostFactory
     {
-        Post Create(AddPostRequest reqeuest, string fileName);
+        Post Create(AddPostRequest request, string fileName);
     }
 }

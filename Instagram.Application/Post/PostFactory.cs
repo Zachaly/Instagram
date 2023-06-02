@@ -6,7 +6,7 @@ namespace Instagram.Application
 {
     public class PostFactory : IPostFactory
     {
-        public Post Create(AddPostRequest reqeuest, string fileName)
+        public Post Create(AddPostRequest request, string fileName)
         {
             throw new NotImplementedException();
         }
