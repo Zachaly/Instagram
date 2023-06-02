@@ -8,6 +8,7 @@ namespace Instagram.Database.Repository.Abstraction
     public abstract class RepositoryBase<TEntity, TModel, TGetRequest> : KeylessRepositoryBase<TEntity, TModel, TGetRequest>, IRepositoryBase<TEntity, TModel, TGetRequest>
         where TEntity : IEntity
         where TModel : IModel
+        where TGetRequest : PagedRequest
     {
         protected RepositoryBase(ISqlQueryBuilder sqlQueryBuilder, IConnectionFactory connectionFactory) : base(sqlQueryBuilder, connectionFactory)
         {

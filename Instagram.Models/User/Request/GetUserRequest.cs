@@ -2,7 +2,7 @@
 
 namespace Instagram.Models.User.Request
 {
-    public class GetUserRequest
+    public class GetUserRequest : PagedRequest
     {
         public long? Id { get; set; }
         public string? Email { get; set; }

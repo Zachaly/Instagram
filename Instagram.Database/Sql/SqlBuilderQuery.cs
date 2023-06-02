@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Instagram.Models;
+using System.Text;
 
 namespace Instagram.Database.Sql
 {
@@ -65,6 +66,11 @@ namespace Instagram.Database.Sql
                 index++;
             }
             return this;
+        }
+
+        public ISqlBuilderQuery WithPagination(PagedRequest request)
+        {
+            throw new NotImplementedException();
         }
     }
 }
