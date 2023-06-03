@@ -16,7 +16,8 @@ namespace Instagram.Database.Migrations
                 .WithColumn("Id").AsInt64().Identity().PrimaryKey()
                 .WithColumn("Content").AsString(200).NotNullable()
                 .WithColumn("CreatorId").AsInt64().NotNullable()
-                .WithColumn("FileName").AsAnsiString(40).NotNullable();
+                .WithColumn("FileName").AsAnsiString(40).NotNullable()
+                .WithColumn("Created").AsInt64().NotNullable();
         }
     }
 }

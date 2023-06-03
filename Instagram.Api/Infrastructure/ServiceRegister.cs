@@ -21,6 +21,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<ISqlQueryBuilder, SqlQueryBuilder>();
 
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IPostRepository, PostRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -36,10 +37,12 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IPostService, PostService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
-                
+            services.AddScoped<IPostFactory, PostFactory>();
+
             services.AddMediatR(opt =>
             {
                 opt.RegisterServicesFromAssemblyContaining<LoginCommand>();

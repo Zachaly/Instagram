@@ -14,6 +14,14 @@ namespace Instagram.Tests.Integration
                 .RuleFor(u => u.Bio, _ => "")
                 .RuleFor(u => u.Gender, f => f.PickRandom<Gender>())
                 .RuleFor(u => u.Name, f => f.Name.FullName())
-                .Generate(count); 
+                .Generate(count);
+
+        public static List<Post> GeneratePosts(int count, long userId)
+            => new Faker<Post>()
+                .RuleFor(p => p.CreatorId, _ => userId)
+                .RuleFor(p => p.Content, f => f.Random.AlphaNumeric(30))
+                .RuleFor(p => p.Created, f => f.Random.Long(0, DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
+                .RuleFor(p => p.FileName, f => f.Random.AlphaNumeric(30))
+                .Generate(count);
     }
 }

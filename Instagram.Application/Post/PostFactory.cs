@@ -7,8 +7,12 @@ namespace Instagram.Application
     public class PostFactory : IPostFactory
     {
         public Post Create(AddPostRequest request, string fileName)
+        => new Post
         {
-            throw new NotImplementedException();
-        }
+            FileName = fileName,
+            Content = request.Content,
+            CreatorId = request.CreatorId,
+            Created = DateTimeOffset.Now.ToUnixTimeSeconds()
+        };
     }
 }

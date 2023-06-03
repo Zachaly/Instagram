@@ -16,12 +16,12 @@ namespace Instagram.Application
 
         public Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request)
         {
-            throw new NotImplementedException();
+            return _postRepository.GetAsync(request);
         }
 
         public Task<PostModel> GetByIdAsync(long id)
         {
-            throw new NotImplementedException();
+            return _postRepository.GetByIdAsync(id);
         }
     }
 }

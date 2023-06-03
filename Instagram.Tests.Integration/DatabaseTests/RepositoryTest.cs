@@ -10,7 +10,8 @@ namespace Instagram.Tests.Integration.DatabaseTests
         protected readonly IConnectionFactory _connectionFactory;
         private readonly string[] _truncateQueries =
         {
-            "TRUNCATE TABLE [User]"
+            "TRUNCATE TABLE [User]",
+            "TRUNCATE TABLE [Post]"
         };
 
         public RepositoryTest()

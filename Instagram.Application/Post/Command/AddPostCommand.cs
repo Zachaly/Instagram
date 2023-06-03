@@ -28,9 +28,27 @@ namespace Instagram.Application.Command
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> Handle(AddPostCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseModel> Handle(AddPostCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if(request.File is null)
+                {
+                    return _responseFactory.CreateFailure("No image to upload");
+                }
+
+                var fileName = await _fileService.SavePostImageAsync(request.File);
+
+                var post = _postFactory.Create(request, fileName);
+
+                await _postRepository.InsertAsync(post);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }

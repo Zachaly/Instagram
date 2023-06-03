@@ -1,4 +1,6 @@
 ﻿using Instagram.Domain.Entity;
+using Instagram.Domain.SqlAttribute;
+using System.Reflection;
 using System.Text;
 
 namespace Instagram.Database.Sql
@@ -34,9 +36,9 @@ namespace Instagram.Database.Sql
 
         public ISqlBuilderQuery BuildSelect<T>(string table)
         {
-            var select = new StringBuilder($"SELECT /**select**/ FROM [{table}] /**where**/ /**orderby**/");
+            var select = new StringBuilder($"SELECT /**select**/ FROM [{table}] /**join**/ /**where**/ /**orderby**/ /**pagination**/");
 
-            var props = typeof(T).GetProperties().Select(prop => prop.Name);
+            var props = typeof(T).GetProperties();
 
             var selectedValues = new StringBuilder("");
 
@@ -44,16 +46,31 @@ namespace Instagram.Database.Sql
             foreach(var prop in props)
             {
                 var coma = "";
+                var name = $"[{table}].[{prop.Name}]";
                 if(index != 0)
                 {
                     coma = ",";
                 }
-                selectedValues.Append($"{coma} [{table}].[{prop}]");
+                var sqlName = prop.GetCustomAttribute<SqlNameAttribute>();
+                if(sqlName is not null)
+                {
+                    name = $"{sqlName.Name} as {prop.Name}";
+                }
+                selectedValues.Append($"{coma} {name}");
                 index++;
             }
 
-            select.Replace("/**select**/", selectedValues.ToString());
+            var joins = typeof(T).GetCustomAttributes<JoinAttribute>();
 
+            var joinBuilder = new StringBuilder("");
+
+            foreach(var join in joins)
+            {
+                joinBuilder.Append($"INNER JOIN {join.Table} ON {join.Condition}");    
+            }
+
+            select.Replace("/**select**/", selectedValues.ToString());
+            select.Replace("/**join**/", joinBuilder.ToString());
             return new SqlBuilderQuery(select.ToString(), table);
         }
 

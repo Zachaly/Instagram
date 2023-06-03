@@ -63,19 +63,30 @@ namespace Instagram.Application
             return newName;
         }
 
-        public Task<string> SavePostImageAsync(IFormFile file)
+        public async Task<string> SavePostImageAsync(IFormFile file)
         {
-            throw new NotImplementedException();
+            Directory.CreateDirectory(_profilePicturePath);
+
+            var newName = $"{Guid.NewGuid()}.png";
+
+            var path = Path.Combine(_profilePicturePath, newName);
+
+            using (var stream = File.Create(path))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return newName;
         }
 
         public Task RemovePostImageAsync(string fileName)
         {
-            throw new NotImplementedException();
+            File.Delete(Path.Join(_profilePicturePath, fileName));
+
+            return Task.CompletedTask;
         }
 
         public Task<FileStream> GetPostImageAsync(string fileName)
-        {
-            throw new NotImplementedException();
-        }
+            => Task.FromResult(ReadFile(_postImagePath, fileName));
     }
 }
