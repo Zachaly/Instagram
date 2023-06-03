@@ -45,5 +45,18 @@ namespace Instagram.Api.Controllers
 
             return res.ReturnNoContentOrBadRequest();
         }
+
+        /// <summary>
+        /// Returns image of post with specified id
+        /// </summary>
+        /// <response code="200">Post image</response>
+        [HttpGet("post/{id}")]
+        [ProducesResponseType(200)]
+        public async Task<FileStreamResult> GetPostImageAsync(long id)
+        {
+            var res = await _mediator.Send(new GetPostImageQuery { Id = id });
+
+            return new FileStreamResult(res, "image/png");
+        }
     }
 }

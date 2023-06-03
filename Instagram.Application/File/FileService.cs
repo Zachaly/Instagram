@@ -65,11 +65,11 @@ namespace Instagram.Application
 
         public async Task<string> SavePostImageAsync(IFormFile file)
         {
-            Directory.CreateDirectory(_profilePicturePath);
+            Directory.CreateDirectory(_postImagePath);
 
             var newName = $"{Guid.NewGuid()}.png";
 
-            var path = Path.Combine(_profilePicturePath, newName);
+            var path = Path.Combine(_postImagePath, newName);
 
             using (var stream = File.Create(path))
             {
@@ -81,7 +81,7 @@ namespace Instagram.Application
 
         public Task RemovePostImageAsync(string fileName)
         {
-            File.Delete(Path.Join(_profilePicturePath, fileName));
+            File.Delete(Path.Join(_postImagePath, fileName));
 
             return Task.CompletedTask;
         }

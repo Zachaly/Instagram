@@ -19,9 +19,11 @@ namespace Instagram.Application.Command
             _postRepository = postRepository;
             _fileService = fileService;
         }
-        public Task<FileStream> Handle(GetPostImageQuery request, CancellationToken cancellationToken)
+        public async Task<FileStream> Handle(GetPostImageQuery request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var post = await _postRepository.GetEntityByIdAsync(request.Id);
+
+            return await _fileService.GetPostImageAsync(post?.FileName ?? "");
         }
     }
 }
