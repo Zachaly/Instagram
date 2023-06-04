@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Instagram.Models;
+using System.Text;
 
 namespace Instagram.Database.Sql
 {
@@ -8,6 +9,7 @@ namespace Instagram.Database.Sql
         private readonly string _table;
         private readonly StringBuilder _where = new StringBuilder("");
         private readonly StringBuilder _orderBy = new StringBuilder("");
+        private string _pagination = "";
 
         public SqlBuilderQuery(string template, string table)
         {
@@ -20,6 +22,7 @@ namespace Instagram.Database.Sql
             return _template
                 .Replace("/**where**/", _where.ToString())
                 .Replace("/**orderby**/", _orderBy.ToString())
+                .Replace("/**pagination**/", _pagination)
                 .ToString();
         }
 
@@ -27,16 +30,18 @@ namespace Instagram.Database.Sql
         {
             if(_orderBy.ToString() == "")
             {
-                _orderBy.Append("ORDER BY");
+                _orderBy.Append("ORDER BY ");
             }
-            _orderBy.Append($" [{_table}].[{orderBy}]");
+            _orderBy.Append(orderBy);
 
             return this;
         }
 
         public ISqlBuilderQuery Where<TRequest>(TRequest request)
         {
-            var props = typeof(TRequest).GetProperties().Where(prop => prop.GetValue(request) is not null).Select(prop => prop.Name);
+            var props = typeof(TRequest).GetProperties()
+                .Where(prop => prop.Name != "PageIndex" && prop.Name != "PageSize" && prop.Name != "SkipPagination")
+                .Where(prop => prop.GetValue(request) is not null).Select(prop => prop.Name);
 
             int index = 0;
 
@@ -64,6 +69,21 @@ namespace Instagram.Database.Sql
                 _where.Append(where);
                 index++;
             }
+            return this;
+        }
+
+        public ISqlBuilderQuery WithPagination(PagedRequest request)
+        {
+            if (request.SkipPagination.GetValueOrDefault())
+            {
+                return this;
+            }
+
+            var index = request.PageIndex ?? 0;
+            var pageSize = request.PageSize ?? 10;
+
+            _pagination = $"OFFSET {index * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
+
             return this;
         }
     }

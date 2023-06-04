@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\image\post\" />
     <Folder Include="wwwroot\image\profile\" />
   </ItemGroup>
 

@@ -15,7 +15,8 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
         protected const string DatabaseName = "InstagramTest";
         private readonly string[] _truncateQueries =
         {
-            "TRUNCATE TABLE [User]"
+            "TRUNCATE TABLE [User]",
+            "TRUNCATE TABLE [Post]"
         };
 
 

@@ -5,6 +5,8 @@ import RegisterPage from './pages/RegisterPage.vue'
 import LoginPage from './pages/LoginPage.vue'
 import ProfilePage from "./pages/ProfilePage.vue";
 import UpdateProfilePage from "./pages/UpdateProfilePage.vue";
+import AddPostPage from './pages/AddPostPage.vue'
+import PostPage from "./pages/PostPage.vue";
 
 const createRoute = (path: string, name: string, component: Component) => ({ path, name, component })
 
@@ -13,7 +15,9 @@ const routes = [
     createRoute('/login', 'login', LoginPage),
     createRoute('/register', 'register', RegisterPage),
     createRoute('/user/:id', 'user', ProfilePage),
-    createRoute('/user/update', 'user-update', UpdateProfilePage)
+    createRoute('/user/update', 'user-update', UpdateProfilePage),
+    createRoute('/add-post', 'add-post', AddPostPage),
+    createRoute('/post/:id', 'post', PostPage)
 ]
 export default createRouter({
     routes,

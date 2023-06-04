@@ -6,13 +6,15 @@ namespace Instagram.Application
 {
     public class FileService : IFileService
     {
-        private string _profilePicturePath;
-        private string _defaultFileName;
+        private readonly string _profilePicturePath;
+        private readonly string _defaultFileName;
+        private readonly string _postImagePath;
 
         public FileService(IConfiguration configuration)
         {
             _profilePicturePath = configuration["File:ProfilePicture"]!;
             _defaultFileName = configuration["File:Default"]!;
+            _postImagePath = configuration["File:Post"]!;
         }
 
         private FileStream ReadFile(string path, string name)
@@ -60,5 +62,31 @@ namespace Instagram.Application
 
             return newName;
         }
+
+        public async Task<string> SavePostImageAsync(IFormFile file)
+        {
+            Directory.CreateDirectory(_postImagePath);
+
+            var newName = $"{Guid.NewGuid()}.png";
+
+            var path = Path.Combine(_postImagePath, newName);
+
+            using (var stream = File.Create(path))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return newName;
+        }
+
+        public Task RemovePostImageAsync(string fileName)
+        {
+            File.Delete(Path.Join(_postImagePath, fileName));
+
+            return Task.CompletedTask;
+        }
+
+        public Task<FileStream> GetPostImageAsync(string fileName)
+            => Task.FromResult(ReadFile(_postImagePath, fileName));
     }
 }

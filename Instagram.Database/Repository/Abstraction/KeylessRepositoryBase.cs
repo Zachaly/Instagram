@@ -9,6 +9,7 @@ namespace Instagram.Database.Repository.Abstraction
     public abstract class KeylessRepositoryBase<TEntity, TModel, TGetRequest> : IKeylessRepositoryBase<TEntity, TModel, TGetRequest>
         where TEntity : IEntity
         where TModel : IModel
+        where TGetRequest : PagedRequest
     {
         protected readonly ISqlQueryBuilder _sqlQueryBuilder;
         protected readonly IConnectionFactory _connectionFactory;
@@ -27,6 +28,7 @@ namespace Instagram.Database.Repository.Abstraction
                 .BuildSelect<TModel>(Table)
                 .Where(request)
                 .OrderBy(DefaultOrderBy)
+                .WithPagination(request)
                 .Build();
 
             return QueryManyAsync<TModel>(query, request);

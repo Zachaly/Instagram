@@ -182,5 +182,51 @@ namespace Instagram.Tests.Integration.DatabaseTests
             Assert.Contains(updatedUsers, user => user.Id == request.Id && user.Name == request.Name && user.Bio == request.Bio);
             Assert.Equal(users.Count(), updatedUsers.Count());
         }
+
+        [Fact]
+        public async Task GetAsync_PaginationApplied_ReturnsCorrectUsers()
+        {
+            foreach (var user in FakeDataFactory.GenerateUsers(10))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
+                ExecuteQuery(query, user);
+            }
+
+            var userIds = GetFromDatabase<long>("SELECT Id FROM [User] ORDER BY Id");
+
+            var request = new GetUserRequest
+            {
+                PageIndex = 1,
+                PageSize = 5
+            };
+
+            var res = await _repository.GetAsync(request);
+
+            Assert.Equivalent(userIds.Skip(5).Take(5), res.Select(x => x.Id));
+        }
+
+        [Fact]
+        public async Task GetAsync_WithSkipPagination_ReturnsAllUsers()
+        {
+            foreach (var user in FakeDataFactory.GenerateUsers(10))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
+                ExecuteQuery(query, user);
+            }
+
+            var userIds = GetFromDatabase<long>("SELECT Id FROM [User] ORDER BY Id");
+
+            var request = new GetUserRequest
+            {
+                PageIndex = 1,
+                PageSize = 5,
+                SkipPagination = true
+            };
+
+            var res = await _repository.GetAsync(request);
+
+            Assert.Equivalent(userIds, res.Select(x => x.Id));
+            Assert.Equal(userIds.Count(), res.Count());
+        }
     }
 }
