@@ -12,7 +12,7 @@ namespace Instagram.Database.Repository
         public PostRepository(ISqlQueryBuilder sqlQueryBuilder, IConnectionFactory connectionFactory) : base(sqlQueryBuilder, connectionFactory)
         {
             Table = "Post";
-            DefaultOrderBy = "Created";
+            DefaultOrderBy = "[Post].[Created] DESC";
         }
     }
 }

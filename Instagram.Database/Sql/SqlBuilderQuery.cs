@@ -30,9 +30,9 @@ namespace Instagram.Database.Sql
         {
             if(_orderBy.ToString() == "")
             {
-                _orderBy.Append("ORDER BY");
+                _orderBy.Append("ORDER BY ");
             }
-            _orderBy.Append($" [{_table}].[{orderBy}]");
+            _orderBy.Append(orderBy);
 
             return this;
         }

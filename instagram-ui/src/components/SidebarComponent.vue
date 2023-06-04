@@ -10,6 +10,11 @@
                     active-class="is-active">Profile</router-link>
             </li>
             <li>
+                <router-link to="/add-post">
+                    Add post
+                </router-link>
+            </li>
+            <li>
                 <a class="button is-danger" @click="logout">Logout</a>
             </li>
         </ul>

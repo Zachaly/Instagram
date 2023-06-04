@@ -1,9 +1,12 @@
 <template>
     <NavigationPage>
         <div class="columns is-centered">
-            <div class="column is-4">
+            <div class="column is-6">
                 <UserCardComponent :user="user" />
                 <p class="title">Posts</p>
+                <div class="is-flex is-flex-wrap-wrap">
+                    <PostListItemComponent v-for="post of posts" :key="post.id" :post="post"/>
+                </div>
             </div>
         </div>
         
@@ -11,12 +14,15 @@
 </template>
 
 <script setup lang="ts">
+import PostListItemComponent from '@/components/PostListItemComponent.vue';
 import NavigationPage from './NavigationPage.vue';
 import UserCardComponent from '@/components/UserCardComponent.vue';
+import PostModel from '@/models/PostModel';
 import UserModel from '@/models/UserModel';
 import Gender from '@/models/enum/Gender';
+import GetPostRequest from '@/models/request/GetPostRequest';
 import axios from 'axios';
-import { onMounted, reactive } from 'vue';
+import { Ref, onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router'
 
 const params = useRoute().params
@@ -28,9 +34,19 @@ const user: UserModel = reactive({
     gender: Gender.NotSpecified,
 })
 
+const posts: Ref<PostModel[]> = ref([])
+
 onMounted(() => {
     axios.get<UserModel>('/user/' + params.id).then(res => {
         Object.assign(user, res.data)
+    })
+
+    const getPostsRequest: GetPostRequest = {
+        CreatorId: parseInt(params.id as string)
+    }
+
+    axios.get<PostModel[]>('post', { params: getPostsRequest }).then(res => {
+        posts.value = res.data
     })
 })
 

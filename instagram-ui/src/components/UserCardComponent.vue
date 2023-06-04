@@ -4,7 +4,7 @@
             <div class="media">
                 <div class="media-left">
                     <figure class="image is-64x64">
-                        <img :src="`${API_URL}/image/profile/${user.id}`" alt="" class="is-rounded">
+                        <img :src="$image('profile', user.id)" alt="" class="is-rounded">
                     </figure>
                 </div>
                 <div class="media-content">
