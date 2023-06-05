@@ -7,9 +7,7 @@
                 </div>
                 <div class="column is-2">
                     <div v-for="user of users" :key="user.id">
-                        <router-link :to="{ name: 'user', params: { id: user.id } }">
-                            {{ user.nickname }}
-                        </router-link>
+                        <UserLinkComponent :nick-name="user.nickname" :id="user.id"/>
                     </div>
                 </div>
             </div>
@@ -25,6 +23,7 @@ import axios from 'axios';
 import { Ref, onMounted, ref } from 'vue';
 import PostModel from '@/models/PostModel';
 import PostCardComponent from '@/components/PostCardComponent.vue';
+import UserLinkComponent from '@/components/UserLinkComponent.vue';
 
 const users: Ref<UserModel[]> = ref([])
 const posts: Ref<PostModel[]> = ref([])
