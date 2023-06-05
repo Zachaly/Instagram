@@ -25,7 +25,6 @@
 <script setup lang="ts">
 import UserModel from '@/models/UserModel';
 import { useAuthStore } from '@/store/authStore';
-import { API_URL } from '@/constants';
 
 const props = defineProps<{
     user: UserModel

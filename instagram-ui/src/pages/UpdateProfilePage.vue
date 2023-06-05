@@ -33,13 +33,13 @@
                         </button>
                     </div>
 
-                    <div class="control">
+                    <div style="width: fit-content;">
                         <div class="file is-boxed">
                             <label class="file-label">
                                 <input type="file" @change="setFile" class="file-input">
                                 <span class="file-cta">
                                     <span class="file-icon">
-                                        <i class="fas fa-upload"></i>
+                                        <font-awesome-icon icon="fa-solid fa-image"/>
                                     </span>
                                     <span class="file-label">
                                         Select a new profile picture
@@ -47,7 +47,7 @@
                                 </span>
                             </label>
                         </div>
-                        <button class="button is-info" @click="sendProfilePicture">Update profile picture</button>
+                        <button class="button is-info" style="width: 100%;" @click="sendProfilePicture">Update profile picture</button>
                     </div>
 
                 </div>
