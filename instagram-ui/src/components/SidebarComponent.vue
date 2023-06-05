@@ -10,7 +10,7 @@
                     active-class="is-active">Profile</router-link>
             </li>
             <li>
-                <router-link to="/add-post">
+                <router-link to="/add-post" active-class="is-active">
                     Add post
                 </router-link>
             </li>
