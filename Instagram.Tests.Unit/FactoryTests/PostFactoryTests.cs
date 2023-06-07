@@ -20,13 +20,25 @@ namespace Instagram.Tests.Unit.FactoryTests
                 Content = "con",
                 CreatorId = 1
             };
-            const string FileName = "file";
 
             var post = _factory.Create(request);
 
             Assert.Equal(request.Content, post.Content);
             Assert.Equal(request.CreatorId, post.CreatorId);
             Assert.InRange(post.Created, DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 50, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 50);
+        }
+
+        [Fact]
+        public void CreateImages_CreatesValidEntities()
+        {
+            var files = new string[] { "file1", "file2" };
+            const long PostId = 1;
+
+            var images = _factory.CreateImages(files, PostId);
+
+            Assert.All(images, image => Assert.Equal(PostId, image.PostId));
+            Assert.Equivalent(files, images.Select(x => x.File));
+
         }
     }
 }

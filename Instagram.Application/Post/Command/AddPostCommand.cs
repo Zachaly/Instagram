@@ -18,14 +18,17 @@ namespace Instagram.Application.Command
         private readonly IPostRepository _postRepository;
         private readonly IFileService _fileService;
         private readonly IResponseFactory _responseFactory;
+        private readonly IPostImageRepository _postImageRepository;
 
         public AddPostHandler(IPostFactory postFactory, IPostRepository postRepository,
-            IFileService fileService, IResponseFactory responseFactory)
+            IFileService fileService, IResponseFactory responseFactory,
+            IPostImageRepository postImageRepository)
         {
             _postFactory = postFactory;
             _postRepository = postRepository;
             _fileService = fileService;
             _responseFactory = responseFactory;
+            _postImageRepository = postImageRepository;
         }
 
         public async Task<ResponseModel> Handle(AddPostCommand request, CancellationToken cancellationToken)
