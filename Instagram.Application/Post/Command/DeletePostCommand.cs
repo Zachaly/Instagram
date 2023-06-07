@@ -39,7 +39,7 @@ namespace Instagram.Application.Command
                     return _responseFactory.CreateFailure("Post not found!");
                 }
 
-                var images = await _postImageRepository.GetAsync(new GetPostImageRequest { PostId = request.Id, SkipPagination = true });
+                var images = (await _postImageRepository.GetAsync(new GetPostImageRequest { PostId = request.Id, SkipPagination = true })).ToList();
                 
                 using(var scope = new TransactionScope())
                 {

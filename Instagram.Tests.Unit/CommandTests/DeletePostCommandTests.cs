@@ -41,10 +41,10 @@ namespace Instagram.Tests.Unit.CommandTests
 
             var images = new List<PostImage>
             {
-                new PostImage { PostId = IdToDelete },
-                new PostImage { PostId = 3 },
-                new PostImage { PostId = 4 },
-                new PostImage { PostId = 5 },
+                new PostImage { PostId = IdToDelete, File = "" },
+                new PostImage { PostId = IdToDelete, File = "" },
+                new PostImage { PostId = 4, File = "" },
+                new PostImage { PostId = 5, File = "" },
             };
 
             _postRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))

@@ -38,12 +38,26 @@ namespace Instagram.Database.Sql
         {
             var select = new StringBuilder($"SELECT /**select**/ FROM [{table}] /**join**/ /**where**/ /**orderby**/ /**pagination**/");
 
-            var props = typeof(T).GetProperties();
+            var joins = typeof(T).GetCustomAttributes<JoinAttribute>();
+
+            var joinBuilder = new StringBuilder("");
+
+            if (joins.Any(join => join.OutsideJoin))
+            {
+                return BuildSelectWithSubQuery<T>(table);
+            }
+
+            foreach (var join in joins)
+            {
+                joinBuilder.Append($"LEFT OUTER JOIN {join.Table} ON {join.Condition}");
+            }
 
             var selectedValues = new StringBuilder("");
 
             int index = 0;
-            foreach(var prop in props)
+
+            var props = typeof(T).GetProperties();
+            foreach (var prop in props)
             {
                 var coma = "";
                 var name = $"[{table}].[{prop.Name}]";
@@ -60,17 +74,73 @@ namespace Instagram.Database.Sql
                 index++;
             }
 
+            select.Replace("/**select**/", selectedValues.ToString());
+            select.Replace("/**join**/", joinBuilder.ToString());
+            return new SqlBuilderQuery(select.ToString(), table);
+        }
+
+        private ISqlBuilderQuery BuildSelectWithSubQuery<T>(string table)
+        {
+            var select = new StringBuilder($"SELECT t.*, /**outsideselect**/ FROM (SELECT /**select**/ FROM [{table}] /**subjoin**/ /**where**/ /**orderby**/ /**pagination**/) as t /**join**/");
+
+            var props = typeof(T).GetProperties();
+
+            var selectedValues = new StringBuilder("");
+            var outsideSelectedValues = new StringBuilder("");
+            int innerIndex = 0;
+            int outerIndex = 0;
+            foreach (var prop in props)
+            {
+                var coma = "";
+                var name = $"[{table}].[{prop.Name}]";
+                var sqlName = prop.GetCustomAttribute<SqlNameAttribute>();
+                if (sqlName?.OuterQuery ?? false)
+                {
+                    if(outerIndex != 0)
+                    {
+                        coma = ",";
+                    }
+
+                    outsideSelectedValues.Append($"{coma} {sqlName.Name}");
+
+                    outerIndex++;
+                    continue;
+                }
+
+                if (innerIndex != 0)
+                {
+                    coma = ",";
+                }
+
+                if (sqlName is not null)
+                {
+                    name = $"{sqlName.Name} as {prop.Name}";
+                }
+                selectedValues.Append($"{coma} {name}");
+                innerIndex++;
+            }
+
             var joins = typeof(T).GetCustomAttributes<JoinAttribute>();
 
-            var joinBuilder = new StringBuilder("");
+            var subJoinBuilder = new StringBuilder("");
+            var outsideJoinBuilder = new StringBuilder("");
 
-            foreach(var join in joins)
+            foreach (var join in joins)
             {
-                joinBuilder.Append($"INNER JOIN {join.Table} ON {join.Condition}");    
+                if(join.OutsideJoin)
+                {
+                    outsideJoinBuilder.Append($"LEFT OUTER JOIN {join.Table} ON {join.Condition}");
+                } else
+                {
+                    subJoinBuilder.Append($"LEFT OUTER JOIN {join.Table} ON {join.Condition}");
+                }
             }
 
             select.Replace("/**select**/", selectedValues.ToString());
-            select.Replace("/**join**/", joinBuilder.ToString());
+            select.Replace("/**outsideselect**/", outsideSelectedValues.ToString());
+            select.Replace("/**join**/", outsideJoinBuilder.ToString());
+            select.Replace("/**subjoin**/", subJoinBuilder.ToString());
+
             return new SqlBuilderQuery(select.ToString(), table);
         }
 

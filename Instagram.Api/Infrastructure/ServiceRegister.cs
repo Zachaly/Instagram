@@ -22,6 +22,7 @@ namespace Instagram.Api.Infrastructure
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
+            services.AddScoped<IPostImageRepository, PostImageRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
