@@ -4,6 +4,7 @@ using Instagram.Models.Post.Request;
 using Instagram.Models.Response;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using System.Transactions;
 
 namespace Instagram.Application.Command
 {
@@ -40,11 +41,20 @@ namespace Instagram.Application.Command
                     return _responseFactory.CreateFailure("No image to upload");
                 }
 
-                var fileName = await _fileService.SavePostImagesAsync(request.Files);
+                var fileNames = await _fileService.SavePostImagesAsync(request.Files);
 
                 var post = _postFactory.Create(request);
 
-                await _postRepository.InsertAsync(post);
+                using(var scope = new TransactionScope())
+                {
+                    var postId = await _postRepository.InsertAsync(post);
+                    var images = _postFactory.CreateImages(fileNames, postId);
+
+                    foreach(var image in images)
+                    {
+                        await _postImageRepository.InsertAsync(image);
+                    }
+                }
 
                 return _responseFactory.CreateSuccess();
             }

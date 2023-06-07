@@ -7,5 +7,6 @@ namespace Instagram.Database.Repository
 {
     public interface IPostImageRepository : IRepositoryBase<PostImage, PostImageModel, GetPostImageRequest>
     {
+        Task DeleteByPostIdAsync(long postId);
     }
 }

@@ -15,8 +15,10 @@ namespace Instagram.Application
         };
 
         public IEnumerable<PostImage> CreateImages(IEnumerable<string> files, long postId)
-        {
-            throw new NotImplementedException();
-        }
+            => files.Select(file => new PostImage
+            {
+                File = file,
+                PostId = postId
+            });
     }
 }

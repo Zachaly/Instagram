@@ -25,8 +25,8 @@ namespace Instagram.Tests.Unit.CommandTests
             _responseFactory = new Mock<IResponseFactory>();
             _fileService = new Mock<IFileService>();
             _postImageRepository = new Mock<IPostImageRepository>();
-            _handler = new AddPostHandler(_postFactory.Object, _postRepository.Object, _fileService.Object, _responseFactory.Object,
-                _postImageRepository.Object);
+            _handler = new AddPostHandler(_postFactory.Object, _postRepository.Object, _fileService.Object,
+                _responseFactory.Object, _postImageRepository.Object);
         }
 
         [Fact]
@@ -54,8 +54,6 @@ namespace Instagram.Tests.Unit.CommandTests
 
             _postImageRepository.Setup(x => x.InsertAsync(It.IsAny<PostImage>()))
                 .Callback((PostImage img) => images.Add(img));
-
-            
 
             var file = new Mock<IFormFile>();
 

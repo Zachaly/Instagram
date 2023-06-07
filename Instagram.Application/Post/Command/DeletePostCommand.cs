@@ -1,7 +1,9 @@
 ﻿using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
+using Instagram.Models.PostImage.Request;
 using Instagram.Models.Response;
 using MediatR;
+using System.Transactions;
 
 namespace Instagram.Application.Command
 {
@@ -37,9 +39,18 @@ namespace Instagram.Application.Command
                     return _responseFactory.CreateFailure("Post not found!");
                 }
 
+                var images = await _postImageRepository.GetAsync(new GetPostImageRequest { PostId = request.Id, SkipPagination = true });
                 
+                using(var scope = new TransactionScope())
+                {
+                    await _postRepository.DeleteByIdAsync(request.Id);
+                    await _postImageRepository.DeleteByPostIdAsync(request.Id);
 
-                await _postRepository.DeleteByIdAsync(request.Id);
+                    foreach (var image in images)
+                    {
+                        await _fileService.RemovePostImageAsync(image.File);
+                    }
+                }
 
                 return _responseFactory.CreateSuccess();
             }
