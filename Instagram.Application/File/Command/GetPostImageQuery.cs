@@ -23,7 +23,7 @@ namespace Instagram.Application.Command
         {
             var post = await _postRepository.GetEntityByIdAsync(request.Id);
 
-            return await _fileService.GetPostImageAsync(post?.FileName ?? "");
+            return await _fileService.GetPostImageAsync("");
         }
     }
 }

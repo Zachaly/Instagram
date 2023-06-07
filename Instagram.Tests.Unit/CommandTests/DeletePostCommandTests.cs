@@ -28,10 +28,10 @@ namespace Instagram.Tests.Unit.CommandTests
             const int IdToDelete = 2;
             var posts = new List<Post> 
             { 
-                new Post { Id = 1, FileName = "post1" },
-                new Post { Id = IdToDelete, FileName = "post2" },
-                new Post { Id = 3, FileName = "post3" },
-                new Post { Id = 4, FileName = "post4" },
+                new Post { Id = 1 },
+                new Post { Id = IdToDelete },
+                new Post { Id = 3 },
+                new Post { Id = 4 },
             };
 
             _postRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
@@ -76,10 +76,10 @@ namespace Instagram.Tests.Unit.CommandTests
             const int IdToDelete = 2;
             var posts = new List<Post>
             {
-                new Post { Id = 1, FileName = "post1" },
-                new Post { Id = IdToDelete, FileName = "post2" },
-                new Post { Id = 3, FileName = "post3" },
-                new Post { Id = 4, FileName = "post4" },
+                new Post { Id = 1, },
+                new Post { Id = IdToDelete, },
+                new Post { Id = 3 },
+                new Post { Id = 4 },
             };
             const string Error = "Err";
 

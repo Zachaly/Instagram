@@ -88,5 +88,10 @@ namespace Instagram.Application
 
         public Task<FileStream> GetPostImageAsync(string fileName)
             => Task.FromResult(ReadFile(_postImagePath, fileName));
+
+        public Task<IEnumerable<string>> SavePostImagesAsync(IEnumerable<IFormFile> files)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

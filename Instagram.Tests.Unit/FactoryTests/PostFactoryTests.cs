@@ -22,11 +22,10 @@ namespace Instagram.Tests.Unit.FactoryTests
             };
             const string FileName = "file";
 
-            var post = _factory.Create(request, FileName);
+            var post = _factory.Create(request);
 
             Assert.Equal(request.Content, post.Content);
             Assert.Equal(request.CreatorId, post.CreatorId);
-            Assert.Equal(FileName, post.FileName);
             Assert.InRange(post.Created, DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 50, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 50);
         }
     }

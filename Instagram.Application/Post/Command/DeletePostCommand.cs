@@ -34,7 +34,7 @@ namespace Instagram.Application.Command
                     return _responseFactory.CreateFailure("Post not found!");
                 }
 
-                await _fileService.RemovePostImageAsync(post.FileName);
+                
 
                 await _postRepository.DeleteByIdAsync(request.Id);
 

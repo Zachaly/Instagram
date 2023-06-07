@@ -5,13 +5,7 @@ using Instagram.Domain.Entity;
 using Instagram.Models.Post.Request;
 using Instagram.Models.Response;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
@@ -38,13 +32,13 @@ namespace Instagram.Tests.Unit.CommandTests
             var posts = new List<Post>();
             const string FileName = "file";
 
-            _fileService.Setup(x => x.SavePostImageAsync(It.IsAny<IFormFile>())).ReturnsAsync(FileName);
+            _fileService.Setup(x => x.SavePostImagesAsync(It.IsAny<IEnumerable<IFormFile>>())).ReturnsAsync(new string[] { FileName });
 
             _postRepository.Setup(x => x.InsertAsync(It.IsAny<Post>()))
                 .Callback((Post post) => posts.Add(post));
 
-            _postFactory.Setup(x => x.Create(It.IsAny<AddPostRequest>(), It.IsAny<string>()))
-                .Returns((AddPostRequest request, string file) => new Post { CreatorId = request.CreatorId, FileName = file });
+            _postFactory.Setup(x => x.Create(It.IsAny<AddPostRequest>()))
+                .Returns((AddPostRequest request) => new Post { CreatorId = request.CreatorId });
 
             _responseFactory.Setup(x => x.CreateSuccess())
                 .Returns(new ResponseModel { Success = true });
@@ -54,13 +48,13 @@ namespace Instagram.Tests.Unit.CommandTests
             var command = new AddPostCommand
             {
                 CreatorId = 1,
-                File = file.Object,
+                Files = new IFormFile[] { file.Object },
             };
 
             var res = await _handler.Handle(command, default);
 
             Assert.True(res.Success);
-            Assert.Contains(posts, x => x.CreatorId == command.CreatorId && x.FileName == FileName);
+            Assert.Contains(posts, x => x.CreatorId == command.CreatorId);
         }
 
         [Fact]
@@ -72,7 +66,7 @@ namespace Instagram.Tests.Unit.CommandTests
             var command = new AddPostCommand
             {
                 CreatorId = 1,
-                File = null,
+                Files = null,
             };
 
             var res = await _handler.Handle(command, default);
@@ -87,7 +81,7 @@ namespace Instagram.Tests.Unit.CommandTests
             var posts = new List<Post>();
             const string Error = "error";
 
-            _fileService.Setup(x => x.SavePostImageAsync(It.IsAny<IFormFile>()))
+            _fileService.Setup(x => x.SavePostImagesAsync(It.IsAny<IEnumerable<IFormFile>>()))
                 .Callback(() => throw new Exception(Error));
 
             _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
@@ -98,7 +92,7 @@ namespace Instagram.Tests.Unit.CommandTests
             var command = new AddPostCommand
             {
                 CreatorId = 1,
-                File = file.Object,
+                Files = new IFormFile[] { file.Object },
             };
 
             var res = await _handler.Handle(command, default);

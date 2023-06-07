@@ -12,5 +12,6 @@ namespace Instagram.Models.Post
         [SqlName("[User].[Nickname]")]
         public string CreatorName { get; set; }
         public long Created { get; set; }
+        public IEnumerable<long> ImageIds { get; set; }
     }
 }

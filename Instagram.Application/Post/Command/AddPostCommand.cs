@@ -9,7 +9,7 @@ namespace Instagram.Application.Command
 {
     public class AddPostCommand : AddPostRequest, IRequest<ResponseModel>
     {
-        public IFormFile File { get; set; }
+        public IEnumerable<IFormFile> Files { get; set; }
     }
 
     public class AddPostHandler : IRequestHandler<AddPostCommand, ResponseModel>
@@ -32,14 +32,14 @@ namespace Instagram.Application.Command
         {
             try
             {
-                if(request.File is null)
+                if(request.Files is null || !request.Files.Any())
                 {
                     return _responseFactory.CreateFailure("No image to upload");
                 }
 
-                var fileName = await _fileService.SavePostImageAsync(request.File);
+                var fileName = await _fileService.SavePostImagesAsync(request.Files);
 
-                var post = _postFactory.Create(request, fileName);
+                var post = _postFactory.Create(request);
 
                 await _postRepository.InsertAsync(post);
 

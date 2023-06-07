@@ -21,7 +21,6 @@ namespace Instagram.Tests.Integration
                 .RuleFor(p => p.CreatorId, _ => userId)
                 .RuleFor(p => p.Content, f => f.Random.AlphaNumeric(30))
                 .RuleFor(p => p.Created, f => f.Random.Long(0, DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
-                .RuleFor(p => p.FileName, f => f.Random.AlphaNumeric(30))
                 .Generate(count);
     }
 }
