@@ -28,6 +28,15 @@ namespace Instagram.Tests.Integration.ApiTests
 
             var postIds = GetFromDatabase<long>("SELECT Id FROM [Post]");
 
+            foreach (var postId in postIds)
+            {
+                foreach (var image in FakeDataFactory.GeneratePostImages(postId, 2))
+                {
+                    var query = new SqlQueryBuilder().BuildInsert("PostImage", image).Build();
+                    ExecuteQuery(query, image);
+                }
+            }
+
             var response = await _httpClient.GetAsync(Endpoint);
             var content = await response.Content.ReadFromJsonAsync<IEnumerable<PostModel>>();
 
@@ -53,6 +62,14 @@ namespace Instagram.Tests.Integration.ApiTests
 
             var post = GetFromDatabase<Post>("SELECT * FROM [Post]").First();
 
+            foreach (var image in FakeDataFactory.GeneratePostImages(post.Id, 2))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("PostImage", image).Build();
+                ExecuteQuery(query, image);
+            }
+
+            var imageIds = GetFromDatabase<long>("SELECT Id FROM PostImage");
+
             var response = await _httpClient.GetAsync($"{Endpoint}/{post.Id}");
             var content = await response.Content.ReadFromJsonAsync<PostModel>();
 
@@ -62,6 +79,7 @@ namespace Instagram.Tests.Integration.ApiTests
             Assert.Equal(post.Created, content.Created);
             Assert.Equal(post.CreatorId, content.CreatorId);
             Assert.Equal(user.Nickname, content.CreatorName);
+            Assert.Equivalent(imageIds, content.ImageIds);
         }
 
         [Fact]

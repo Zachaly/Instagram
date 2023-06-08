@@ -23,3 +23,9 @@ const props = defineProps<{
 }>()
 
 </script>
+
+<style scoped>
+div {
+    user-select: none;
+}
+</style>

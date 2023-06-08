@@ -11,19 +11,20 @@ namespace Instagram.Application.Command
 
     public class GetPostImageHandler : IRequestHandler<GetPostImageQuery, FileStream>
     {
-        private readonly IPostRepository _postRepository;
+        private readonly IPostImageRepository _postImageRepository;
         private readonly IFileService _fileService;
 
-        public GetPostImageHandler(IPostRepository postRepository, IFileService fileService)
+        public GetPostImageHandler(IPostImageRepository postImageRepository, IFileService fileService)
         {
-            _postRepository = postRepository;
+            _postImageRepository = postImageRepository;
             _fileService = fileService;
         }
+
         public async Task<FileStream> Handle(GetPostImageQuery request, CancellationToken cancellationToken)
         {
-            var post = await _postRepository.GetEntityByIdAsync(request.Id);
+            var image = await _postImageRepository.GetEntityByIdAsync(request.Id);
 
-            return await _fileService.GetPostImageAsync(post?.FileName ?? "");
+            return await _fileService.GetPostImageAsync(image.File);
         }
     }
 }

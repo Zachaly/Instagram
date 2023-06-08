@@ -11,7 +11,8 @@ namespace Instagram.Tests.Integration.DatabaseTests
         private readonly string[] _truncateQueries =
         {
             "TRUNCATE TABLE [User]",
-            "TRUNCATE TABLE [Post]"
+            "TRUNCATE TABLE [Post]",
+            "TRUNCATE TABLE [PostImage]"
         };
 
         public RepositoryTest()

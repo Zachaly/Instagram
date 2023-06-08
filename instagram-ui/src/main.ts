@@ -12,9 +12,9 @@ import { library as fontLibrary, library } from '@fortawesome/fontawesome-svg-co
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 /* import specific icons */
-import { faImage } from '@fortawesome/free-solid-svg-icons'
+import { faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faImage)
+library.add(faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch)
 
 const pinia = createPinia()
 

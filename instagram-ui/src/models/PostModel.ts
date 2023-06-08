@@ -3,5 +3,6 @@ export default interface PostModel {
     creatorId: number,
     creatorName: string,
     content: string,
-    created: number
+    created: number,
+    imageIds: number[]
 }

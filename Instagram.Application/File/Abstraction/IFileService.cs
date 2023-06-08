@@ -8,7 +8,7 @@ namespace Instagram.Application.Abstraction
         Task RemoveProfilePictureAsync(string fileName);
         Task<FileStream> GetProfilePictureAsync(string fileName);
 
-        Task<string> SavePostImageAsync(IFormFile file);
+        Task<IEnumerable<string>> SavePostImagesAsync(IEnumerable<IFormFile> files);
         Task RemovePostImageAsync(string fileName);
         Task<FileStream> GetPostImageAsync(string fileName);
     }

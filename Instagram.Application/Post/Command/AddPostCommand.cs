@@ -4,12 +4,13 @@ using Instagram.Models.Post.Request;
 using Instagram.Models.Response;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using System.Transactions;
 
 namespace Instagram.Application.Command
 {
     public class AddPostCommand : AddPostRequest, IRequest<ResponseModel>
     {
-        public IFormFile File { get; set; }
+        public IEnumerable<IFormFile> Files { get; set; }
     }
 
     public class AddPostHandler : IRequestHandler<AddPostCommand, ResponseModel>
@@ -18,30 +19,43 @@ namespace Instagram.Application.Command
         private readonly IPostRepository _postRepository;
         private readonly IFileService _fileService;
         private readonly IResponseFactory _responseFactory;
+        private readonly IPostImageRepository _postImageRepository;
 
         public AddPostHandler(IPostFactory postFactory, IPostRepository postRepository,
-            IFileService fileService, IResponseFactory responseFactory)
+            IFileService fileService, IResponseFactory responseFactory,
+            IPostImageRepository postImageRepository)
         {
             _postFactory = postFactory;
             _postRepository = postRepository;
             _fileService = fileService;
             _responseFactory = responseFactory;
+            _postImageRepository = postImageRepository;
         }
 
         public async Task<ResponseModel> Handle(AddPostCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                if(request.File is null)
+                if(request.Files is null || !request.Files.Any())
                 {
                     return _responseFactory.CreateFailure("No image to upload");
                 }
 
-                var fileName = await _fileService.SavePostImageAsync(request.File);
+                var fileNames = await _fileService.SavePostImagesAsync(request.Files);
 
-                var post = _postFactory.Create(request, fileName);
+                var post = _postFactory.Create(request);
 
-                await _postRepository.InsertAsync(post);
+                using(var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var postId = await _postRepository.InsertAsync(post);
+                    var images = _postFactory.CreateImages(fileNames, postId);
+
+                    foreach(var image in images)
+                    {
+                        await _postImageRepository.InsertAsync(image);
+                    }
+                    scope.Complete();
+                }
 
                 return _responseFactory.CreateSuccess();
             }

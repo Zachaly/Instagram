@@ -1,7 +1,9 @@
 ﻿using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
+using Instagram.Models.PostImage.Request;
 using Instagram.Models.Response;
 using MediatR;
+using System.Transactions;
 
 namespace Instagram.Application.Command
 {
@@ -15,12 +17,15 @@ namespace Instagram.Application.Command
         private readonly IPostRepository _postRepository;
         private readonly IFileService _fileService;
         private readonly IResponseFactory _responseFactory;
+        private readonly IPostImageRepository _postImageRepository;
 
-        public DeletePostHandler(IPostRepository postRepository, IFileService fileService, IResponseFactory responseFactory)
+        public DeletePostHandler(IPostRepository postRepository, IFileService fileService, IResponseFactory responseFactory,
+            IPostImageRepository postImageRepository)
         {
             _postRepository = postRepository;
             _fileService = fileService;
             _responseFactory = responseFactory;
+            _postImageRepository = postImageRepository;
         }
 
         public async Task<ResponseModel> Handle(DeletePostCommand request, CancellationToken cancellationToken)
@@ -34,9 +39,19 @@ namespace Instagram.Application.Command
                     return _responseFactory.CreateFailure("Post not found!");
                 }
 
-                await _fileService.RemovePostImageAsync(post.FileName);
+                var images = (await _postImageRepository.GetAsync(new GetPostImageRequest { PostId = request.Id, SkipPagination = true })).ToList();
+                
+                using(var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    await _postRepository.DeleteByIdAsync(request.Id);
+                    await _postImageRepository.DeleteByPostIdAsync(request.Id);
 
-                await _postRepository.DeleteByIdAsync(request.Id);
+                    foreach (var image in images)
+                    {
+                        await _fileService.RemovePostImageAsync(image.File);
+                    }
+                    scope.Complete();
+                }
 
                 return _responseFactory.CreateSuccess();
             }
