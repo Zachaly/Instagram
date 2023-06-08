@@ -2,23 +2,32 @@
     <AuthorizedPage>
         <NavigationPage>
             <div class="columns is-centered">
-                <div class="column is-4">
+                <div class="column is-6">
                     <div class="control m-2">
                         <label class="label">Content</label>
-                        <textarea rows="5" class="textarea" v-model="request.content">
+                        <textarea rows="2" class="textarea" v-model="request.content">
 
                         </textarea>
+                    </div>
+                    <div>
+                        <label class="label">Selected images</label>
+                        <div class="is-flex is-flex-wrap-wrap">
+                            <figure v-for="img in imageUrls" :key="img" style="width:;" class="image is-128x128 m-1">
+                                <img :key="img" :src="img" alt="" />
+                            </figure>
+                        </div>
+
                     </div>
                     <div class="control m-2">
                         <div class="file is-boxed">
                             <label class="file-label" style="width: 100%;">
-                                <input type="file" @change="selectFile" class="file-input">
+                                <input type="file" multiple @change="selectFile" class="file-input">
                                 <span class="file-cta">
                                     <span class="file-icon">
-                                        <font-awesome-icon icon="fa-solid fa-image"/>
+                                        <font-awesome-icon icon="fa-solid fa-image" />
                                     </span>
                                     <span class="file-label">
-                                        Select image
+                                        Select images
                                     </span>
                                 </span>
                             </label>
@@ -38,7 +47,7 @@ import AddPostRequest from '@/models/request/AddPostRequest';
 import ResponseModel from '@/models/ResponseModel';
 import AuthorizedPage from './AuthorizedPage.vue';
 import NavigationPage from './NavigationPage.vue';
-import { reactive } from 'vue';
+import { Ref, reactive, ref } from 'vue';
 import { useAuthStore } from '@/store/authStore';
 import axios, { AxiosError } from 'axios';
 import { useRouter } from 'vue-router';
@@ -51,17 +60,26 @@ const request: AddPostRequest = reactive({
     file: undefined
 })
 
+const imageUrls: Ref<string[]> = ref([])
+
 const selectFile = (e: Event) => {
-    request.file = (e.target! as HTMLInputElement).files![0]
+    request.files = (e.target! as HTMLInputElement).files!
+    imageUrls.value = []
+    for (let i = 0; i < request.files?.length! ?? 0; i++) {
+        imageUrls.value.push(URL.createObjectURL(request.files![i]))
+    }
 }
 
 const send = () => {
-    if (!request.file) {
+    if (!request.files) {
         alert("No file selected!")
     }
 
     const formData = new FormData()
-    formData.append('File', request.file!)
+    for (let i = 0; i < request.files!.length; i++) {
+        formData.append('Files', request.files![i])
+    }
+
     formData.append('CreatorId', request.creatorId.toString())
     formData.append('Content', request.content)
 
