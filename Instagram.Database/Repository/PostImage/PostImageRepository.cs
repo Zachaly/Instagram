@@ -17,7 +17,13 @@ namespace Instagram.Database.Repository
 
         public Task DeleteByPostIdAsync(long postId)
         {
-            throw new NotImplementedException();
+            var param = new { PostId = postId };
+            var query = _sqlQueryBuilder
+                .BuildDelete(Table)
+                .Where(param)
+                .Build();
+
+            return QueryAsync(query, param);
         }
     }
 }

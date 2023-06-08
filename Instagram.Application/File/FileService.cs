@@ -89,9 +89,26 @@ namespace Instagram.Application
         public Task<FileStream> GetPostImageAsync(string fileName)
             => Task.FromResult(ReadFile(_postImagePath, fileName));
 
-        public Task<IEnumerable<string>> SavePostImagesAsync(IEnumerable<IFormFile> files)
+        public async Task<IEnumerable<string>> SavePostImagesAsync(IEnumerable<IFormFile> files)
         {
-            throw new NotImplementedException();
+            Directory.CreateDirectory(_postImagePath);
+
+            var names = new List<string>();
+
+            foreach(var file in files)
+            {
+                var newName = $"{Guid.NewGuid()}.png";
+
+                var path = Path.Combine(_postImagePath, newName);
+
+                using (var stream = File.Create(path))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                names.Add(newName);
+            }
+
+            return names;
         }
     }
 }

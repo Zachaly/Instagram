@@ -41,7 +41,7 @@ namespace Instagram.Application.Command
 
                 var images = (await _postImageRepository.GetAsync(new GetPostImageRequest { PostId = request.Id, SkipPagination = true })).ToList();
                 
-                using(var scope = new TransactionScope())
+                using(var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     await _postRepository.DeleteByIdAsync(request.Id);
                     await _postImageRepository.DeleteByPostIdAsync(request.Id);
@@ -50,6 +50,7 @@ namespace Instagram.Application.Command
                     {
                         await _fileService.RemovePostImageAsync(image.File);
                     }
+                    scope.Complete();
                 }
 
                 return _responseFactory.CreateSuccess();

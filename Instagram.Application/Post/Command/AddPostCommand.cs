@@ -45,7 +45,7 @@ namespace Instagram.Application.Command
 
                 var post = _postFactory.Create(request);
 
-                using(var scope = new TransactionScope())
+                using(var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     var postId = await _postRepository.InsertAsync(post);
                     var images = _postFactory.CreateImages(fileNames, postId);
@@ -54,6 +54,7 @@ namespace Instagram.Application.Command
                     {
                         await _postImageRepository.InsertAsync(image);
                     }
+                    scope.Complete();
                 }
 
                 return _responseFactory.CreateSuccess();
