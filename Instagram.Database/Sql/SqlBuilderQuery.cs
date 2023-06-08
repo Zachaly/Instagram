@@ -26,6 +26,11 @@ namespace Instagram.Database.Sql
                 .ToString();
         }
 
+        public ISqlBuilderQuery JoinConditional<TRequest>(TRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         public ISqlBuilderQuery OrderBy(string orderBy)
         {
             if(_orderBy.ToString() == "")

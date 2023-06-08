@@ -1,4 +1,5 @@
 ﻿using Instagram.Domain.Enum;
+using Instagram.Domain.SqlAttribute;
 
 namespace Instagram.Models.User.Request
 {
@@ -11,5 +12,7 @@ namespace Instagram.Models.User.Request
         public string? Bio { get; set; }
         public string? PasswordHash { get; set; }
         public Gender? Gender { get; set; }
+        [Where(Condition = "[User].[Id] IN ")]
+        public IEnumerable<long>? UserIds { get; set; }
     }
 }

@@ -66,5 +66,10 @@ namespace Instagram.Database.Repository.Abstraction
                 await connection.QueryAsync(query, param);
             }
         }
+
+        public Task<int> GetCount(TGetRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

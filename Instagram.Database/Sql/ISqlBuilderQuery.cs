@@ -8,5 +8,6 @@ namespace Instagram.Database.Sql
         ISqlBuilderQuery Where<TRequest>(TRequest request);
         ISqlBuilderQuery OrderBy(string orderBy);
         ISqlBuilderQuery WithPagination(PagedRequest request);
+        ISqlBuilderQuery JoinConditional<TRequest>(TRequest request);
     }
 }

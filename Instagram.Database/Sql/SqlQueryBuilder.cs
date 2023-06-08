@@ -174,5 +174,10 @@ namespace Instagram.Database.Sql
 
             return new SqlBuilderQuery(update.ToString(), table);
         }
+
+        public ISqlBuilderQuery BuildCount(string table)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
