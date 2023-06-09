@@ -28,10 +28,5 @@ namespace Instagram.Application
         {
             throw new NotImplementedException();
         }
-
-        public Task<UserFollowModel> GetByIdAsync(long id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

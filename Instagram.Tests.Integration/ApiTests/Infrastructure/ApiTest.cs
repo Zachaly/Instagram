@@ -16,7 +16,9 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
         private readonly string[] _truncateQueries =
         {
             "TRUNCATE TABLE [User]",
-            "TRUNCATE TABLE [Post]"
+            "TRUNCATE TABLE [Post]",
+            "TRUNCATE TABLE [PostImage]",
+            "TRUNCATE TABLE [UserFollow]"
         };
 
 

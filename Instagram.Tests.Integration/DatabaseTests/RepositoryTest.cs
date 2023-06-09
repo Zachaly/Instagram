@@ -12,7 +12,8 @@ namespace Instagram.Tests.Integration.DatabaseTests
         {
             "TRUNCATE TABLE [User]",
             "TRUNCATE TABLE [Post]",
-            "TRUNCATE TABLE [PostImage]"
+            "TRUNCATE TABLE [PostImage]",
+            "TRUNCATE TABLE [UserFollow]"
         };
 
         public RepositoryTest()

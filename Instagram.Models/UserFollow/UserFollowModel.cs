@@ -6,7 +6,7 @@ namespace Instagram.Models.UserFollow
     {
         public long FollowingUserId { get; set; }
         public long FollowedUserId { get; set; }
-        [SqlName("[User].[Name] as UserName")]
-        public long UserName { get; set; }
+        [SqlName("[User].[Nickname]")]
+        public string UserName { get; set; }
     }
 }

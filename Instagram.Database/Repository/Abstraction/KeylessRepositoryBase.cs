@@ -29,6 +29,7 @@ namespace Instagram.Database.Repository.Abstraction
                 .Where(request)
                 .OrderBy(DefaultOrderBy)
                 .WithPagination(request)
+                .JoinConditional(request)
                 .Build();
 
             return QueryManyAsync<TModel>(query, request);
@@ -67,9 +68,14 @@ namespace Instagram.Database.Repository.Abstraction
             }
         }
 
-        public Task<int> GetCount(TGetRequest request)
+        public Task<int> GetCountAsync(TGetRequest request)
         {
-            throw new NotImplementedException();
+            var query = _sqlQueryBuilder
+                .BuildCount(Table)
+                .Where(request)
+                .Build();
+
+            return QuerySingleAsync<int>(query, request);
         }
     }
 }

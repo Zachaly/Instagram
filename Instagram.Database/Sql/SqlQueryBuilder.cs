@@ -36,7 +36,7 @@ namespace Instagram.Database.Sql
 
         public ISqlBuilderQuery BuildSelect<T>(string table)
         {
-            var select = new StringBuilder($"SELECT /**select**/ FROM [{table}] /**join**/ /**where**/ /**orderby**/ /**pagination**/");
+            var select = new StringBuilder($"SELECT /**select**/ FROM [{table}] /**join**/ /**conditionaljoin**/ /**where**/ /**orderby**/ /**pagination**/");
 
             var joins = typeof(T).GetCustomAttributes<JoinAttribute>();
 
@@ -114,7 +114,7 @@ namespace Instagram.Database.Sql
 
                 if (sqlName is not null)
                 {
-                    name = $"{sqlName.Name} as {prop.Name}";
+                    name = $"{sqlName.Name} as [{prop.Name}]";
                 }
                 selectedValues.Append($"{coma} {name}");
                 innerIndex++;
@@ -177,7 +177,9 @@ namespace Instagram.Database.Sql
 
         public ISqlBuilderQuery BuildCount(string table)
         {
-            throw new NotImplementedException();
+            var template = $"SELECT COUNT(*) FROM [{table}] /**where**/";
+
+            return new SqlBuilderQuery(template, table);
         }
     }
 }
