@@ -8,25 +8,56 @@ namespace Instagram.Application
 {
     public class UserFollowService : IUserFollowService
     {
+        private readonly IUserFollowRepository _userFollowRepository;
+        private readonly IUserFollowFactory _userFollowFactory;
+        private readonly IResponseFactory _responseFactory;
+
         public UserFollowService(IUserFollowRepository userFollowRepository, IUserFollowFactory userFollowFactory, 
             IResponseFactory responseFactory)
         {
-
+            _userFollowRepository = userFollowRepository;
+            _userFollowFactory = userFollowFactory;
+            _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> AddAsync(AddUserFollowRequest request)
+        public async Task<ResponseModel> AddAsync(AddUserFollowRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var follow = _userFollowFactory.Create(request);
+
+                await _userFollowRepository.InsertAsync(follow);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
 
-        public Task<ResponseModel> DeleteAsync(long followerId, long followedId)
+        public async Task<ResponseModel> DeleteAsync(long followerId, long followedId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _userFollowRepository.DeleteAsync(followerId, followedId);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
 
         public Task<IEnumerable<UserFollowModel>> GetAsync(GetUserFollowRequest request)
         {
-            throw new NotImplementedException();
+            return _userFollowRepository.GetAsync(request);
+        }
+
+        public Task<int> GetCountAsync(GetUserFollowRequest request)
+        {
+            return _userFollowRepository.GetCountAsync(request);
         }
     }
 }

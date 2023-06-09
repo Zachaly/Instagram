@@ -75,7 +75,7 @@ namespace Instagram.Tests.Unit.ServiceTests
                 .Callback(() => throw new Exception(Error));
 
             _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = true, Error = err });
+                .Returns((string err) => new ResponseModel { Success = false, Error = err });
 
             var request = new AddUserFollowRequest { FollowedUserId = 1 };
             var res = await _service.AddAsync(request);
@@ -117,13 +117,26 @@ namespace Instagram.Tests.Unit.ServiceTests
             _userFollowRepository.Setup(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<long>()))
                 .Callback(() => throw new Exception(Error));
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
+                .Returns((string err) => new ResponseModel { Success = false, Error = err });
 
             var res = await _service.DeleteAsync(1, 2);
 
             Assert.False(res.Success);
             Assert.Equal(Error, res.Error);
+        }
+
+        [Fact]
+        public async Task GetCountAsync_ReturnsCount()
+        {
+            const int Count = 10;
+
+            _userFollowRepository.Setup(x => x.GetCountAsync(It.IsAny<GetUserFollowRequest>()))
+                .ReturnsAsync(10);
+
+            var res = await _service.GetCountAsync(new GetUserFollowRequest());
+
+            Assert.Equal(Count, res);
         }
     }
 }

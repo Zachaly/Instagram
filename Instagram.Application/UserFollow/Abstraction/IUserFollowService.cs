@@ -9,5 +9,6 @@ namespace Instagram.Application.Abstraction
         Task<IEnumerable<UserFollowModel>> GetAsync(GetUserFollowRequest request);
         Task<ResponseModel> AddAsync(AddUserFollowRequest request);
         Task<ResponseModel> DeleteAsync(long followerId, long followedId);
+        Task<int> GetCountAsync(GetUserFollowRequest request);
     }
 }

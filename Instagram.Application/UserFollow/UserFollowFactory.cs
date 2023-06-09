@@ -7,8 +7,10 @@ namespace Instagram.Application
     public class UserFollowFactory : IUserFollowFactory
     {
         public UserFollow Create(AddUserFollowRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => new UserFollow
+            {
+                FollowedUserId = request.FollowedUserId,
+                FollowingUserId = request.FollowingUserId,
+            };
     }
 }
