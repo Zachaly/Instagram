@@ -23,5 +23,10 @@ namespace Instagram.Application
         {
             return _postRepository.GetByIdAsync(id);
         }
+
+        public Task<int> GetCountAsync(GetPostRequest request)
+        {
+            return _postRepository.GetCountAsync(request);
+        }
     }
 }

@@ -3,6 +3,6 @@
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class ConditionalJoinAttribute : JoinAttribute
     {
-        public string ExclusiveWith { get; set; } = "";
+        public string JoinedColumn { get; set; } = "";
     }
 }

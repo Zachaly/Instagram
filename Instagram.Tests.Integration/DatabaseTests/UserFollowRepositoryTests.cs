@@ -15,6 +15,42 @@ namespace Instagram.Tests.Integration.DatabaseTests
         }
 
         [Fact]
+        public async Task GetAsync_WithoutConditionalJoin_JoinsNothing()
+        {
+            foreach (var user in FakeDataFactory.GenerateUsers(2))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
+                ExecuteQuery(query, user);
+            }
+
+            var users = GetFromDatabase<User>("SELECT * FROM [User]");
+
+            var follows = new List<UserFollow>
+            {
+                new UserFollow { FollowedUserId = users.First().Id, FollowingUserId = users.Last().Id },
+                new UserFollow { FollowedUserId = users.Last().Id, FollowingUserId = users.First().Id }
+            };
+
+            foreach (var follow in follows)
+            {
+                var query = new SqlQueryBuilder().BuildInsert("UserFollow", follow).Build();
+                ExecuteQuery(query, follow);
+            }
+
+            var request = new GetUserFollowRequest
+            {
+                
+            };
+
+            var res = await _repository.GetAsync(request);
+
+            Assert.Equal(2, res.Count());
+            Assert.Equivalent(follows.Select(x => x.FollowedUserId), res.Select(x => x.FollowingUserId));
+            Assert.Equivalent(follows.Select(x => x.FollowedUserId), res.Select(x => x.FollowedUserId));
+            Assert.All(res, x => Assert.Null(x.UserName));
+        }
+
+        [Fact]
         public async Task GetAsync_RequestWithConditionalJoin_JoinsProperColumns()
         {
             foreach (var user in FakeDataFactory.GenerateUsers(2))

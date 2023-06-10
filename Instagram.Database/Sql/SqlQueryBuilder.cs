@@ -36,7 +36,7 @@ namespace Instagram.Database.Sql
 
         public ISqlBuilderQuery BuildSelect<T>(string table)
         {
-            var select = new StringBuilder($"SELECT /**select**/ FROM [{table}] /**join**/ /**conditionaljoin**/ /**where**/ /**orderby**/ /**pagination**/");
+            var select = new StringBuilder($"SELECT /**select**//**conditionalselect**/ FROM [{table}] /**join**/ /**conditionaljoin**/ /**where**/ /**orderby**/ /**pagination**/");
 
             var joins = typeof(T).GetCustomAttributes<JoinAttribute>();
 
@@ -68,6 +68,10 @@ namespace Instagram.Database.Sql
                 var sqlName = prop.GetCustomAttribute<SqlNameAttribute>();
                 if(sqlName is not null)
                 {
+                    if (sqlName.Conditional)
+                    {
+                        continue;
+                    }
                     name = $"{sqlName.Name} as {prop.Name}";
                 }
                 selectedValues.Append($"{coma} {name}");

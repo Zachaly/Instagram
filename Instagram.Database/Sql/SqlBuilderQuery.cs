@@ -12,6 +12,7 @@ namespace Instagram.Database.Sql
         private readonly StringBuilder _where = new StringBuilder("");
         private readonly StringBuilder _orderBy = new StringBuilder("");
         private readonly StringBuilder _conditionalJoin = new StringBuilder("");
+        private readonly StringBuilder _conditionalSelect = new StringBuilder("");
         private string _pagination = "";
 
         public SqlBuilderQuery(string template, string table)
@@ -27,6 +28,7 @@ namespace Instagram.Database.Sql
                 .Replace("/**orderby**/", _orderBy.ToString())
                 .Replace("/**pagination**/", _pagination)
                 .Replace("/**conditionaljoin**/", _conditionalJoin.ToString())
+                .Replace("/**conditionalselect**/", _conditionalSelect.ToString())
                 .ToString();
         }
 
@@ -35,20 +37,23 @@ namespace Instagram.Database.Sql
             var joins = typeof(TRequest)
                 .GetProperties()
                 .Where(prop => prop.GetValue(request) != default)
-                .Select(prop => new { Attr = prop.GetCustomAttribute<ConditionalJoinAttribute>(), prop.Name })
-                .Where(prop => prop.Attr is not null);
+                .Select(prop => prop.GetCustomAttribute<ConditionalJoinAttribute>())
+                .Where(attr => attr is not null);
 
             var excludedJoins = new List<string>();
 
             foreach(var join in joins)
             {
-                if (excludedJoins.Contains(join!.Name))
+                if (excludedJoins.Contains(join!.JoinedColumn))
                 {
                     continue;
                 }
 
-                _conditionalJoin.Append($" LEFT OUTER JOIN [{join.Attr.Table}] ON {join.Attr.Condition}");
-                excludedJoins.Add(join.Attr.ExclusiveWith);
+                _conditionalJoin.Append($" LEFT OUTER JOIN [{join.Table}] ON {join.Condition}");
+                excludedJoins.Add(join.JoinedColumn);
+
+                _conditionalSelect.Append(", ");
+                _conditionalSelect.Append(join.JoinedColumn);
             }
 
             return this;
