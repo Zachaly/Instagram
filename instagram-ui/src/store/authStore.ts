@@ -1,4 +1,6 @@
 import LoginResponse from "@/models/LoginResponse";
+import UserFollowModel from "@/models/UserFollowModel";
+import GetUserFollowRequest from "@/models/request/GetUserFollowRequest";
 import { RefSymbol } from "@vue/reactivity";
 import axios from "axios";
 import { defineStore } from "pinia";
@@ -12,6 +14,8 @@ export const useAuthStore = defineStore('auth', () => {
         email: ''
     })
 
+    const userFollowsIds: Ref<number[]> = ref([])
+
     const authorize = (response: LoginResponse) => {
         if (!response.authToken) {
             isAuthorized.value = false
@@ -19,9 +23,17 @@ export const useAuthStore = defineStore('auth', () => {
             authInfo.value = response
             isAuthorized.value = true
             axios.defaults.headers.common.Authorization = `Bearer ${authInfo.value.authToken}`
+            updateFollows()
         }
 
         return isAuthorized.value
+    }
+
+    const updateFollows = () => {
+        const followRequest: GetUserFollowRequest = { FollowingUserId: authInfo.value.userId, SkipPagination: true }
+        axios.get<UserFollowModel[]>('user-follow', {
+            params: followRequest
+        }).then(res => userFollowsIds.value = res.data.map(x => x.followedUserId))
     }
 
     const logout = () => {
@@ -34,5 +46,5 @@ export const useAuthStore = defineStore('auth', () => {
 
     const userId = (): number => authInfo.value.userId
 
-    return { isAuthorized, authorize, logout, userId }
+    return { isAuthorized, authorize, logout, userId, updateFollows, userFollowsIds }
 })  

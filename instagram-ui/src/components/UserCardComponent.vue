@@ -8,12 +8,25 @@
                     </figure>
                 </div>
                 <div class="media-content">
-                    <p class="title">{{ user.nickname }}</p>
+                    <p class="title">
+                        {{ user.nickname }}
+                        <button @click="follow" v-if="!authStore.userFollowsIds.includes(user.id) && authStore.isAuthorized && user.id !== authStore.userId()" class="button is-success">
+                            Follow
+                        </button>
+                        <button @click="unFollow" v-else-if="authStore.userFollowsIds.includes(user.id) && authStore.isAuthorized && user.id !== authStore.userId()" class="button is-warning">
+                            Unfollow
+                        </button>
+                    </p>
                     <p class="subtitle"> {{ user.name }}</p>
                 </div>
                 <div class="media-right" v-if="authStore.userId() == user.id">
                     <router-link to="/user/update">Update profile</router-link>
                 </div>
+            </div>
+            <div>
+                <span class="m-1">Posts: {{ postCount }}</span>
+                <span class="m-1">Followers: {{ followersCount }}</span>
+                <span class="m-1">Followed: {{ followedCount }}</span>
             </div>
             <div class="content">
                 {{ user.bio }}
@@ -24,12 +37,51 @@
 
 <script setup lang="ts">
 import UserModel from '@/models/UserModel';
+import AddUserFollowRequest from '@/models/request/AddUserFollowRequest';
+import GetPostRequest from '@/models/request/GetPostRequest';
+import GetUserFollowRequest from '@/models/request/GetUserFollowRequest';
 import { useAuthStore } from '@/store/authStore';
+import axios from 'axios';
+import { Ref, onMounted, ref } from 'vue';
 
 const props = defineProps<{
     user: UserModel
 }>()
 
+const followedCount: Ref<number> = ref(0)
+const followersCount: Ref<number> = ref(0)
+const postCount: Ref<number> = ref(0)
+
 const authStore = useAuthStore()
+
+const follow = () => {
+    const request: AddUserFollowRequest = { followedUserId: props.user.id, followingUserId: authStore.userId() }
+    axios.post('user-follow', request).then(() => {
+        authStore.updateFollows()
+    })
+}
+
+const unFollow = () => {
+    axios.delete(`user-follow/${authStore.userId()}/${props.user.id}`).then(() => {
+        authStore.updateFollows()
+    })
+}
+
+onMounted(() => {
+    const followRequest: GetUserFollowRequest = { FollowingUserId: props.user.id }
+    axios.get<number>('user-follow/count', {
+        params: followRequest
+    }).then(res => followedCount.value = res.data)
+
+    const followerRequest: GetUserFollowRequest = { FollowedUserId: props.user.id }
+    axios.get<number>('user-follow/count', {
+        params: followerRequest
+    }).then(res => followersCount.value = res.data)
+
+    const postRequest: GetPostRequest = { CreatorId: props.user.id }
+    axios.get<number>('post/count', {
+        params: postRequest
+    }).then(res => postCount.value = res.data)
+})
 
 </script>

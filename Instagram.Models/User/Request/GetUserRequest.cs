@@ -14,5 +14,7 @@ namespace Instagram.Models.User.Request
         public Gender? Gender { get; set; }
         [Where(Condition = "[User].[Id] IN ")]
         public IEnumerable<long>? UserIds { get; set; }
+        [Where(Condition = "[User].[Id] NOT IN ")]
+        public IEnumerable<int>? SkipIds { get; set; }
     }
 }
