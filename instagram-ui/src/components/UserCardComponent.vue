@@ -10,10 +10,14 @@
                 <div class="media-content">
                     <p class="title">
                         {{ user.nickname }}
-                        <button @click="follow" v-if="!authStore.userFollowsIds.includes(user.id) && authStore.isAuthorized && user.id !== authStore.userId()" class="button is-success">
+                        <button @click="follow"
+                            v-if="!authStore.userFollowsIds.includes(user.id) && authStore.isAuthorized && user.id !== authStore.userId()"
+                            class="button is-success">
                             Follow
                         </button>
-                        <button @click="unFollow" v-else-if="authStore.userFollowsIds.includes(user.id) && authStore.isAuthorized && user.id !== authStore.userId()" class="button is-warning">
+                        <button @click="unFollow"
+                            v-else-if="authStore.userFollowsIds.includes(user.id) && authStore.isAuthorized && user.id !== authStore.userId()"
+                            class="button is-warning">
                             Unfollow
                         </button>
                     </p>
@@ -25,17 +29,23 @@
             </div>
             <div>
                 <span class="m-1">Posts: {{ postCount }}</span>
-                <span class="m-1">Followers: {{ followersCount }}</span>
-                <span class="m-1">Followed: {{ followedCount }}</span>
+                <span class="m-1" @click="showFollows(true)">Followers: {{ followersCount }}</span>
+                <span class="m-1" @click="showFollows(false)">Followed: {{ followedCount }}</span>
             </div>
             <div class="content">
                 {{ user.bio }}
             </div>
+
+
         </div>
+    </div>
+    <div v-if="follows.length > 0" style="position: fixed; top: 20vh; left: 40%; z-index: 10;">
+        <FollowerListComponent :follows="follows" :follower="showFollowed" @close="closeFollows" />
     </div>
 </template>
 
 <script setup lang="ts">
+import UserFollowModel from '@/models/UserFollowModel';
 import UserModel from '@/models/UserModel';
 import AddUserFollowRequest from '@/models/request/AddUserFollowRequest';
 import GetPostRequest from '@/models/request/GetPostRequest';
@@ -43,6 +53,7 @@ import GetUserFollowRequest from '@/models/request/GetUserFollowRequest';
 import { useAuthStore } from '@/store/authStore';
 import axios from 'axios';
 import { Ref, onMounted, ref } from 'vue';
+import FollowerListComponent from './FollowerListComponent.vue';
 
 const props = defineProps<{
     user: UserModel
@@ -65,6 +76,26 @@ const unFollow = () => {
     axios.delete(`user-follow/${authStore.userId()}/${props.user.id}`).then(() => {
         authStore.updateFollows()
     })
+}
+
+const follows: Ref<UserFollowModel[]> = ref([])
+const showFollowed: Ref<boolean> = ref(false)
+
+const showFollows = (followed: boolean) => {
+    showFollowed.value = followed
+    if (!followed) {
+        const request: GetUserFollowRequest = { FollowingUserId: props.user.id, JoinFollowed: true }
+        axios.get<UserFollowModel[]>('user-follow', { params: request })
+            .then(res => follows.value = res.data)
+    } else {
+        const request: GetUserFollowRequest = { FollowedUserId: props.user.id, JoinFollower: true }
+        axios.get<UserFollowModel[]>('user-follow', { params: request })
+            .then(res => follows.value = res.data)
+    }
+}
+
+const closeFollows = () => {
+    follows.value = []
 }
 
 onMounted(() => {
