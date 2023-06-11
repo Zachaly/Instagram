@@ -23,6 +23,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<IPostImageRepository, PostImageRepository>();
+            services.AddScoped<IUserFollowRepository, UserFollowRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -39,10 +40,12 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IUserFollowService, UserFollowService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
             services.AddScoped<IPostFactory, PostFactory>();
+            services.AddScoped<IUserFollowFactory, UserFollowFactory>();
 
             services.AddMediatR(opt =>
             {
@@ -69,39 +72,7 @@ namespace Instagram.Api.Infrastructure
                     ValidIssuer = builder.Configuration["Auth:Issuer"],
                     ValidAudience = builder.Configuration["Auth:Audience"],
                 };
-            })
-            .AddJwtBearer("Websocket", config =>
-            {
-                var bytes = Encoding.UTF8.GetBytes(builder.Configuration["Auth:SecretKey"]);
-                var key = new SymmetricSecurityKey(bytes);
-
-                config.SaveToken = true;
-                config.RequireHttpsMetadata = false;
-                config.TokenValidationParameters = new TokenValidationParameters
-                {
-                    IssuerSigningKey = key,
-                    ValidIssuer = builder.Configuration["Auth:Issuer"],
-                    ValidAudience = builder.Configuration["Auth:Audience"],
-                };
-                config.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = (context) =>
-                    {
-                        var path = context.HttpContext.Request.Path;
-                        if (path.StartsWithSegments("/ws"))
-                        {
-                            var token = context.Request.Query["access_token"];
-
-                            if (!string.IsNullOrWhiteSpace(token))
-                            {
-                                context.Token = token;
-                            }
-                        }
-
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+            });            
         }
     }
 }

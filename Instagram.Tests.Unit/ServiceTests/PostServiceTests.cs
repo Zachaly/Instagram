@@ -48,5 +48,18 @@ namespace Instagram.Tests.Unit.ServiceTests
 
             Assert.Equal(post, res);
         }
+
+        [Fact]
+        public async Task GetCountAsync_ReturnsCount()
+        {
+            const int Count = 20;
+
+            _postRepository.Setup(x => x.GetCountAsync(It.IsAny<GetPostRequest>()))
+                .ReturnsAsync(Count);
+
+            var res = await _service.GetCountAsync(new GetPostRequest());
+
+            Assert.Equal(Count, res);
+        }
     }
 }

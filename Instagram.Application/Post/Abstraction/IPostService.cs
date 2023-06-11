@@ -7,5 +7,6 @@ namespace Instagram.Application.Abstraction
     {
         Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request);
         Task<PostModel> GetByIdAsync(long id);
+        Task<int> GetCountAsync(GetPostRequest request);
     }
 }

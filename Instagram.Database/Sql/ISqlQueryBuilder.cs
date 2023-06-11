@@ -8,5 +8,6 @@ namespace Instagram.Database.Sql
         ISqlBuilderQuery BuildInsert<TEntity>(string table, TEntity entity) where TEntity : IEntity;
         ISqlBuilderQuery BuildDelete(string table);
         ISqlBuilderQuery BuildUpdate<TRequest>(string table, TRequest request);
+        ISqlBuilderQuery BuildCount(string table);
     }
 }

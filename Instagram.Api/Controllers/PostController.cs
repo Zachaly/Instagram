@@ -81,5 +81,18 @@ namespace Instagram.Api.Controllers
 
             return res.ReturnNoContentOrBadRequest();
         }
+
+        /// <summary>
+        /// Returns count of posts specified by request
+        /// </summary>
+        /// <response code="200">Number of posts</response>
+        [HttpGet("count")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<int>> GetCountAsync([FromQuery] GetPostRequest request)
+        {
+            var res = await _postService.GetCountAsync(request);
+
+            return Ok(res);
+        }
     }
 }

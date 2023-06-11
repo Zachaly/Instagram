@@ -10,5 +10,6 @@ namespace Instagram.Database.Repository.Abstraction
     {
         Task InsertAsync(TEntity entity);
         Task<IEnumerable<TModel>> GetAsync(TGetRequest request);
+        Task<int> GetCountAsync(TGetRequest request);
     }
 }

@@ -89,5 +89,23 @@ namespace Instagram.Tests.Integration.ApiTests
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
+
+        [Fact]
+        public async Task GetCountAsync_ReturnsProperCount()
+        {
+            const int PostCount = 15;
+
+            foreach (var post in FakeDataFactory.GeneratePosts(PostCount, 2137))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("Post", post).Build();
+                ExecuteQuery(query, post);
+            }
+
+            var response = await _httpClient.GetAsync($"{Endpoint}/count");
+            var content = await response.Content.ReadFromJsonAsync<int>();
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(PostCount, content);
+        }
     }
 }

@@ -80,6 +80,29 @@ namespace Instagram.Tests.Integration.DatabaseTests
         }
 
         [Fact]
+        public async Task GetAsync_RequestWithProperty_WithWhereAttribute_ReturnsSpecifiedUsers()
+        {
+            foreach (var user in FakeDataFactory.GenerateUsers(10))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
+                ExecuteQuery(query, user);
+            }
+
+            var users = GetFromDatabase<User>("SELECT * FROM [User]").Skip(2).Take(2);
+
+            var request = new GetUserRequest
+            {
+                UserIds = users.Select(x => x.Id)
+            };
+
+            var res = await _repository.GetAsync(request);
+
+            Assert.Equivalent(users.Select(x => x.Id), res.Select(x => x.Id));
+            Assert.Equivalent(users.Select(x => x.Nickname), res.Select(x => x.Nickname));
+            Assert.Equal(users.Count(), res.Count());
+        }
+
+        [Fact]
         public async Task InsertUser_UserAddedToDatabase()
         {
             var user = new User
@@ -227,6 +250,42 @@ namespace Instagram.Tests.Integration.DatabaseTests
 
             Assert.Equivalent(userIds, res.Select(x => x.Id));
             Assert.Equal(userIds.Count(), res.Count());
+        }
+
+        [Fact]
+        public async Task GetCountAsync_ReturnsProperCount()
+        {
+            const int Count = 20;
+
+            foreach (var user in FakeDataFactory.GenerateUsers(20))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
+                ExecuteQuery(query, user);
+            }
+
+            var res = await _repository.GetCountAsync(new GetUserRequest());
+
+            Assert.Equal(Count, res);
+        }
+
+        [Fact]
+        public async Task GetEntityById_ReturnsSpecifiedEntity()
+        {
+            foreach (var user in FakeDataFactory.GenerateUsers(5))
+            {
+                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
+                ExecuteQuery(query, user);
+            }
+
+            var testUser = GetFromDatabase<User>("SELECT * FROM [User]").Last();
+
+            var res = await _repository.GetEntityByIdAsync(testUser.Id);
+
+            Assert.Equal(testUser.Id, res.Id);
+            Assert.Equal(testUser.Name, res.Name);
+            Assert.Equal(testUser.Nickname, res.Nickname);
+            Assert.Equal(testUser.Gender, res.Gender);
+            Assert.Equal(testUser.Bio, res.Bio);
         }
     }
 }

@@ -28,5 +28,11 @@ namespace Instagram.Tests.Integration
                 .RuleFor(i => i.PostId, _ => postId)
                 .RuleFor(i => i.File, f => f.Random.AlphaNumeric(40))
                 .Generate(count);
+
+        public static List<UserFollow> GenerateFollows(int count)
+            => new Faker<UserFollow>()
+                .RuleFor(f => f.FollowedUserId, f => f.Random.Int(0, 20))
+                .RuleFor(f => f.FollowingUserId, f => f.Random.Int(0, 20))
+                .Generate(count);
     }
 }

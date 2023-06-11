@@ -13,12 +13,14 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 /* import specific icons */
 import { faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch } from '@fortawesome/free-solid-svg-icons'
+import QueryString from 'qs'
 
 library.add(faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch)
 
 const pinia = createPinia()
 
 axios.defaults.baseURL = API_URL
+axios.defaults.paramsSerializer = params => QueryString.stringify(params)
 
 createApp(App)
     .component('font-awesome-icon', FontAwesomeIcon)

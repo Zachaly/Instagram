@@ -1,5 +1,5 @@
 export default interface PagedRequest {
-    pageIndex?: number,
-    pageSize?: number,
-    skipPagination?: boolean
+    PageIndex?: number,
+    PageSize?: number,
+    SkipPagination?: boolean
 }

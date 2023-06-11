@@ -2,7 +2,7 @@
     <NavigationPage>
         <div class="columns is-centered">
             <div class="column is-6">
-                <UserCardComponent :user="user" />
+                <UserCardComponent v-if="!loading" :user="user" />
                 <p class="title">Posts</p>
                 <div class="is-flex is-flex-wrap-wrap">
                     <PostListItemComponent v-for="post of posts" :key="post.id" :post="post"/>
@@ -26,6 +26,7 @@ import { Ref, onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router'
 
 const params = useRoute().params
+const loading: Ref<boolean> = ref(true)
 const user: UserModel = reactive({
     name: '',
     nickname: '',
@@ -39,6 +40,7 @@ const posts: Ref<PostModel[]> = ref([])
 onMounted(() => {
     axios.get<UserModel>('/user/' + params.id).then(res => {
         Object.assign(user, res.data)
+        loading.value = false
     })
 
     const getPostsRequest: GetPostRequest = {
