@@ -34,5 +34,17 @@ namespace Instagram.Tests.Integration
                 .RuleFor(f => f.FollowedUserId, f => f.Random.Int(0, 20))
                 .RuleFor(f => f.FollowingUserId, f => f.Random.Int(0, 20))
                 .Generate(count);
+
+        public static List<PostLike> GeneratePostLikes(IEnumerable<long> postIds, IEnumerable<long> userIds)
+        {
+            var likes = new List<PostLike>();
+
+            foreach(var postId in postIds)
+            {
+                likes.AddRange(userIds.Select(userId => new PostLike { PostId = postId, UserId = userId }));
+            }
+
+            return likes;
+        }
     }
 }

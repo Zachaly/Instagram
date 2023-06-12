@@ -16,7 +16,8 @@ namespace Instagram.Models.Post
         public long Created { get; set; }
         [SqlName("[PostImage].[Id]", OuterQuery = true)]
         public IEnumerable<long> ImageIds { get; set; }
-        [SqlName("Count([PostLike].[UserId])", OuterQuery = true)]
+        [SqlName("Count([PostLike].[UserId]) as LikeCount", OuterQuery = true)]
+        [NotGrouped]
         public int LikeCount { get; set; }
     }
 }
