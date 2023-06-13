@@ -1,5 +1,4 @@
-﻿
-using Instagram.Database.Repository;
+﻿using Instagram.Database.Repository;
 using Instagram.Database.Sql;
 using Instagram.Domain.Entity;
 
