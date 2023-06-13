@@ -49,6 +49,15 @@ namespace Instagram.Tests.Integration.DatabaseTests
             ExecuteQuery(query, item);
         }
 
+        protected void Insert<T>(string table, IEnumerable<T> items) where T : IEntity
+        {
+            foreach(var item in items)
+            {
+                var query = new SqlQueryBuilder().BuildInsert(table, item).Build();
+                ExecuteQuery(query, item);
+            }
+        }
+
         public void Dispose()
         {
             using (var connection = new SqlConnection(Constants.ConnectionString))

@@ -15,26 +15,17 @@ namespace Instagram.Tests.Integration.ApiTests
         public async Task GetAsync_ReturnsPosts()
         {
             var user = FakeDataFactory.GenerateUsers(1).First();
-            var userQuery = new SqlQueryBuilder().BuildInsert("User", user).Build();
-            ExecuteQuery(userQuery, user);
+            Insert("User", user);
 
             var userId = GetFromDatabase<long>("SELECT Id FROM [User]").First();
 
-            foreach(var post in FakeDataFactory.GeneratePosts(5, userId))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("Post", post).Build();
-                ExecuteQuery(query, post);
-            }
+            Insert("Post", FakeDataFactory.GeneratePosts(5, userId));
 
             var postIds = GetFromDatabase<long>("SELECT Id FROM [Post]");
 
             foreach (var postId in postIds)
             {
-                foreach (var image in FakeDataFactory.GeneratePostImages(postId, 2))
-                {
-                    var query = new SqlQueryBuilder().BuildInsert("PostImage", image).Build();
-                    ExecuteQuery(query, image);
-                }
+                Insert("PostImage", FakeDataFactory.GeneratePostImages(postId, 2));
             }
 
             var response = await _httpClient.GetAsync(Endpoint);
@@ -54,19 +45,11 @@ namespace Instagram.Tests.Integration.ApiTests
 
             var userId = GetFromDatabase<long>("SELECT Id FROM [User]").First();
 
-            foreach (var p in FakeDataFactory.GeneratePosts(5, userId))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("Post", p).Build();
-                ExecuteQuery(query, p);
-            }
+            Insert("Post", FakeDataFactory.GeneratePosts(5, userId));
 
             var post = GetFromDatabase<Post>("SELECT * FROM [Post]").First();
 
-            foreach (var image in FakeDataFactory.GeneratePostImages(post.Id, 2))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("PostImage", image).Build();
-                ExecuteQuery(query, image);
-            }
+            Insert("PostImage", FakeDataFactory.GeneratePostImages(post.Id, 2));
 
             var imageIds = GetFromDatabase<long>("SELECT Id FROM PostImage");
 
@@ -95,11 +78,7 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             const int PostCount = 15;
 
-            foreach (var post in FakeDataFactory.GeneratePosts(PostCount, 2137))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("Post", post).Build();
-                ExecuteQuery(query, post);
-            }
+            Insert("Post", FakeDataFactory.GeneratePosts(PostCount, 2137));
 
             var response = await _httpClient.GetAsync($"{Endpoint}/count");
             var content = await response.Content.ReadFromJsonAsync<int>();

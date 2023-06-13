@@ -14,19 +14,13 @@ namespace Instagram.Tests.Integration.ApiTests
         [Fact]
         public async Task GetAsync_ReturnsLikes()
         {
-            foreach(var user in FakeDataFactory.GenerateUsers(2))
-            {
-                Insert("User", user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(2));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]");
 
             var likes = FakeDataFactory.GeneratePostLikes(new long[] { 1, 2, 3, 4 }, users.Select(x => x.Id));
 
-            foreach(var like in likes) 
-            {
-                Insert("PostLike", like);
-            }
+            Insert("PostLike", likes);
 
             var response = await _httpClient.GetAsync(Endpoint);
             var content = await response.Content.ReadFromJsonAsync<IEnumerable<PostLikeModel>>();
@@ -40,10 +34,7 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             var likes = FakeDataFactory.GeneratePostLikes(new long[] { 1, 2, 3, 4 }, new long[] { 1, 2, 3, 4 });
 
-            foreach (var like in likes)
-            {
-                Insert("PostLike", like);
-            }
+            Insert("PostLike", likes);
 
             var response = await _httpClient.GetAsync($"{Endpoint}/count");
             var content = await response.Content.ReadFromJsonAsync<int>();
@@ -76,10 +67,7 @@ namespace Instagram.Tests.Integration.ApiTests
             const long PostId = 2;
             const long UserId = 3;
 
-            foreach (var like in FakeDataFactory.GeneratePostLikes(new long[] { 1, PostId, 3, 4 }, new long[] { 1, 2, UserId, 4 }))
-            {
-                Insert("PostLike", like);
-            }
+            Insert("PostLike", FakeDataFactory.GeneratePostLikes(new long[] { 1, PostId, 3, 4 }, new long[] { 1, 2, UserId, 4 }));
 
             var response = await _httpClient.DeleteAsync($"{Endpoint}/{PostId}/{UserId}");
 

@@ -23,11 +23,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
             imagesToInsert.AddRange(FakeDataFactory.GeneratePostImages(IdToDelete, 10));
             imagesToInsert.AddRange(FakeDataFactory.GeneratePostImages(3, 10));
 
-            foreach(var image in imagesToInsert )
-            {
-                var query = new SqlQueryBuilder().BuildInsert("PostImage", image).Build();
-                ExecuteQuery(query, image);
-            }
+            Insert("PostImage", imagesToInsert);
 
             await _repository.DeleteByPostIdAsync(IdToDelete);
 

@@ -17,11 +17,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetAsync_ReturnsPosts_WithJoinedColumns()
         {
-            foreach(var user in FakeDataFactory.GenerateUsers(2))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(2));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]");
 
@@ -31,21 +27,13 @@ namespace Instagram.Tests.Integration.DatabaseTests
             var postsToInsert = FakeDataFactory.GeneratePosts(5, user1.Id);
             postsToInsert.AddRange(FakeDataFactory.GeneratePosts(5, user2.Id));
 
-            foreach (var post in postsToInsert)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("Post", post).Build();
-                ExecuteQuery(query, post);
-            }
+            Insert("Post", postsToInsert);
 
             var postIds = GetFromDatabase<long>("SELECT Id FROM [Post]");
 
             foreach(var postId in postIds)
             {
-                foreach(var image in FakeDataFactory.GeneratePostImages(postId, 2))
-                {
-                    var query = new SqlQueryBuilder().BuildInsert("PostImage", image).Build();
-                    ExecuteQuery(query, image);
-                }
+                Insert("PostImage", FakeDataFactory.GeneratePostImages(postId, 2));
             }
 
             var images = GetFromDatabase<PostImage>("SELECT * FROM [PostImage]");
@@ -79,11 +67,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
 
             post.Id = GetFromDatabase<long>("SELECT Id FROM Post").First();
 
-            foreach(var image in FakeDataFactory.GeneratePostImages(post.Id, 10))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("PostImage", image).Build();
-                ExecuteQuery(query, image);
-            }
+            Insert("PostImage", FakeDataFactory.GeneratePostImages(post.Id, 10));
 
             var imageIds = GetFromDatabase<long>("SELECT Id FROM PostImage");
 
@@ -99,10 +83,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetAsync_ModelsHaveProperLikeCount()
         {
-            foreach(var user in FakeDataFactory.GenerateUsers(5))
-            {
-                Insert("User", user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(5));
 
             var userIds = GetFromDatabase<long>("SELECT Id FROM [User]");
 
@@ -113,10 +94,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
                 postsToInsert.AddRange(FakeDataFactory.GeneratePosts(2, id));
             }
 
-            foreach(var post in postsToInsert)
-            {
-                Insert("Post", post);
-            }
+            Insert("Post", postsToInsert);
 
             var postIds = GetFromDatabase<long>("SELECT Id FROM Post");
 
@@ -128,10 +106,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
 
             var likes = FakeDataFactory.GeneratePostLikes(postIds, userIds);
 
-            foreach (var like in likes)
-            {
-                Insert("PostLike", like);
-            }
+            Insert("PostLike", likes);
 
             var result = await _repository.GetAsync(new GetPostRequest());
 

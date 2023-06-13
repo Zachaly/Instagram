@@ -17,11 +17,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetAsync_WithoutConditionalJoin_JoinsNothing()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(2))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(2));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]");
 
@@ -31,11 +27,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
                 new UserFollow { FollowedUserId = users.Last().Id, FollowingUserId = users.First().Id }
             };
 
-            foreach (var follow in follows)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("UserFollow", follow).Build();
-                ExecuteQuery(query, follow);
-            }
+            Insert("UserFollow", follows);
 
             var request = new GetUserFollowRequest
             {
@@ -53,11 +45,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetAsync_RequestWithConditionalJoin_JoinsProperColumns()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(2))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(2));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]");
 
@@ -67,11 +55,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
                 new UserFollow { FollowedUserId = users.Last().Id, FollowingUserId = users.First().Id }
             };
 
-            foreach(var follow in follows)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("UserFollow", follow).Build();
-                ExecuteQuery(query, follow);
-            }
+            Insert("UserFollow", follows);
 
             var request = new GetUserFollowRequest
             {
@@ -88,11 +72,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetAsync_RequestWithExclusiveConditionalJoins_OneJoinApplied()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(2))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(2));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]");
 
@@ -102,11 +82,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
                 new UserFollow { FollowedUserId = users.Last().Id, FollowingUserId = users.First().Id }
             };
 
-            foreach (var follow in follows)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("UserFollow", follow).Build();
-                ExecuteQuery(query, follow);
-            }
+            Insert("UserFollow", follows);
 
             var request = new GetUserFollowRequest
             {
@@ -134,11 +110,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
                 new UserFollow { FollowedUserId = 5, FollowingUserId = 6 },
             };
 
-            foreach (var follow in follows)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("UserFollow", follow).Build();
-                ExecuteQuery(query, follow);
-            }
+            Insert("UserFollow", follows);
 
             await _repository.DeleteAsync(FollowerIdToDelete, FollowedIdToDelete);
 

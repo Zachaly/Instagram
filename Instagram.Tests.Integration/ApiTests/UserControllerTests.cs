@@ -163,11 +163,7 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             var users = FakeDataFactory.GenerateUsers(5);
 
-            foreach(var user in users)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", users);
 
             var response = await _httpClient.GetAsync(Endpoint);
             var content = await response.Content.ReadFromJsonAsync<IEnumerable<UserModel>>();
@@ -184,11 +180,7 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             var users = FakeDataFactory.GenerateUsers(5);
 
-            foreach (var user in users)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", users);
 
             var name = users.First().Nickname;
 
@@ -236,11 +228,7 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             await Authorize();
 
-            foreach (var user in FakeDataFactory.GenerateUsers(5))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(5));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]");
             var userToUpdate = users.Last();

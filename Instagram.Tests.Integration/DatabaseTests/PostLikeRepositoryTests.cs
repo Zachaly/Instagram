@@ -22,10 +22,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
             var postIds = new long[] { 1, PostIdToDelete, 3, 4, 5 };
             var userIds = new long[] { 1, 2, UserIdToDelete, 4, 5 };
 
-            foreach(var like in FakeDataFactory.GeneratePostLikes(postIds, userIds))
-            {
-                Insert("PostLike", like);
-            }
+            Insert("PostLike", FakeDataFactory.GeneratePostLikes(postIds, userIds));
 
             await _repository.DeleteAsync(PostIdToDelete, UserIdToDelete);
 
