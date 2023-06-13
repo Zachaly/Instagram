@@ -7,8 +7,10 @@ namespace Instagram.Application
     public class PostLikeFactory : IPostLikeFactory
     {
         public PostLike Create(AddPostLikeRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => new PostLike
+            {
+                PostId = request.PostId,
+                UserId = request.UserId,
+            };
     }
 }

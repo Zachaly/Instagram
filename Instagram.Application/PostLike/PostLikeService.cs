@@ -20,24 +20,44 @@ namespace Instagram.Application
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> AddAsync(AddPostLikeRequest request)
+        public async Task<ResponseModel> AddAsync(AddPostLikeRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var like = _postLikeFactory.Create(request);
+
+                await _postLikeRepository.InsertAsync(like);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
 
-        public Task<ResponseModel> DeleteAsync(long postId, long userId)
+        public async Task<ResponseModel> DeleteAsync(long postId, long userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _postLikeRepository.DeleteAsync(postId, userId);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
 
         public Task<IEnumerable<PostLikeModel>> GetAsync(GetPostLikeRequest request)
         {
-            throw new NotImplementedException();
+            return _postLikeRepository.GetAsync(request);
         }
 
         public Task<int> GetCountAsync(GetPostLikeRequest request)
         {
-            throw new NotImplementedException();
+            return _postLikeRepository.GetCountAsync(request);
         }
     }
 }

@@ -138,7 +138,7 @@ namespace Instagram.Tests.Unit.ServiceTests
 
             var res = await _service.DeleteAsync(1, 2);
 
-            Assert.True(res.Success);
+            Assert.False(res.Success);
             Assert.Equal(Error, res.Error);
         }
     }
