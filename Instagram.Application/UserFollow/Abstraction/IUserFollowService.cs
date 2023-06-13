@@ -4,11 +4,9 @@ using Instagram.Models.UserFollow.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IUserFollowService
+    public interface IUserFollowService : IKeylessServiceBase<UserFollowModel, GetUserFollowRequest>
     {
-        Task<IEnumerable<UserFollowModel>> GetAsync(GetUserFollowRequest request);
         Task<ResponseModel> AddAsync(AddUserFollowRequest request);
         Task<ResponseModel> DeleteAsync(long followerId, long followedId);
-        Task<int> GetCountAsync(GetUserFollowRequest request);
     }
 }

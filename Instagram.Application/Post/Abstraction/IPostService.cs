@@ -3,10 +3,8 @@ using Instagram.Models.Post.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IPostService
+    public interface IPostService : IServiceBase<PostModel, GetPostRequest>
     {
-        Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request);
-        Task<PostModel> GetByIdAsync(long id);
-        Task<int> GetCountAsync(GetPostRequest request);
+
     }
 }

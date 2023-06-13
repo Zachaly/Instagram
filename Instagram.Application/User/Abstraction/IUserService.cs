@@ -4,10 +4,8 @@ using Instagram.Models.User.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IUserService
+    public interface IUserService : IServiceBase<UserModel, GetUserRequest>
     {
-        Task<IEnumerable<UserModel>> GetAsync(GetUserRequest request);
-        Task<UserModel> GetByIdAsync(long id);
         Task<ResponseModel> UpdateAsync(UpdateUserRequest request);
     }
 }

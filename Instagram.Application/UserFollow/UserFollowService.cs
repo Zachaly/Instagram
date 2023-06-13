@@ -1,21 +1,20 @@
 ﻿using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
+using Instagram.Domain.Entity;
 using Instagram.Models.Response;
 using Instagram.Models.UserFollow;
 using Instagram.Models.UserFollow.Request;
 
 namespace Instagram.Application
 {
-    public class UserFollowService : IUserFollowService
+    public class UserFollowService : KeylessServiceBase<UserFollow, UserFollowModel, GetUserFollowRequest, IUserFollowRepository>, IUserFollowService
     {
-        private readonly IUserFollowRepository _userFollowRepository;
         private readonly IUserFollowFactory _userFollowFactory;
         private readonly IResponseFactory _responseFactory;
 
         public UserFollowService(IUserFollowRepository userFollowRepository, IUserFollowFactory userFollowFactory, 
-            IResponseFactory responseFactory)
+            IResponseFactory responseFactory) : base(userFollowRepository)
         {
-            _userFollowRepository = userFollowRepository;
             _userFollowFactory = userFollowFactory;
             _responseFactory = responseFactory;
         }
@@ -26,7 +25,7 @@ namespace Instagram.Application
             {
                 var follow = _userFollowFactory.Create(request);
 
-                await _userFollowRepository.InsertAsync(follow);
+                await _repository.InsertAsync(follow);
 
                 return _responseFactory.CreateSuccess();
             }
@@ -40,7 +39,7 @@ namespace Instagram.Application
         {
             try
             {
-                await _userFollowRepository.DeleteAsync(followerId, followedId);
+                await _repository.DeleteAsync(followerId, followedId);
 
                 return _responseFactory.CreateSuccess();
             }
@@ -48,16 +47,6 @@ namespace Instagram.Application
             {
                 return _responseFactory.CreateFailure(ex.Message);
             }
-        }
-
-        public Task<IEnumerable<UserFollowModel>> GetAsync(GetUserFollowRequest request)
-        {
-            return _userFollowRepository.GetAsync(request);
-        }
-
-        public Task<int> GetCountAsync(GetUserFollowRequest request)
-        {
-            return _userFollowRepository.GetCountAsync(request);
         }
     }
 }
