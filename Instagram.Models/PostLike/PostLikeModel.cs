@@ -2,6 +2,7 @@
 
 namespace Instagram.Models.PostLike
 {
+    [Join(Table = "[User]", Condition = "[User].[Id]=[PostLike].[UserId]")]
     public class PostLikeModel : IModel
     {
         public long UserId { get; set; }

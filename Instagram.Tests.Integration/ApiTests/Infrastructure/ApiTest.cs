@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using Instagram.Database.Sql;
+using Instagram.Domain.Entity;
 using Instagram.Models.User;
 using Instagram.Models.User.Request;
 using Microsoft.Data.SqlClient;
@@ -18,7 +20,8 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
             "TRUNCATE TABLE [User]",
             "TRUNCATE TABLE [Post]",
             "TRUNCATE TABLE [PostImage]",
-            "TRUNCATE TABLE [UserFollow]"
+            "TRUNCATE TABLE [UserFollow]",
+            "TRUNCATE TABLE [PostLike]"
         };
 
 
@@ -54,6 +57,13 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
             {
                 connection.Query(query, param);
             }
+        }
+
+        protected void Insert<T>(string table, T item) where T : IEntity
+        {
+            var query = new SqlQueryBuilder().BuildInsert(table, item).Build();
+
+            ExecuteQuery(query, item);
         }
 
         protected async Task Authorize()
