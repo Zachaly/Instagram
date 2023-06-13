@@ -9,7 +9,6 @@
 <script setup lang="ts">
 import PostModel from '@/models/PostModel';
 
-
 const props = defineProps<{
     post: PostModel
 }>()

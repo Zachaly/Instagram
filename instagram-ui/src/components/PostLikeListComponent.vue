@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import PostLikeModel from '@/models/PostLikeModel';
-import GetPostLikeRequest from '@/models/request/GetPostLikeRequest';
+import GetPostLikeRequest from '@/models/request/get/GetPostLikeRequest';
 import axios from 'axios';
 import { Ref, onMounted, ref } from 'vue';
 import UserLinkComponent from './UserLinkComponent.vue';

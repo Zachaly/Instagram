@@ -20,7 +20,6 @@
 
         <div class="card-content">
             <UserLinkComponent :nickName="post.creatorName" :id="post.creatorId" />
-
             <p>
                 {{ post.content }}
             </p>
@@ -43,7 +42,7 @@ import PostModel from '@/models/PostModel';
 import UserLinkComponent from './UserLinkComponent.vue';
 import { ref } from 'vue';
 import { useAuthStore } from '@/store/authStore';
-import GetPostLikeRequest from '@/models/request/GetPostLikeRequest';
+import GetPostLikeRequest from '@/models/request/get/GetPostLikeRequest';
 import axios from 'axios';
 import AddPostLikeRequest from '@/models/request/AddPostLikeRequest';
 import PostLikeListComponent from './PostLikeListComponent.vue';
@@ -75,9 +74,11 @@ const like = () => {
 
     axios.get<number>('post-like/count', { params: getRequest }).then(res => {
         if (res.data > 0) {
+            console.log('del')
             axios.delete(`post-like/${props.post.id}/${authStore.userId()}`).then()
         }
         else {
+            console.log('add')
             const addRequest: AddPostLikeRequest = { postId: props.post.id, userId: authStore.userId() }
             axios.post('post-like', addRequest).then()
         }

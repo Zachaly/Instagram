@@ -1,7 +1,6 @@
 import LoginResponse from "@/models/LoginResponse";
 import UserFollowModel from "@/models/UserFollowModel";
-import GetUserFollowRequest from "@/models/request/GetUserFollowRequest";
-import { RefSymbol } from "@vue/reactivity";
+import GetUserFollowRequest from "@/models/request/get/GetUserFollowRequest";
 import axios from "axios";
 import { defineStore } from "pinia";
 import { Ref, ref } from 'vue'

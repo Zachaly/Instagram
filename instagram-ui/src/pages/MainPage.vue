@@ -24,9 +24,9 @@ import { Ref, onMounted, ref } from 'vue';
 import PostModel from '@/models/PostModel';
 import PostCardComponent from '@/components/PostCardComponent.vue';
 import UserLinkComponent from '@/components/UserLinkComponent.vue';
-import GetPostRequest from '@/models/request/GetPostRequest';
+import GetPostRequest from '@/models/request/get/GetPostRequest';
 import { useAuthStore } from '@/store/authStore';
-import GetUserRequest from '@/models/request/GetUserRequest';
+import GetUserRequest from '@/models/request/get/GetUserRequest';
 
 const users: Ref<UserModel[]> = ref([])
 const posts: Ref<PostModel[]> = ref([])
@@ -40,10 +40,10 @@ const loadPosts = () => {
 }
 
 const loadUsers = () => {
-    const request: GetUserRequest = { SkipIds: [...authStore.userFollowsIds, authStore.userId() ] }
-    axios.get<UserModel[]>('user', { 
+    const request: GetUserRequest = { SkipIds: [...authStore.userFollowsIds, authStore.userId()] }
+    axios.get<UserModel[]>('user', {
         params: request
-     }).then(res => users.value = res.data)
+    }).then(res => users.value = res.data)
 }
 
 onMounted(() => {

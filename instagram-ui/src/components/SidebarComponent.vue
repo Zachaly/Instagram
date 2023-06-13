@@ -18,7 +18,6 @@
                 <a class="button is-danger" @click="logout">Logout</a>
             </li>
         </ul>
-
     </aside>
 </template>
 

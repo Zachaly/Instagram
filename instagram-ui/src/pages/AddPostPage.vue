@@ -16,7 +16,6 @@
                                 <img :key="img" :src="img" alt="" />
                             </figure>
                         </div>
-
                     </div>
                     <div class="control m-2">
                         <div class="file is-boxed">

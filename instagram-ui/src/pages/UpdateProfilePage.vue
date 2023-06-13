@@ -49,7 +49,6 @@
                         </div>
                         <button class="button is-info" style="width: 100%;" @click="sendProfilePicture">Update profile picture</button>
                     </div>
-
                 </div>
             </div>
         </NavigationPage>

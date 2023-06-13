@@ -9,7 +9,6 @@ declare module '@vue/runtime-core' {
 
 export { }
 
-
 const plugin: Plugin<[]> = {
     install: (app: App<any>) => {
         app.config.globalProperties.$image = (type: string, id: number) => `${API_URL}/image/${type}/${id}`

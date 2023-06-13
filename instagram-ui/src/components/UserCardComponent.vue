@@ -35,8 +35,6 @@
             <div class="content">
                 {{ user.bio }}
             </div>
-
-
         </div>
     </div>
     <div v-if="follows.length > 0" class="fixed-center">
@@ -48,8 +46,8 @@
 import UserFollowModel from '@/models/UserFollowModel';
 import UserModel from '@/models/UserModel';
 import AddUserFollowRequest from '@/models/request/AddUserFollowRequest';
-import GetPostRequest from '@/models/request/GetPostRequest';
-import GetUserFollowRequest from '@/models/request/GetUserFollowRequest';
+import GetPostRequest from '@/models/request/get/GetPostRequest';
+import GetUserFollowRequest from '@/models/request/get/GetUserFollowRequest';
 import { useAuthStore } from '@/store/authStore';
 import axios from 'axios';
 import { Ref, onMounted, ref } from 'vue';

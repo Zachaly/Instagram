@@ -3,10 +3,8 @@ using Instagram.Database.Factory;
 using Instagram.Database.Repository.Abstraction;
 using Instagram.Database.Sql;
 using Instagram.Domain.Entity;
-using Instagram.Models;
 using Instagram.Models.Post;
 using Instagram.Models.Post.Request;
-using System.Linq;
 
 namespace Instagram.Database.Repository
 {
@@ -66,9 +64,11 @@ namespace Instagram.Database.Repository
             PostModel model = null;
             using (var connection = _connectionFactory.CreateConnection())
             {
-                await connection.QueryAsync<PostModel, long, PostModel>(query, (post, imageId) =>
+                await connection.QueryAsync<PostModel, long, int, PostModel>(query, (post, imageId, likeCount) =>
                 {
                     model = model ?? post;
+
+                    model.LikeCount = likeCount;
 
                     model.ImageIds ??= new List<long>();
 
@@ -78,7 +78,7 @@ namespace Instagram.Database.Repository
                     }
 
                     return model;
-                }, param);
+                }, param, splitOn: "Id, Id, LikeCount");
             }
 
             return model;
