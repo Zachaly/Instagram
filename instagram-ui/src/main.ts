@@ -9,10 +9,10 @@ import { library as  library } from '@fortawesome/fontawesome-svg-core'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import { faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch, faX } from '@fortawesome/free-solid-svg-icons'
+import { faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch, faX, faHeart } from '@fortawesome/free-solid-svg-icons'
 import QueryString from 'qs'
 
-library.add(faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch, faX)
+library.add(faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch, faX, faHeart)
 
 const pinia = createPinia()
 

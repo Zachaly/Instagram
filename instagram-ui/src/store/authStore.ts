@@ -16,25 +16,28 @@ export const useAuthStore = defineStore('auth', () => {
 
     const userFollowsIds: Ref<number[]> = ref([])
 
-    const authorize = (response: LoginResponse) => {
+    const authorize = async (response: LoginResponse) => {
         if (!response.authToken) {
             isAuthorized.value = false
         } else {
             authInfo.value = response
             isAuthorized.value = true
             axios.defaults.headers.common.Authorization = `Bearer ${authInfo.value.authToken}`
-            updateFollows()
+            await updateFollows()
         }
 
         return isAuthorized.value
     }
 
-    const updateFollows = () => {
+    const updateFollows = (): Promise<any> => new Promise((resolve, reject) => {
         const followRequest: GetUserFollowRequest = { FollowingUserId: authInfo.value.userId, SkipPagination: true }
         axios.get<UserFollowModel[]>('user-follow', {
             params: followRequest
-        }).then(res => userFollowsIds.value = res.data.map(x => x.followedUserId))
-    }
+        }).then(res => {
+            userFollowsIds.value = res.data.map(x => x.followedUserId)
+            resolve(true)
+        })
+    })
 
     const logout = () => {
         authInfo.value = {

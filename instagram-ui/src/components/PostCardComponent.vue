@@ -1,6 +1,6 @@
 <template>
     <div class="card m-1">
-        <div>
+        <div @dblclick="like">
             <div class="card-image">
                 <figure class="image is-4by3">
                     <img :src="$image('post', post.imageIds[currentImageIndex])">
@@ -24,7 +24,17 @@
             <p>
                 {{ post.content }}
             </p>
+            <p class="subtitle is-4">
+                <span @click="showLikes = post.likeCount > 0">
+                    <font-awesome-icon :icon="['fas', 'heart']" />
+                    {{ post.likeCount }}
+                </span>
+            </p>
         </div>
+    </div>
+
+    <div v-if="showLikes" class="fixed-center">
+        <PostLikeListComponent :postId="post.id" @close="showLikes = false" />
     </div>
 </template>
 
@@ -32,11 +42,18 @@
 import PostModel from '@/models/PostModel';
 import UserLinkComponent from './UserLinkComponent.vue';
 import { ref } from 'vue';
+import { useAuthStore } from '@/store/authStore';
+import GetPostLikeRequest from '@/models/request/GetPostLikeRequest';
+import axios from 'axios';
+import AddPostLikeRequest from '@/models/request/AddPostLikeRequest';
+import PostLikeListComponent from './PostLikeListComponent.vue';
 
 const currentImageIndex = ref(0)
+const authStore = useAuthStore()
+const showLikes = ref(false)
 
 const changeIndex = (value: number) => {
-    if(currentImageIndex.value + value < 0 || currentImageIndex.value + value > props.post.imageIds.length - 1){
+    if (currentImageIndex.value + value < 0 || currentImageIndex.value + value > props.post.imageIds.length - 1) {
         return
     }
     currentImageIndex.value += value
@@ -48,5 +65,23 @@ const props = defineProps<{
     post: PostModel
 }>()
 
+const like = () => {
+    if (!authStore.isAuthorized) {
+        alert('You must be logged in to do that!')
+        return
+    }
+
+    const getRequest: GetPostLikeRequest = { PostId: props.post.id, UserId: authStore.userId() }
+
+    axios.get<number>('post-like/count', { params: getRequest }).then(res => {
+        if (res.data > 0) {
+            axios.delete(`post-like/${props.post.id}/${authStore.userId()}`).then()
+        }
+        else {
+            const addRequest: AddPostLikeRequest = { postId: props.post.id, userId: authStore.userId() }
+            axios.post('post-like', addRequest).then()
+        }
+    })
+}
 
 </script>
