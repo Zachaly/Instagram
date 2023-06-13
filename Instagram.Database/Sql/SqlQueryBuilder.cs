@@ -93,17 +93,10 @@ namespace Instagram.Database.Sql
 
             var selectedValues = new StringBuilder("");
             var outsideSelectedValues = new StringBuilder("");
-            var groupByValues = new StringBuilder("");
-
-            var groupBy = typeof(T).GetCustomAttribute<GroupByAttribute>() is not null;
 
             int innerIndex = 0;
             int outerIndex = 0;
 
-            if (groupBy)
-            {
-                groupByValues.Append("GROUP BY ");
-            }
 
             foreach (var prop in props)
             {
@@ -118,12 +111,6 @@ namespace Instagram.Database.Sql
                     }
 
                     outsideSelectedValues.Append($"{coma} {sqlName.Name}");
-
-                    if (groupBy && prop.GetCustomAttribute<NotGroupedAttribute>() is null)
-                    {
-                        coma = outerIndex > 0 || innerIndex > 0 ? "," : "";
-                        groupByValues.Append($"{coma} {sqlName.Name}");
-                    }
 
                     outerIndex++;
 
@@ -141,12 +128,6 @@ namespace Instagram.Database.Sql
                 }
 
                 selectedValues.Append($"{coma} {name}");
-                
-                if (groupBy && prop.GetCustomAttribute<NotGroupedAttribute>() is null)
-                {
-                    coma = outerIndex > 0 || innerIndex > 0 ? "," : "";
-                    groupByValues.Append($"{coma} t.{prop.Name}");
-                }
                 
                 innerIndex++;
             }
@@ -172,9 +153,48 @@ namespace Instagram.Database.Sql
             select.Replace("/**outsideselect**/", outsideSelectedValues.ToString());
             select.Replace("/**join**/", outsideJoinBuilder.ToString());
             select.Replace("/**subjoin**/", subJoinBuilder.ToString());
-            select.Replace("/**groupby**/", groupByValues.ToString());
+            select.Replace("/**groupby**/", GenerateGroupBy<T>());
 
             return new SqlBuilderQuery(select.ToString(), table);
+        }
+
+        private string GenerateGroupBy<T>()
+        {
+            if(typeof(T).GetCustomAttribute<GroupByAttribute>() is null)
+            {
+                return "";
+            }
+
+            var groupBuilder = new StringBuilder("GROUP BY ");
+
+            var props = typeof(T)
+                .GetProperties()
+                .Where(prop => prop.GetCustomAttribute<NotGroupedAttribute>() is null);
+
+            var index = 0;
+
+            foreach (var prop in props)
+            {
+                var sqlName = prop.GetCustomAttribute<SqlNameAttribute>();
+                var coma = " ";
+                var name = $"t.{prop.Name}";
+
+                if(index != 0)
+                {
+                    coma = ", ";
+                }
+
+                if(sqlName?.OuterQuery ?? false)
+                {
+                    name = sqlName.Name;
+                }
+
+                groupBuilder.Append($"{coma} {name}");
+
+                index++;
+            }
+
+            return groupBuilder.ToString();
         }
 
         public ISqlBuilderQuery BuildUpdate<TRequest>(string table, TRequest request)
