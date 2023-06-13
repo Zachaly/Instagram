@@ -31,13 +31,14 @@ namespace Instagram.Database.Repository
 
             using(var connection = _connectionFactory.CreateConnection())
             {
-                await connection.QueryAsync<PostModel, long, PostModel>(query, (post, imageId) =>
+                await connection.QueryAsync<PostModel, long, int, PostModel>(query, (post, imageId, likeCount) =>
                 {
                     PostModel model;
                     if(!lookup.TryGetValue(post.Id, out model))
                     {
                         lookup.Add(post.Id, post);
                         model = post;
+                        post.LikeCount = likeCount;
                     }
 
                     model.ImageIds ??= new List<long>();
@@ -48,7 +49,7 @@ namespace Instagram.Database.Repository
                     }
 
                     return model;
-                }, request);
+                }, request, splitOn: "Id, Id, LikeCount");
             }
 
             return lookup.Values;

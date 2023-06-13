@@ -38,8 +38,8 @@ const authStore = useAuthStore()
 
 const login = () => {
     axios.post<LoginRequest, AxiosResponse<LoginResponse>>('user/login', toRaw(request))
-        .then(res => {
-            if (authStore.authorize(res.data)) {
+        .then(async (res) => {
+            if (await authStore.authorize(res.data)) {
                 router.push('/')
             }
         })

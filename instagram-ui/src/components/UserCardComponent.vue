@@ -39,7 +39,7 @@
 
         </div>
     </div>
-    <div v-if="follows.length > 0" style="position: fixed; top: 20vh; left: 40%; z-index: 10;">
+    <div v-if="follows.length > 0" class="fixed-center">
         <FollowerListComponent :follows="follows" :follower="showFollowed" @close="closeFollows" />
     </div>
 </template>

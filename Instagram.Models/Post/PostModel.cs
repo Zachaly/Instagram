@@ -4,10 +4,11 @@ namespace Instagram.Models.Post
 {
     [Join(Table = "[User]", Condition = "[User].[Id]=[Post].[CreatorId]")]
     [Join(Table = "[PostImage]", Condition = "t.[Id]=[PostImage].[PostId]", OutsideJoin = true)]
+    [Join(Table = "[PostLike]", Condition = "t.[Id]=[PostLike].[PostId]", OutsideJoin = true)]
+    [GroupBy]
     public class PostModel : IModel
     {
         public long Id { get; set; }
-        [SqlName("[User].[Id]")]
         public long CreatorId { get; set; }
         public string Content { get; set; }
         [SqlName("[User].[Nickname]")]
@@ -15,5 +16,8 @@ namespace Instagram.Models.Post
         public long Created { get; set; }
         [SqlName("[PostImage].[Id]", OuterQuery = true)]
         public IEnumerable<long> ImageIds { get; set; }
+        [SqlName("Count([PostLike].[UserId]) as LikeCount", OuterQuery = true)]
+        [NotGrouped]
+        public int LikeCount { get; set; }
     }
 }

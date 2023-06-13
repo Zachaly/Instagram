@@ -57,6 +57,7 @@ namespace Instagram.Database.Sql
             int index = 0;
 
             var props = typeof(T).GetProperties();
+
             foreach (var prop in props)
             {
                 var coma = "";
@@ -80,23 +81,27 @@ namespace Instagram.Database.Sql
 
             select.Replace("/**select**/", selectedValues.ToString());
             select.Replace("/**join**/", joinBuilder.ToString());
+
             return new SqlBuilderQuery(select.ToString(), table);
         }
 
         private ISqlBuilderQuery BuildSelectWithSubQuery<T>(string table)
         {
-            var select = new StringBuilder($"SELECT t.*, /**outsideselect**/ FROM (SELECT /**select**/ FROM [{table}] /**subjoin**/ /**where**/ /**orderby**/ /**pagination**/) as t /**join**/");
+            var select = new StringBuilder($"SELECT t.*, /**outsideselect**/ FROM (SELECT /**select**/ FROM [{table}] /**subjoin**/ /**where**/ /**orderby**/ /**pagination**/) as t /**join**/ /**groupby**/");
 
             var props = typeof(T).GetProperties();
 
             var selectedValues = new StringBuilder("");
             var outsideSelectedValues = new StringBuilder("");
+
             int innerIndex = 0;
             int outerIndex = 0;
+
+
             foreach (var prop in props)
             {
                 var coma = "";
-                var name = $"[{table}].[{prop.Name}]";
+                var name = $"[{table}].[{prop.Name}] as [{prop.Name}]";
                 var sqlName = prop.GetCustomAttribute<SqlNameAttribute>();
                 if (sqlName?.OuterQuery ?? false)
                 {
@@ -108,6 +113,7 @@ namespace Instagram.Database.Sql
                     outsideSelectedValues.Append($"{coma} {sqlName.Name}");
 
                     outerIndex++;
+
                     continue;
                 }
 
@@ -120,7 +126,9 @@ namespace Instagram.Database.Sql
                 {
                     name = $"{sqlName.Name} as [{prop.Name}]";
                 }
+
                 selectedValues.Append($"{coma} {name}");
+                
                 innerIndex++;
             }
 
@@ -134,7 +142,8 @@ namespace Instagram.Database.Sql
                 if(join.OutsideJoin)
                 {
                     outsideJoinBuilder.Append($"LEFT OUTER JOIN {join.Table} ON {join.Condition}");
-                } else
+                } 
+                else
                 {
                     subJoinBuilder.Append($"LEFT OUTER JOIN {join.Table} ON {join.Condition}");
                 }
@@ -144,8 +153,48 @@ namespace Instagram.Database.Sql
             select.Replace("/**outsideselect**/", outsideSelectedValues.ToString());
             select.Replace("/**join**/", outsideJoinBuilder.ToString());
             select.Replace("/**subjoin**/", subJoinBuilder.ToString());
+            select.Replace("/**groupby**/", GenerateGroupBy<T>());
 
             return new SqlBuilderQuery(select.ToString(), table);
+        }
+
+        private string GenerateGroupBy<T>()
+        {
+            if(typeof(T).GetCustomAttribute<GroupByAttribute>() is null)
+            {
+                return "";
+            }
+
+            var groupBuilder = new StringBuilder("GROUP BY ");
+
+            var props = typeof(T)
+                .GetProperties()
+                .Where(prop => prop.GetCustomAttribute<NotGroupedAttribute>() is null);
+
+            var index = 0;
+
+            foreach (var prop in props)
+            {
+                var sqlName = prop.GetCustomAttribute<SqlNameAttribute>();
+                var coma = " ";
+                var name = $"t.{prop.Name}";
+
+                if(index != 0)
+                {
+                    coma = ", ";
+                }
+
+                if(sqlName?.OuterQuery ?? false)
+                {
+                    name = sqlName.Name;
+                }
+
+                groupBuilder.Append($"{coma} {name}");
+
+                index++;
+            }
+
+            return groupBuilder.ToString();
         }
 
         public ISqlBuilderQuery BuildUpdate<TRequest>(string table, TRequest request)

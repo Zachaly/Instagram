@@ -95,5 +95,47 @@ namespace Instagram.Tests.Integration.DatabaseTests
             Assert.Equal(user.Nickname, res.CreatorName);
             Assert.Equivalent(imageIds, res.ImageIds);
         }
+
+        [Fact]
+        public async Task GetAsync_ModelsHaveProperLikeCount()
+        {
+            foreach(var user in FakeDataFactory.GenerateUsers(5))
+            {
+                Insert("User", user);
+            }
+
+            var userIds = GetFromDatabase<long>("SELECT Id FROM [User]");
+
+            var postsToInsert = new List<Post>();
+
+            foreach(var id in userIds)
+            {
+                postsToInsert.AddRange(FakeDataFactory.GeneratePosts(2, id));
+            }
+
+            foreach(var post in postsToInsert)
+            {
+                Insert("Post", post);
+            }
+
+            var postIds = GetFromDatabase<long>("SELECT Id FROM Post");
+
+            foreach (var id in postIds)
+            {
+                var image = new PostImage { File = "file", PostId = id };
+                Insert("PostImage", image);
+            }
+
+            var likes = FakeDataFactory.GeneratePostLikes(postIds, userIds);
+
+            foreach (var like in likes)
+            {
+                Insert("PostLike", like);
+            }
+
+            var result = await _repository.GetAsync(new GetPostRequest());
+
+            Assert.All(result, post => Assert.Equal(likes.Count(x => x.PostId == post.Id), post.LikeCount));
+        }
     }
 }
