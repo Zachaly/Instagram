@@ -110,7 +110,6 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_ExceptionThrown_Fail()
         {
-            var posts = new List<Post>();
             const string Error = "error";
 
             _fileService.Setup(x => x.SavePostImagesAsync(It.IsAny<IEnumerable<IFormFile>>()))

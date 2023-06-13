@@ -38,7 +38,6 @@ namespace Instagram.Tests.Unit.FactoryTests
 
             Assert.All(images, image => Assert.Equal(PostId, image.PostId));
             Assert.Equivalent(files, images.Select(x => x.File));
-
         }
     }
 }

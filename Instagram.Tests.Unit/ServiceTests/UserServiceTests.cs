@@ -33,7 +33,8 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new UserModel { Id = 4 },
             };
 
-            _userRepository.Setup(x => x.GetAsync(It.IsAny<GetUserRequest>())).ReturnsAsync(users);
+            _userRepository.Setup(x => x.GetAsync(It.IsAny<GetUserRequest>()))
+                .ReturnsAsync(users);
 
             var res = await _service.GetAsync(new GetUserRequest());
 
@@ -45,7 +46,8 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             var user = new UserModel { Id = 1, Name = "test" };
 
-            _userRepository.Setup(x => x.GetByIdAsync(It.IsAny<long>())).ReturnsAsync(user);
+            _userRepository.Setup(x => x.GetByIdAsync(It.IsAny<long>()))
+                .ReturnsAsync(user);
 
             var res = await _service.GetByIdAsync(0);
 

@@ -29,10 +29,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
 
             Insert("UserFollow", follows);
 
-            var request = new GetUserFollowRequest
-            {
-                
-            };
+            var request = new GetUserFollowRequest();
 
             var res = await _repository.GetAsync(request);
 

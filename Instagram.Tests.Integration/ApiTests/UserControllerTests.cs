@@ -127,7 +127,6 @@ namespace Instagram.Tests.Integration.ApiTests
             var response = await _httpClient.PostAsJsonAsync($"{Endpoint}/login", loginRequest);
             var content = await response.Content.ReadFromJsonAsync<DataResponseModel<LoginResponse>>();
 
-
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.NotEmpty(content.Error);
             Assert.False(content.Success);
