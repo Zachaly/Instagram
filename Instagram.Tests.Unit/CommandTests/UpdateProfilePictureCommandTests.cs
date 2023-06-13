@@ -31,7 +31,8 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string NewFileName = "file";
 
-            _fileService.Setup(x => x.SaveProfilePictureAsync(It.IsAny<IFormFile>())).ReturnsAsync(NewFileName);
+            _fileService.Setup(x => x.SaveProfilePictureAsync(It.IsAny<IFormFile>()))
+                .ReturnsAsync(NewFileName);
 
             var user = new User { ProfilePicture = null };
 
@@ -93,7 +94,8 @@ namespace Instagram.Tests.Unit.CommandTests
             _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
                 .ReturnsAsync(() => null);
 
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>())).Returns(new ResponseModel { Success = false });
+            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
+                .Returns(new ResponseModel { Success = false });
 
             var file = new Mock<IFormFile>();
 

@@ -15,11 +15,7 @@ namespace Instagram.Tests.Integration.ApiTests
         [Fact]
         public async Task GetAsync_NoConditionalJoins_ReturnsFollows()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(2))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(2));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]");
 
@@ -29,11 +25,7 @@ namespace Instagram.Tests.Integration.ApiTests
                 new UserFollow { FollowedUserId = users.Last().Id, FollowingUserId = users.First().Id },
             };
 
-            foreach(var follow in follows)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("UserFollow", follow).Build();
-                ExecuteQuery(query, follow);
-            }
+            Insert("UserFollow", follows);
 
             var response = await _httpClient.GetAsync(Endpoint);
             var content = await response.Content.ReadFromJsonAsync<IEnumerable<UserFollowModel>>();
@@ -47,11 +39,7 @@ namespace Instagram.Tests.Integration.ApiTests
         [Fact]
         public async Task GetAsync_WithConditionalJoins_ReturnsFollowsWithJoinedUserName()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(2))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(2));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]");
 
@@ -61,11 +49,7 @@ namespace Instagram.Tests.Integration.ApiTests
                 new UserFollow { FollowedUserId = users.Last().Id, FollowingUserId = users.First().Id },
             };
 
-            foreach (var follow in follows)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("UserFollow", follow).Build();
-                ExecuteQuery(query, follow);
-            }
+            Insert("UserFollow", follows);
 
             var response = await _httpClient.GetAsync($"{Endpoint}?JoinFollower=true");
             var content = await response.Content.ReadFromJsonAsync<IEnumerable<UserFollowModel>>();
@@ -82,11 +66,7 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             const int Count = 20;
 
-            foreach(var follow in FakeDataFactory.GenerateFollows(Count))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("UserFollow", follow).Build();
-                ExecuteQuery(query, follow);
-            }
+            Insert("UserFollow", FakeDataFactory.GenerateFollows(Count));
 
             var response = await _httpClient.GetAsync($"{Endpoint}/count");
             var content = await response.Content.ReadFromJsonAsync<int>();
@@ -120,11 +100,7 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             await Authorize();
 
-            foreach (var follow in FakeDataFactory.GenerateFollows(20))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("UserFollow", follow).Build();
-                ExecuteQuery(query, follow);
-            }
+            Insert("UserFollow", FakeDataFactory.GenerateFollows(20));
 
             var followToDelete = GetFromDatabase<UserFollow>("SELECT * FROM [UserFollow]").First();
 

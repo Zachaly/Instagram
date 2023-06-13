@@ -49,35 +49,10 @@ namespace Instagram.Database.Sql
 
             foreach (var join in joins)
             {
-                joinBuilder.Append($"LEFT OUTER JOIN {join.Table} ON {join.Condition}");
+                joinBuilder.Append($"LEFT OUTER JOIN [{join.Table}] ON {join.Condition}");
             }
 
-            var selectedValues = new StringBuilder("");
-
-            int index = 0;
-
-            var props = typeof(T).GetProperties();
-
-            foreach (var prop in props)
-            {
-                var coma = "";
-                var name = $"[{table}].[{prop.Name}]";
-                if(index != 0)
-                {
-                    coma = ",";
-                }
-                var sqlName = prop.GetCustomAttribute<SqlNameAttribute>();
-                if(sqlName is not null)
-                {
-                    if (sqlName.Conditional)
-                    {
-                        continue;
-                    }
-                    name = $"{sqlName.Name} as {prop.Name}";
-                }
-                selectedValues.Append($"{coma} {name}");
-                index++;
-            }
+            var selectedValues = SelectValues<T>(table);
 
             select.Replace("/**select**/", selectedValues.ToString());
             select.Replace("/**join**/", joinBuilder.ToString());
@@ -87,50 +62,10 @@ namespace Instagram.Database.Sql
 
         private ISqlBuilderQuery BuildSelectWithSubQuery<T>(string table)
         {
-            var select = new StringBuilder($"SELECT t.*, /**outsideselect**/ FROM (SELECT /**select**/ FROM [{table}] /**subjoin**/ /**where**/ /**orderby**/ /**pagination**/) as t /**join**/ /**groupby**/");
+            var select = new StringBuilder($"SELECT t.* /**outsideselect**/ FROM (SELECT /**select**/ FROM [{table}] /**subjoin**/ /**where**/ /**orderby**/ /**pagination**/) as t /**join**/ /**groupby**/");
 
-            var props = typeof(T).GetProperties();
-
-            var selectedValues = new StringBuilder("");
-            var outsideSelectedValues = new StringBuilder("");
-
-            int innerIndex = 0;
-            int outerIndex = 0;
-
-
-            foreach (var prop in props)
-            {
-                var coma = "";
-                var name = $"[{table}].[{prop.Name}] as [{prop.Name}]";
-                var sqlName = prop.GetCustomAttribute<SqlNameAttribute>();
-                if (sqlName?.OuterQuery ?? false)
-                {
-                    if(outerIndex != 0)
-                    {
-                        coma = ",";
-                    }
-
-                    outsideSelectedValues.Append($"{coma} {sqlName.Name}");
-
-                    outerIndex++;
-
-                    continue;
-                }
-
-                if (innerIndex != 0)
-                {
-                    coma = ",";
-                }
-
-                if (sqlName is not null)
-                {
-                    name = $"{sqlName.Name} as [{prop.Name}]";
-                }
-
-                selectedValues.Append($"{coma} {name}");
-                
-                innerIndex++;
-            }
+            var innerSelect = SelectValues<T>(table);
+            var outerSelect = SelectOuterQueryValues<T>();
 
             var joins = typeof(T).GetCustomAttributes<JoinAttribute>();
 
@@ -141,16 +76,16 @@ namespace Instagram.Database.Sql
             {
                 if(join.OutsideJoin)
                 {
-                    outsideJoinBuilder.Append($"LEFT OUTER JOIN {join.Table} ON {join.Condition}");
+                    outsideJoinBuilder.Append($"LEFT OUTER JOIN [{join.Table}] ON {join.Condition}");
                 } 
                 else
                 {
-                    subJoinBuilder.Append($"LEFT OUTER JOIN {join.Table} ON {join.Condition}");
+                    subJoinBuilder.Append($"LEFT OUTER JOIN [{join.Table}] ON {join.Condition}");
                 }
             }
 
-            select.Replace("/**select**/", selectedValues.ToString());
-            select.Replace("/**outsideselect**/", outsideSelectedValues.ToString());
+            select.Replace("/**select**/", innerSelect.ToString());
+            select.Replace("/**outsideselect**/", outerSelect.ToString());
             select.Replace("/**join**/", outsideJoinBuilder.ToString());
             select.Replace("/**subjoin**/", subJoinBuilder.ToString());
             select.Replace("/**groupby**/", GenerateGroupBy<T>());
@@ -195,6 +130,53 @@ namespace Instagram.Database.Sql
             }
 
             return groupBuilder.ToString();
+        }
+
+        private StringBuilder SelectValues<T>(string table)
+        {
+            var selectedValues = new StringBuilder("");
+            int index = 0;
+            var props = typeof(T).GetProperties();
+
+            foreach (var prop in props)
+            {
+                var coma = "";
+                var name = $"[{table}].[{prop.Name}] as [{prop.Name}]";
+                if (index != 0)
+                {
+                    coma = ",";
+                }
+                var sqlName = prop.GetCustomAttribute<SqlNameAttribute>();
+                if (sqlName is not null)
+                {
+                    if (sqlName.Conditional || sqlName.OuterQuery)
+                    {
+                        continue;
+                    }
+                    name = $"{sqlName.Name} as {prop.Name}";
+                }
+                selectedValues.Append($"{coma} {name}");
+                index++;
+            }
+
+            return selectedValues;
+        }
+
+        private StringBuilder SelectOuterQueryValues<T>()
+        {
+            var selectedValues = new StringBuilder("");
+
+            var props = typeof(T)
+                .GetProperties()
+                .Select(prop => new { Attr = prop.GetCustomAttribute<SqlNameAttribute>(), PropName = prop.Name } )
+                .Where(prop => prop.Attr is not null && prop.Attr.OuterQuery);
+
+            foreach (var prop in props)
+            {
+                selectedValues.Append($", {prop.Attr.Name}");
+            }
+
+            return selectedValues;
         }
 
         public ISqlBuilderQuery BuildUpdate<TRequest>(string table, TRequest request)

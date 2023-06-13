@@ -15,15 +15,6 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
     {
         protected readonly HttpClient _httpClient;
         protected const string DatabaseName = "InstagramTest";
-        private readonly string[] _truncateQueries =
-        {
-            "TRUNCATE TABLE [User]",
-            "TRUNCATE TABLE [Post]",
-            "TRUNCATE TABLE [PostImage]",
-            "TRUNCATE TABLE [UserFollow]",
-            "TRUNCATE TABLE [PostLike]"
-        };
-
 
         public ApiTest()
         {
@@ -66,6 +57,15 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
             ExecuteQuery(query, item);
         }
 
+        protected void Insert<T>(string table, IEnumerable<T> items) where T : IEntity
+        {
+            foreach (var item in items)
+            {
+                var query = new SqlQueryBuilder().BuildInsert(table, item).Build();
+                ExecuteQuery(query, item);
+            }
+        }
+
         protected async Task Authorize()
         {
             var registerRequest = new RegisterRequest
@@ -94,7 +94,7 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
         {
             using (var connection = new SqlConnection(Constants.ConnectionString))
             {
-                foreach (var query in _truncateQueries)
+                foreach (var query in Constants.TruncateQueries)
                 {
                     connection.Query(query);
                 }

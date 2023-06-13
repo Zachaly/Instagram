@@ -2,9 +2,9 @@
 
 namespace Instagram.Models.Post
 {
-    [Join(Table = "[User]", Condition = "[User].[Id]=[Post].[CreatorId]")]
-    [Join(Table = "[PostImage]", Condition = "t.[Id]=[PostImage].[PostId]", OutsideJoin = true)]
-    [Join(Table = "[PostLike]", Condition = "t.[Id]=[PostLike].[PostId]", OutsideJoin = true)]
+    [Join(Table = "User", Condition = "[User].[Id]=[Post].[CreatorId]")]
+    [Join(Table = "PostImage", Condition = "t.[Id]=[PostImage].[PostId]", OutsideJoin = true)]
+    [Join(Table = "PostLike", Condition = "t.[Id]=[PostLike].[PostId]", OutsideJoin = true)]
     [GroupBy]
     public class PostModel : IModel
     {

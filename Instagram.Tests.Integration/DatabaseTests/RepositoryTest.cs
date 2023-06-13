@@ -10,15 +10,6 @@ namespace Instagram.Tests.Integration.DatabaseTests
     public class RepositoryTest : IDisposable
     {
         protected readonly IConnectionFactory _connectionFactory;
-        private readonly string[] _truncateQueries =
-        {
-            "TRUNCATE TABLE [User]",
-            "TRUNCATE TABLE [Post]",
-            "TRUNCATE TABLE [PostImage]",
-            "TRUNCATE TABLE [UserFollow]",
-            "TRUNCATE TABLE [PostLike]"
-        };
-
         public RepositoryTest()
         {
             var factoryMock =  new Mock<IConnectionFactory>();
@@ -26,7 +17,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
             _connectionFactory = factoryMock.Object;
         }
 
-        protected IEnumerable<T> GetFromDatabase<T>(string query, object param = null)
+        protected IEnumerable<T> GetFromDatabase<T>(string query, object? param = null)
         {
             using(var connection = new SqlConnection(Constants.ConnectionString))
             {
@@ -49,11 +40,20 @@ namespace Instagram.Tests.Integration.DatabaseTests
             ExecuteQuery(query, item);
         }
 
+        protected void Insert<T>(string table, IEnumerable<T> items) where T : IEntity
+        {
+            foreach(var item in items)
+            {
+                var query = new SqlQueryBuilder().BuildInsert(table, item).Build();
+                ExecuteQuery(query, item);
+            }
+        }
+
         public void Dispose()
         {
             using (var connection = new SqlConnection(Constants.ConnectionString))
             {
-                foreach (var query in _truncateQueries)
+                foreach (var query in Constants.TruncateQueries)
                 {
                     connection.Query(query);
                 }

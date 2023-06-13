@@ -1,32 +1,13 @@
 ﻿using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
+using Instagram.Domain.Entity;
 using Instagram.Models.Post;
 using Instagram.Models.Post.Request;
 
 namespace Instagram.Application
 {
-    public class PostService : IPostService
+    public class PostService : ServiceBase<Post, PostModel, GetPostRequest, IPostRepository>, IPostService
     {
-        private readonly IPostRepository _postRepository;
-
-        public PostService(IPostRepository postRepository)
-        {
-            _postRepository = postRepository;
-        }
-
-        public Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request)
-        {
-            return _postRepository.GetAsync(request);
-        }
-
-        public Task<PostModel> GetByIdAsync(long id)
-        {
-            return _postRepository.GetByIdAsync(id);
-        }
-
-        public Task<int> GetCountAsync(GetPostRequest request)
-        {
-            return _postRepository.GetCountAsync(request);
-        }
+        public PostService(IPostRepository postRepository) : base(postRepository) { }
     }
 }

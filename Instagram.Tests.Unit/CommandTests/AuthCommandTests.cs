@@ -30,11 +30,14 @@ namespace Instagram.Tests.Unit.CommandTests
             var user = new User { Id = 1, Email = "mail" };
             const string Token = "token";
 
-            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
+            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync(user);
 
-            _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true);
+            _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
 
-            _authService.Setup(x => x.GenerateTokenAsync(It.IsAny<User>())).ReturnsAsync(Token);
+            _authService.Setup(x => x.GenerateTokenAsync(It.IsAny<User>()))
+                .ReturnsAsync(Token);
 
             _userFactory.Setup(x => x.CreateLoginResponse(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns((long id, string token, string email) => new LoginResponse
@@ -61,9 +64,11 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             var user = new User { Id = 1, Email = "mail" };
 
-            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
+            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync(user);
 
-            _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(false);
+            _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(false);
 
             _responseFactory.Setup(x => x.CreateFailure<LoginResponse>(It.IsAny<string>()))
                 .Returns((string error) => new DataResponseModel<LoginResponse> { Error = error, Success = false, Data = null });
@@ -79,7 +84,8 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task LoginCommand_UserNotFound_Failure()
         {
-            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>())).ReturnsAsync(() => null);
+            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => null);
 
             _responseFactory.Setup(x => x.CreateFailure<LoginResponse>(It.IsAny<string>()))
                 .Returns((string error) => new DataResponseModel<LoginResponse> { Error = error, Success = false, Data = null });
@@ -97,7 +103,10 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             var users = new List<User>();
             const long UserId = 1;
-            _userRepository.Setup(x => x.InsertAsync(It.IsAny<User>())).Callback((User user) => users.Add(user)).ReturnsAsync(UserId);
+
+            _userRepository.Setup(x => x.InsertAsync(It.IsAny<User>()))
+                .Callback((User user) => users.Add(user))
+                .ReturnsAsync(UserId);
             _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>()))
                 .ReturnsAsync((string email) => users.FirstOrDefault(x => x.Email == email));
 

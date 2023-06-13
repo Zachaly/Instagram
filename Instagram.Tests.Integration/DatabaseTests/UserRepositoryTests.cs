@@ -18,11 +18,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         public async Task GetAsync_EmptyRequest_ReturnsAllUsers()
         {
             var users = FakeDataFactory.GenerateUsers(5);
-            foreach (var user in users)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", users);
 
             var userIds = GetFromDatabase<long>("SELECT [Id] FROM [User]");
 
@@ -36,11 +32,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         public async Task GetAsync_RequestWithSingleProperty_ReturnsSpecifiedUsers()
         {
             var users = FakeDataFactory.GenerateUsers(10);
-            foreach (var user in users)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", users);
 
             var request = new GetUserRequest
             {
@@ -59,11 +51,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         public async Task GetAsync_RequestWithMultipleProperties_ReturnsSpecifiedUsers()
         {
             var users = FakeDataFactory.GenerateUsers(10);
-            foreach (var user in users)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", users);
 
             var request = new GetUserRequest
             {
@@ -82,11 +70,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetAsync_RequestWithProperty_WithWhereAttribute_ReturnsSpecifiedUsers()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(10))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(10));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]").Skip(2).Take(2);
 
@@ -132,11 +116,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         public async Task GetEntityByEmail_ReturnsCorrectUser()
         {
             var users = FakeDataFactory.GenerateUsers(5);
-            foreach (var user in users)
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", users);
 
             var testUser = GetFromDatabase<User>("SELECT * FROM [User]").First();
             var res = await _repository.GetEntityByEmailAsync(testUser.Email);
@@ -147,11 +127,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task DeleteByIdAsync_DeletesCorrectEntity()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(5))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(5));
 
             var testUser = GetFromDatabase<User>("SELECT * FROM [User]").First();
 
@@ -166,11 +142,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetByIdAsync_ReturnsCorrectEntity()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(5))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(5));
 
             var testUser = GetFromDatabase<User>("SELECT * FROM [User]").Last();
 
@@ -186,11 +158,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task UpdateAsync_UpdatesCorrectUser()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(5))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(5));
 
             var users = GetFromDatabase<User>("SELECT * FROM [User]");
 
@@ -209,11 +177,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetAsync_PaginationApplied_ReturnsCorrectUsers()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(10))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(10));
 
             var userIds = GetFromDatabase<long>("SELECT Id FROM [User] ORDER BY Id");
 
@@ -231,11 +195,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetAsync_WithSkipPagination_ReturnsAllUsers()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(10))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(10));
 
             var userIds = GetFromDatabase<long>("SELECT Id FROM [User] ORDER BY Id");
 
@@ -257,11 +217,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         {
             const int Count = 20;
 
-            foreach (var user in FakeDataFactory.GenerateUsers(20))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(Count));
 
             var res = await _repository.GetCountAsync(new GetUserRequest());
 
@@ -271,11 +227,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
         [Fact]
         public async Task GetEntityById_ReturnsSpecifiedEntity()
         {
-            foreach (var user in FakeDataFactory.GenerateUsers(5))
-            {
-                var query = new SqlQueryBuilder().BuildInsert("User", user).Build();
-                ExecuteQuery(query, user);
-            }
+            Insert("User", FakeDataFactory.GenerateUsers(5));
 
             var testUser = GetFromDatabase<User>("SELECT * FROM [User]").Last();
 

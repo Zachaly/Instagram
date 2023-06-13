@@ -1,22 +1,21 @@
 ﻿using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
+using Instagram.Domain.Entity;
 using Instagram.Models.PostLike;
 using Instagram.Models.PostLike.Request;
 using Instagram.Models.Response;
 
 namespace Instagram.Application
 {
-    public class PostLikeService : IPostLikeService
+    public class PostLikeService : KeylessServiceBase<PostLike, PostLikeModel, GetPostLikeRequest, IPostLikeRepository>, IPostLikeService
     {
         private readonly IPostLikeFactory _postLikeFactory;
-        private readonly IPostLikeRepository _postLikeRepository;
         private readonly IResponseFactory _responseFactory;
 
         public PostLikeService(IPostLikeFactory postLikeFactory, IPostLikeRepository postLikeRepository,
-            IResponseFactory responseFactory)
+            IResponseFactory responseFactory) : base(postLikeRepository)
         {
             _postLikeFactory = postLikeFactory;
-            _postLikeRepository = postLikeRepository;
             _responseFactory = responseFactory;
         }
 
@@ -26,7 +25,7 @@ namespace Instagram.Application
             {
                 var like = _postLikeFactory.Create(request);
 
-                await _postLikeRepository.InsertAsync(like);
+                await _repository.InsertAsync(like);
 
                 return _responseFactory.CreateSuccess();
             }
@@ -40,7 +39,7 @@ namespace Instagram.Application
         {
             try
             {
-                await _postLikeRepository.DeleteAsync(postId, userId);
+                await _repository.DeleteAsync(postId, userId);
 
                 return _responseFactory.CreateSuccess();
             }
@@ -48,16 +47,6 @@ namespace Instagram.Application
             {
                 return _responseFactory.CreateFailure(ex.Message);
             }
-        }
-
-        public Task<IEnumerable<PostLikeModel>> GetAsync(GetPostLikeRequest request)
-        {
-            return _postLikeRepository.GetAsync(request);
-        }
-
-        public Task<int> GetCountAsync(GetPostLikeRequest request)
-        {
-            return _postLikeRepository.GetCountAsync(request);
         }
     }
 }
