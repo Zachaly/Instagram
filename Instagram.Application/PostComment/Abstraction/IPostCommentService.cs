@@ -6,6 +6,6 @@ namespace Instagram.Application.Abstraction
 {
     public interface IPostCommentService : IServiceBase<PostCommentModel, GetPostCommentRequest>
     {
-        Task<ResponseModel> AddAsync(AddPostCommentRequest postComment);
+        Task<ResponseModel> AddAsync(AddPostCommentRequest request);
     }
 }
