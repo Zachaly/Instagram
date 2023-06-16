@@ -5,6 +5,7 @@ namespace Instagram.Models.Post
     [Join(Table = "User", Condition = "[User].[Id]=[Post].[CreatorId]")]
     [Join(Table = "PostImage", Condition = "t.[Id]=[PostImage].[PostId]", OutsideJoin = true)]
     [Join(Table = "PostLike", Condition = "t.[Id]=[PostLike].[PostId]", OutsideJoin = true)]
+    [Join(Table = "PostComment", Condition = "t.[Id]=[PostComment].[PostId]", OutsideJoin = true)]
     [GroupBy]
     public class PostModel : IModel
     {
@@ -19,5 +20,9 @@ namespace Instagram.Models.Post
         [SqlName("Count([PostLike].[UserId]) as LikeCount", OuterQuery = true)]
         [NotGrouped]
         public int LikeCount { get; set; }
+
+        [SqlName("Count([PostComment].[Id]) as CommentCount", OuterQuery = true)]
+        [NotGrouped]
+        public int CommentCount { get; set; }
     }
 }

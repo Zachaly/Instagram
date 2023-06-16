@@ -29,7 +29,7 @@ namespace Instagram.Database.Repository
 
             using(var connection = _connectionFactory.CreateConnection())
             {
-                await connection.QueryAsync<PostModel, long, int, PostModel>(query, (post, imageId, likeCount) =>
+                await connection.QueryAsync<PostModel, long, int, int, PostModel>(query, (post, imageId, likeCount, commentCount) =>
                 {
                     PostModel model;
                     if(!lookup.TryGetValue(post.Id, out model))
@@ -37,6 +37,7 @@ namespace Instagram.Database.Repository
                         lookup.Add(post.Id, post);
                         model = post;
                         post.LikeCount = likeCount;
+                        post.CommentCount = commentCount;
                     }
 
                     model.ImageIds ??= new List<long>();
@@ -47,7 +48,7 @@ namespace Instagram.Database.Repository
                     }
 
                     return model;
-                }, request, splitOn: "Id, Id, LikeCount");
+                }, request, splitOn: "Id, Id, LikeCount, CommentCount");
             }
 
             return lookup.Values;
@@ -64,11 +65,12 @@ namespace Instagram.Database.Repository
             PostModel model = null;
             using (var connection = _connectionFactory.CreateConnection())
             {
-                await connection.QueryAsync<PostModel, long, int, PostModel>(query, (post, imageId, likeCount) =>
+                await connection.QueryAsync<PostModel, long, int, int, PostModel>(query, (post, imageId, likeCount, commentCount) =>
                 {
                     model = model ?? post;
 
                     model.LikeCount = likeCount;
+                    model.CommentCount = commentCount;
 
                     model.ImageIds ??= new List<long>();
 
@@ -78,7 +80,7 @@ namespace Instagram.Database.Repository
                     }
 
                     return model;
-                }, param, splitOn: "Id, Id, LikeCount");
+                }, param, splitOn: "Id, Id, LikeCount, CommentCount");
             }
 
             return model;
