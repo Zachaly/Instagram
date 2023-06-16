@@ -29,6 +29,10 @@
                     {{ post.likeCount }}
                 </span>
             </p>
+            <p @click="showComments = !showComments">
+                Comments({{ post.commentCount }})
+            </p>
+            <PostCommentList :post-id="post.id" v-if="showComments" />
         </div>
     </div>
 
@@ -46,6 +50,7 @@ import GetPostLikeRequest from '@/models/request/get/GetPostLikeRequest';
 import axios from 'axios';
 import AddPostLikeRequest from '@/models/request/AddPostLikeRequest';
 import PostLikeListComponent from './PostLikeListComponent.vue';
+import PostCommentList from './PostCommentList.vue';
 
 const currentImageIndex = ref(0)
 const authStore = useAuthStore()
@@ -63,6 +68,8 @@ const selectIndex = (index: number) => currentImageIndex.value = index
 const props = defineProps<{
     post: PostModel
 }>()
+
+const showComments = ref(false)
 
 const like = () => {
     if (!authStore.isAuthorized) {

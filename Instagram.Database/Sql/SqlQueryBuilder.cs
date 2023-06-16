@@ -153,7 +153,7 @@ namespace Instagram.Database.Sql
                     {
                         continue;
                     }
-                    name = $"{sqlName.Name} as {prop.Name}";
+                    name = $"{sqlName.Name} as [{prop.Name}]";
                 }
                 selectedValues.Append($"{coma} {name}");
                 index++;
