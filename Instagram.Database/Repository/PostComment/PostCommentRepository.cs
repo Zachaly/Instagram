@@ -7,12 +7,12 @@ using Instagram.Models.PostComment.Request;
 
 namespace Instagram.Database.Repository
 {
-    internal class PostCommentRepository : RepositoryBase<PostComment, PostCommentModel, GetPostCommentRequest>, IPostCommentRepository
+    public class PostCommentRepository : RepositoryBase<PostComment, PostCommentModel, GetPostCommentRequest>, IPostCommentRepository
     {
         public PostCommentRepository(ISqlQueryBuilder sqlQueryBuilder, IConnectionFactory connectionFactory) : base(sqlQueryBuilder, connectionFactory)
         {
             Table = "PostComment";
-            DefaultOrderBy = "[PostComment].[Created] ASC";
+            DefaultOrderBy = "[PostComment].[Created]";
         }
     }
 }

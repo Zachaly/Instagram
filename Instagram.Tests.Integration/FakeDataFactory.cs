@@ -46,5 +46,13 @@ namespace Instagram.Tests.Integration
 
             return likes;
         }
+
+        public static List<PostComment> GeneratePostComments(long userId, int count)
+            => new Faker<PostComment>()
+                .RuleFor(p => p.UserId, _ => userId)
+                .RuleFor(p => p.Content, f => f.Random.AlphaNumeric(30))
+                .RuleFor(p => p.Created, f => f.Random.Long(0, DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
+                .RuleFor(p => p.PostId, f => f.Random.Long(1, 5))
+                .Generate(count);
     }
 }

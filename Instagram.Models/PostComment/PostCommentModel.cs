@@ -2,6 +2,7 @@
 
 namespace Instagram.Models.PostComment
 {
+    [Join(Table = "User", Condition = "[User].[Id]=[PostComment].[UserId]")]
     public class PostCommentModel : IModel
     {
         public long Id { get; set; }
