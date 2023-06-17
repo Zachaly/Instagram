@@ -1,4 +1,5 @@
 ﻿using Instagram.Api.Infrastructure;
+using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application.Abstraction;
 using Instagram.Models.Response;
 using Instagram.Models.UserFollow;
@@ -11,11 +12,11 @@ namespace Instagram.Api.Controllers
     [Route("/api/user-follow")]
     public class UserFollowController : ControllerBase
     {
-        private readonly IUserFollowService _userFollowService;
+        private readonly IUserFollowServiceProxy _userFollowServiceProxy;
 
-        public UserFollowController(IUserFollowService userFollowService)
+        public UserFollowController(IUserFollowServiceProxy userFollowServiceProxy)
         {
-            _userFollowService = userFollowService;
+            _userFollowServiceProxy = userFollowServiceProxy;
         }
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<UserFollowModel>>> GetAsync([FromQuery] GetUserFollowRequest request)
         {
-            var res = await _userFollowService.GetAsync(request);
+            var res = await _userFollowServiceProxy.GetAsync(request);
 
             return Ok(res);
         }
@@ -39,7 +40,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<int>> GetCountAsync([FromQuery] GetUserFollowRequest request)
         {
-            var res = await _userFollowService.GetCountAsync(request);
+            var res = await _userFollowServiceProxy.GetCountAsync(request);
 
             return Ok(res);
         }
@@ -55,7 +56,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> PostAsync(AddUserFollowRequest request)
         {
-            var res = await _userFollowService.AddAsync(request);
+            var res = await _userFollowServiceProxy.AddAsync(request);
 
             return res.ReturnNoContentOrBadRequest();
         }
@@ -71,7 +72,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> DeleteAsync(long followerId, long followedId)
         {
-            var res = await _userFollowService.DeleteAsync(followerId, followedId);
+            var res = await _userFollowServiceProxy.DeleteAsync(followerId, followedId);
 
             return res.ReturnNoContentOrBadRequest();
         }

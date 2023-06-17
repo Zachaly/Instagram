@@ -1,4 +1,5 @@
 ﻿using FluentMigrator.Runner;
+using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application;
 using Instagram.Application.Abstraction;
 using Instagram.Application.Command;
@@ -57,6 +58,15 @@ namespace Instagram.Api.Infrastructure
             {
                 opt.RegisterServicesFromAssemblyContaining<LoginCommand>();
             });
+        }
+        
+        public static void RegisterProxies(this IServiceCollection services)
+        {
+            services.AddScoped<IPostServiceProxy, PostServiceProxy>();
+            services.AddScoped<IPostCommentServiceProxy, PostCommentServiceProxy>();
+            services.AddScoped<IPostLikeServiceProxy, PostLikeServiceProxy>();
+            services.AddScoped<IUserServiceProxy, UserServiceProxy>();
+            services.AddScoped<IUserFollowServiceProxy, UserFollowServiceProxy>();
         }
 
         public static void ConfigureAuthorization(this WebApplicationBuilder builder)

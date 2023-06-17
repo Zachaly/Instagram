@@ -1,4 +1,5 @@
 ﻿using Instagram.Api.Infrastructure;
+using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application.Abstraction;
 using Instagram.Application.Command;
 using Instagram.Models.Post;
@@ -14,12 +15,12 @@ namespace Instagram.Api.Controllers
     public class PostController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IPostService _postService;
+        private readonly IPostServiceProxy _postServiceProxy;
 
-        public PostController(IMediator mediator, IPostService postService)
+        public PostController(IMediator mediator, IPostServiceProxy postServiceProxy)
         {
             _mediator = mediator;
-            _postService = postService;
+            _postServiceProxy = postServiceProxy;
         }
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<PostModel>>> GetAsync([FromQuery] GetPostRequest request)
         {
-            var res = await _postService.GetAsync(request);
+            var res = await _postServiceProxy.GetAsync(request);
 
             return Ok(res);
         }
@@ -45,7 +46,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult<PostModel>> GetByIdAsync(long id)
         {
-            var res = await _postService.GetByIdAsync(id);
+            var res = await _postServiceProxy.GetByIdAsync(id);
 
             return ResponseModelExtentions.ReturnOkOrNotFound(res);
         }
@@ -90,7 +91,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<int>> GetCountAsync([FromQuery] GetPostRequest request)
         {
-            var res = await _postService.GetCountAsync(request);
+            var res = await _postServiceProxy.GetCountAsync(request);
 
             return Ok(res);
         }

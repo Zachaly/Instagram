@@ -1,4 +1,5 @@
 ﻿using Instagram.Api.Infrastructure;
+using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application.Abstraction;
 using Instagram.Application.Command;
 using Instagram.Models.Response;
@@ -13,12 +14,12 @@ namespace Instagram.Api.Controllers
     [Route("/api/user")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserServiceProxy _userServiceProxy;
         private readonly IMediator _mediator;
 
-        public UserController(IUserService userService, IMediator mediator)
+        public UserController(IUserServiceProxy userServiceProxy, IMediator mediator)
         {
-            _userService = userService;
+            _userServiceProxy = userServiceProxy;
             _mediator = mediator;
         }
 
@@ -30,7 +31,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<UserModel>>> GetAsync([FromQuery] GetUserRequest request)
         {
-            var res = await _userService.GetAsync(request);
+            var res = await _userServiceProxy.GetAsync(request);
 
             return Ok(res);
         }
@@ -45,7 +46,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult<UserModel>> GetByIdAsync(long id)
         {
-            var res = await _userService.GetByIdAsync(id);
+            var res = await _userServiceProxy.GetByIdAsync(id);
 
             return ResponseModelExtentions.ReturnOkOrNotFound(res);
         }
@@ -91,7 +92,7 @@ namespace Instagram.Api.Controllers
         [Authorize]
         public async Task<ActionResult<ResponseModel>> UpdateAsync(UpdateUserRequest request)
         {
-            var res = await _userService.UpdateAsync(request);
+            var res = await _userServiceProxy.UpdateAsync(request);
 
             return res.ReturnNoContentOrBadRequest();
         }

@@ -1,5 +1,5 @@
 ﻿using Instagram.Api.Infrastructure;
-using Instagram.Application.Abstraction;
+using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Models.PostComment;
 using Instagram.Models.PostComment.Request;
 using Instagram.Models.Response;
@@ -11,11 +11,11 @@ namespace Instagram.Api.Controllers
     [Route("/api/post-comment")]
     public class PostCommentController : ControllerBase
     {
-        private readonly IPostCommentService _postCommentService;
+        private readonly IPostCommentServiceProxy _postCommentServiceProxy;
 
-        public PostCommentController(IPostCommentService postCommentService)
+        public PostCommentController(IPostCommentServiceProxy postCommentServiceProxy)
         {
-            _postCommentService = postCommentService;
+            _postCommentServiceProxy = postCommentServiceProxy;
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(200)] 
         public async Task<ActionResult<IEnumerable<PostCommentModel>>> GetAsync([FromQuery] GetPostCommentRequest request)
         {
-            var res = await _postCommentService.GetAsync(request);
+            var res = await _postCommentServiceProxy.GetAsync(request);
 
             return Ok(res);
         }
@@ -41,7 +41,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult<PostCommentModel>> GetByIdAsync(long id)
         {
-            var res = await _postCommentService.GetByIdAsync(id);
+            var res = await _postCommentServiceProxy.GetByIdAsync(id);
 
             return ResponseModelExtentions.ReturnOkOrNotFound(res);
         }
@@ -54,7 +54,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<int>> GetCountAsync([FromQuery] GetPostCommentRequest request)
         {
-            var res = await _postCommentService.GetCountAsync(request);
+            var res = await _postCommentServiceProxy.GetCountAsync(request);
 
             return Ok(res);
         }
@@ -71,7 +71,7 @@ namespace Instagram.Api.Controllers
         [Authorize]
         public async Task<ActionResult<ResponseModel>> PostAsync(AddPostCommentRequest request)
         {
-            var res = await _postCommentService.AddAsync(request);
+            var res = await _postCommentServiceProxy.AddAsync(request);
 
             return res.ReturnCreatedOrBadRequest("/api/post-comment");
         }

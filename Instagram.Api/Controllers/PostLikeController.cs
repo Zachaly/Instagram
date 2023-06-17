@@ -1,4 +1,5 @@
 ﻿using Instagram.Api.Infrastructure;
+using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application.Abstraction;
 using Instagram.Models.PostLike;
 using Instagram.Models.PostLike.Request;
@@ -11,11 +12,11 @@ namespace Instagram.Api.Controllers
     [Route("/api/post-like")]
     public class PostLikeController : ControllerBase
     {
-        private readonly IPostLikeService _postLikeService;
+        private readonly IPostLikeServiceProxy _postLikeServiceProxy;
 
-        public PostLikeController(IPostLikeService postLikeService)
+        public PostLikeController(IPostLikeServiceProxy postLikeServiceProxy)
         {
-            _postLikeService = postLikeService;
+            _postLikeServiceProxy = postLikeServiceProxy;
         }
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<PostLikeModel>>> GetAsync([FromQuery] GetPostLikeRequest request)
         {
-            var res = await _postLikeService.GetAsync(request);
+            var res = await _postLikeServiceProxy.GetAsync(request);
 
             return Ok(res);
         }
@@ -39,7 +40,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<int>> GetCountAsync([FromQuery] GetPostLikeRequest request)
         {
-            var res = await _postLikeService.GetCountAsync(request);
+            var res = await _postLikeServiceProxy.GetCountAsync(request);
 
             return Ok(res);
         }
@@ -55,7 +56,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> PostAsync(AddPostLikeRequest request)
         {
-            var res = await _postLikeService.AddAsync(request);
+            var res = await _postLikeServiceProxy.AddAsync(request);
 
             return res.ReturnNoContentOrBadRequest();
         }
@@ -71,7 +72,7 @@ namespace Instagram.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> DeleteAsync(long postId, long userId)
         {
-            var res = await _postLikeService.DeleteAsync(postId, userId);
+            var res = await _postLikeServiceProxy.DeleteAsync(postId, userId);
 
             return res.ReturnNoContentOrBadRequest();
         }
