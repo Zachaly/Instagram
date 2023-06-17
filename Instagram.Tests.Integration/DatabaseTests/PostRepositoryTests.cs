@@ -1,4 +1,5 @@
-﻿using Instagram.Database.Repository;
+﻿using FluentMigrator;
+using Instagram.Database.Repository;
 using Instagram.Database.Sql;
 using Instagram.Domain.Entity;
 using Instagram.Models.Post.Request;
@@ -31,10 +32,15 @@ namespace Instagram.Tests.Integration.DatabaseTests
 
             var postIds = GetFromDatabase<long>("SELECT Id FROM [Post]");
 
+            var postTags = new List<PostTag>();
+
             foreach(var postId in postIds)
             {
                 Insert("PostImage", FakeDataFactory.GeneratePostImages(postId, 2));
+                postTags.AddRange(FakeDataFactory.GeneratePostTags(postId, 2));
             }
+
+            Insert("PostTag", postTags);
 
             var images = GetFromDatabase<PostImage>("SELECT * FROM [PostImage]");
 
@@ -47,6 +53,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
             Assert.All(res, post =>
             {
                 Assert.Equivalent(images.Where(x => x.PostId == post.Id).Select(x => x.Id), post.ImageIds);
+                Assert.Equivalent(postTags.Where(x => x.PostId == post.Id).Select(x => x.Tag), post.Tags);
             });
             Assert.Equivalent(postIds, res.Select(x => x.Id));
         }

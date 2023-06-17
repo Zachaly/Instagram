@@ -29,7 +29,7 @@ namespace Instagram.Database.Repository
 
             using(var connection = _connectionFactory.CreateConnection())
             {
-                await connection.QueryAsync<PostModel, long, int, int, PostModel>(query, (post, imageId, likeCount, commentCount) =>
+                await connection.QueryAsync<PostModel, long, int, int, string, PostModel>(query, (post, imageId, likeCount, commentCount, tag) =>
                 {
                     PostModel model;
                     if(!lookup.TryGetValue(post.Id, out model))
@@ -42,13 +42,20 @@ namespace Instagram.Database.Repository
 
                     model.ImageIds ??= new List<long>();
 
+                    model.Tags ??= new List<string>();
+
                     if (!model.ImageIds.Contains(imageId))
                     {
                         (model.ImageIds as List<long>)!.Add(imageId);
                     }
 
+                    if (!model.Tags.Contains(tag))
+                    {
+                        (model.Tags as List<string>)!.Add(tag);
+                    }
+
                     return model;
-                }, request, splitOn: "Id, Id, LikeCount, CommentCount");
+                }, request, splitOn: "Id, Id, LikeCount, CommentCount, Tag");
             }
 
             return lookup.Values;
@@ -65,7 +72,7 @@ namespace Instagram.Database.Repository
             PostModel model = null;
             using (var connection = _connectionFactory.CreateConnection())
             {
-                await connection.QueryAsync<PostModel, long, int, int, PostModel>(query, (post, imageId, likeCount, commentCount) =>
+                await connection.QueryAsync<PostModel, long, int, int, string, PostModel>(query, (post, imageId, likeCount, commentCount, tag) =>
                 {
                     model = model ?? post;
 
@@ -74,13 +81,20 @@ namespace Instagram.Database.Repository
 
                     model.ImageIds ??= new List<long>();
 
+                    model.Tags ??= new List<string>();
+
                     if (!model.ImageIds.Contains(imageId))
                     {
                         (model.ImageIds as List<long>)!.Add(imageId);
                     }
 
+                    if (!model.Tags.Contains(tag))
+                    {
+                        (model.Tags as List<string>)!.Add(tag);
+                    }
+
                     return model;
-                }, param, splitOn: "Id, Id, LikeCount, CommentCount");
+                }, param, splitOn: "Id, Id, LikeCount, CommentCount, Tag");
             }
 
             return model;
