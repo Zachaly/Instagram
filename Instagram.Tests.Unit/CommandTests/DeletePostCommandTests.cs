@@ -76,6 +76,9 @@ namespace Instagram.Tests.Unit.CommandTests
 
             _fileService.Setup(x => x.RemovePostImageAsync(It.IsAny<string>()));
 
+            _postTagRepository.Setup(x => x.DeleteByPostIdAsync(It.IsAny<long>()))
+                .Callback((long postId) => tags.RemoveAll(x => x.PostId == postId));
+
             _responseFactory.Setup(x => x.CreateSuccess())
                 .Returns(new ResponseModel { Success = true });
 

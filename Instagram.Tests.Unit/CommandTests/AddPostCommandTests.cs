@@ -3,6 +3,7 @@ using Instagram.Application.Command;
 using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.Post.Request;
+using Instagram.Models.PostTag.Request;
 using Instagram.Models.Response;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -57,6 +58,9 @@ namespace Instagram.Tests.Unit.CommandTests
 
             _postImageRepository.Setup(x => x.InsertAsync(It.IsAny<PostImage>()))
                 .Callback((PostImage img) => images.Add(img));
+
+            _postTagService.Setup(x => x.AddAsync(It.IsAny<AddPostTagRequest>()))
+                .Callback((AddPostTagRequest request) => tags.AddRange(request.Tags));
 
             var file = new Mock<IFormFile>();
 

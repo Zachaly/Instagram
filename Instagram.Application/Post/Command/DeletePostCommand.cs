@@ -52,6 +52,9 @@ namespace Instagram.Application.Command
                     {
                         await _fileService.RemovePostImageAsync(image.File);
                     }
+
+                    await _postTagRepository.DeleteByPostIdAsync(request.Id);
+
                     scope.Complete();
                 }
 

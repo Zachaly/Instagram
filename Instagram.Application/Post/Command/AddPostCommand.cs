@@ -1,6 +1,7 @@
 ﻿using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
 using Instagram.Models.Post.Request;
+using Instagram.Models.PostTag.Request;
 using Instagram.Models.Response;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -57,6 +58,9 @@ namespace Instagram.Application.Command
                     {
                         await _postImageRepository.InsertAsync(image);
                     }
+
+                    await _postTagService.AddAsync(new AddPostTagRequest { PostId = postId, Tags = request.Tags });
+
                     scope.Complete();
                 }
 
