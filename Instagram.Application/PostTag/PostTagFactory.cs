@@ -7,13 +7,9 @@ namespace Instagram.Application
     public class PostTagFactory : IPostTagFactory
     {
         public IEnumerable<PostTag> CreateMany(AddPostTagRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => request.Tags.Select(name => new PostTag { Tag = name.ToLower(), PostId = request.PostId });
 
         public IEnumerable<PostTag> CreateMany(long postId, IEnumerable<string> tags)
-        {
-            throw new NotImplementedException();
-        }
+        => tags.Select(name => new PostTag { PostId = postId, Tag = name.ToLower() });
     }
 }

@@ -4,6 +4,7 @@ using Instagram.Domain.Entity;
 using Instagram.Models.PostTag;
 using Instagram.Models.PostTag.Request;
 using Instagram.Models.Response;
+using System.Transactions;
 
 namespace Instagram.Application
 {
@@ -18,14 +19,42 @@ namespace Instagram.Application
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> AddAsync(AddPostTagRequest request)
+        public async Task<ResponseModel> AddAsync(AddPostTagRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var tags = _postTagFactory.CreateMany(request);
+
+                using(var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    foreach(var tag in tags)
+                    {
+                        await _repository.InsertAsync(tag);
+                    }
+
+                    scope.Complete();
+                }
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
 
-        public Task<ResponseModel> DeleteAsync(long postId, string tag)
+        public async Task<ResponseModel> DeleteAsync(long postId, string tag)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _repository.DeleteAsync(postId, tag);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }
