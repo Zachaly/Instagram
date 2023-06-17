@@ -1,4 +1,5 @@
 ﻿using FluentMigrator.Runner;
+using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application;
 using Instagram.Application.Abstraction;
 using Instagram.Application.Command;
@@ -6,6 +7,7 @@ using Instagram.Database.Factory;
 using Instagram.Database.Migrations;
 using Instagram.Database.Repository;
 using Instagram.Database.Sql;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -57,6 +59,17 @@ namespace Instagram.Api.Infrastructure
             {
                 opt.RegisterServicesFromAssemblyContaining<LoginCommand>();
             });
+        }
+        
+        public static void RegisterProxies(this IServiceCollection services)
+        {
+            services.AddScoped<IPostServiceProxy, PostServiceProxy>();
+            services.AddScoped<IPostCommentServiceProxy, PostCommentServiceProxy>();
+            services.AddScoped<IPostLikeServiceProxy, PostLikeServiceProxy>();
+            services.AddScoped<IUserServiceProxy, UserServiceProxy>();
+            services.AddScoped<IUserFollowServiceProxy, UserFollowServiceProxy>();
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
         }
 
         public static void ConfigureAuthorization(this WebApplicationBuilder builder)
