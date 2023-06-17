@@ -15,6 +15,7 @@ namespace Instagram.Tests.Unit.CommandTests
         private readonly Mock<IResponseFactory> _responseFactory;
         private readonly Mock<IFileService> _fileService;
         private readonly Mock<IPostImageRepository> _postImageRepository;
+        private readonly Mock<IPostTagRepository> _postTagRepository;
         private readonly DeletePostHandler _handler;
 
         public DeletePostCommandTests()
@@ -23,8 +24,9 @@ namespace Instagram.Tests.Unit.CommandTests
             _responseFactory = new Mock<IResponseFactory>();
             _fileService = new Mock<IFileService>();
             _postImageRepository = new Mock<IPostImageRepository>();
+            _postTagRepository = new Mock<IPostTagRepository>();
             _handler = new DeletePostHandler(_postRepository.Object, _fileService.Object, _responseFactory.Object,
-                _postImageRepository.Object);
+                _postImageRepository.Object, _postTagRepository.Object);
         }
 
         [Fact]
@@ -45,6 +47,16 @@ namespace Instagram.Tests.Unit.CommandTests
                 new PostImage { PostId = IdToDelete, File = "" },
                 new PostImage { PostId = 4, File = "" },
                 new PostImage { PostId = 5, File = "" },
+            };
+
+            var tags = new List<PostTag>
+            {
+                new PostTag { PostId = 3 },
+                new PostTag { PostId = IdToDelete },
+                new PostTag { PostId = 1 },
+                new PostTag { PostId = IdToDelete },
+                new PostTag { PostId = 4 },
+                new PostTag { PostId = 5 },
             };
 
             _postRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
@@ -74,6 +86,7 @@ namespace Instagram.Tests.Unit.CommandTests
             Assert.True(res.Success);
             Assert.DoesNotContain(posts, x => x.Id == command.Id);
             Assert.DoesNotContain(images, x => x.PostId == command.Id);
+            Assert.DoesNotContain(tags, x => x.PostId == command.Id);
         }
 
         [Fact]

@@ -16,6 +16,7 @@ namespace Instagram.Tests.Unit.CommandTests
         private readonly Mock<IResponseFactory> _responseFactory;
         private readonly Mock<IFileService> _fileService;
         private readonly Mock<IPostImageRepository> _postImageRepository;
+        private readonly Mock<IPostTagService> _postTagService;
         private readonly AddPostHandler _handler;
 
         public AddPostCommandTests()
@@ -25,8 +26,9 @@ namespace Instagram.Tests.Unit.CommandTests
             _responseFactory = new Mock<IResponseFactory>();
             _fileService = new Mock<IFileService>();
             _postImageRepository = new Mock<IPostImageRepository>();
+            _postTagService = new Mock<IPostTagService>();
             _handler = new AddPostHandler(_postFactory.Object, _postRepository.Object, _fileService.Object,
-                _responseFactory.Object, _postImageRepository.Object);
+                _responseFactory.Object, _postImageRepository.Object, _postTagService.Object);
         }
 
         [Fact]
@@ -34,6 +36,7 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             var posts = new List<Post>();
             var images = new List<PostImage>();
+            var tags = new List<string>();
             const string FileName = "file";
             const long PostId = 1;
 
@@ -61,6 +64,7 @@ namespace Instagram.Tests.Unit.CommandTests
             {
                 CreatorId = 1,
                 Files = new IFormFile[] { file.Object },
+                Tags = new string[] { "tag1", "tag2", "tag3" }
             };
 
             var res = await _handler.Handle(command, default);
@@ -69,6 +73,7 @@ namespace Instagram.Tests.Unit.CommandTests
             Assert.Contains(posts, x => x.CreatorId == command.CreatorId);
             Assert.Contains(images, x => x.PostId == PostId && x.File == FileName);
             Assert.Single(images);
+            Assert.Equivalent(command.Tags, tags);
         }
 
         [Fact]
