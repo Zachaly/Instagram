@@ -7,6 +7,7 @@ using Instagram.Database.Factory;
 using Instagram.Database.Migrations;
 using Instagram.Database.Repository;
 using Instagram.Database.Sql;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -67,6 +68,8 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostLikeServiceProxy, PostLikeServiceProxy>();
             services.AddScoped<IUserServiceProxy, UserServiceProxy>();
             services.AddScoped<IUserFollowServiceProxy, UserFollowServiceProxy>();
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
         }
 
         public static void ConfigureAuthorization(this WebApplicationBuilder builder)
