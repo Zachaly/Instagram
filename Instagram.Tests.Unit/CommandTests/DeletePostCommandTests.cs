@@ -15,6 +15,7 @@ namespace Instagram.Tests.Unit.CommandTests
         private readonly Mock<IResponseFactory> _responseFactory;
         private readonly Mock<IFileService> _fileService;
         private readonly Mock<IPostImageRepository> _postImageRepository;
+        private readonly Mock<IPostTagRepository> _postTagRepository;
         private readonly DeletePostHandler _handler;
 
         public DeletePostCommandTests()
@@ -23,8 +24,9 @@ namespace Instagram.Tests.Unit.CommandTests
             _responseFactory = new Mock<IResponseFactory>();
             _fileService = new Mock<IFileService>();
             _postImageRepository = new Mock<IPostImageRepository>();
+            _postTagRepository = new Mock<IPostTagRepository>();
             _handler = new DeletePostHandler(_postRepository.Object, _fileService.Object, _responseFactory.Object,
-                _postImageRepository.Object);
+                _postImageRepository.Object, _postTagRepository.Object);
         }
 
         [Fact]
@@ -47,6 +49,16 @@ namespace Instagram.Tests.Unit.CommandTests
                 new PostImage { PostId = 5, File = "" },
             };
 
+            var tags = new List<PostTag>
+            {
+                new PostTag { PostId = 3 },
+                new PostTag { PostId = IdToDelete },
+                new PostTag { PostId = 1 },
+                new PostTag { PostId = IdToDelete },
+                new PostTag { PostId = 4 },
+                new PostTag { PostId = 5 },
+            };
+
             _postRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
                 .Callback((long id) => posts.Remove(posts.First(x => x.Id == id)));
 
@@ -64,6 +76,9 @@ namespace Instagram.Tests.Unit.CommandTests
 
             _fileService.Setup(x => x.RemovePostImageAsync(It.IsAny<string>()));
 
+            _postTagRepository.Setup(x => x.DeleteByPostIdAsync(It.IsAny<long>()))
+                .Callback((long postId) => tags.RemoveAll(x => x.PostId == postId));
+
             _responseFactory.Setup(x => x.CreateSuccess())
                 .Returns(new ResponseModel { Success = true });
 
@@ -74,6 +89,7 @@ namespace Instagram.Tests.Unit.CommandTests
             Assert.True(res.Success);
             Assert.DoesNotContain(posts, x => x.Id == command.Id);
             Assert.DoesNotContain(images, x => x.PostId == command.Id);
+            Assert.DoesNotContain(tags, x => x.PostId == command.Id);
         }
 
         [Fact]

@@ -6,5 +6,6 @@ export default interface PostModel {
     created: number,
     imageIds: number[],
     likeCount: number,
-    commentCount: number
+    commentCount: number,
+    tags: string[]
 }

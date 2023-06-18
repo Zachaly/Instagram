@@ -54,5 +54,11 @@ namespace Instagram.Tests.Integration
                 .RuleFor(p => p.Created, f => f.Random.Long(0, DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
                 .RuleFor(p => p.PostId, f => f.Random.Long(1, 5))
                 .Generate(count);
+
+        public static List<PostTag> GeneratePostTags(long postId, int count)
+            => new Faker<PostTag>()
+                .RuleFor(t => t.PostId, _ => postId)
+                .RuleFor(t => t.Tag, f => f.Random.AlphaNumeric(15))
+                .Generate(count);
     }
 }

@@ -17,6 +17,18 @@
                             </figure>
                         </div>
                     </div>
+                    <div>
+                        <p class="label">
+                            Tags:
+                        </p>
+                        <p>
+                            <span v-for="tag in request.tags" :key="tag">#{{ tag }} &nbsp; </span>
+                        </p>
+                        <div>
+                            <input type="text" class="input" v-model="newTag" />
+                            <button class="button is-info" @click="addTag">Add tag</button>
+                        </div>
+                    </div>
                     <div class="control m-2">
                         <div class="file is-boxed">
                             <label class="file-label" style="width: 100%;">
@@ -56,13 +68,27 @@ const router = useRouter()
 const request: AddPostRequest = reactive({
     creatorId: useAuthStore().userId(),
     content: '',
-    file: undefined
+    file: undefined,
+    tags: []
 })
+
+const newTag = ref('')
+
+const addTag = () => {
+    if (newTag.value == '' || request.tags.includes(newTag.value)) {
+        alert("Tag empty or already added!")
+        return
+    }
+
+    request.tags.push(newTag.value)
+    newTag.value = ''
+}
 
 const imageUrls: Ref<string[]> = ref([])
 
 const selectFile = (e: Event) => {
     request.files = (e.target! as HTMLInputElement).files!
+    
     imageUrls.value = []
     for (let i = 0; i < request.files?.length! ?? 0; i++) {
         imageUrls.value.push(URL.createObjectURL(request.files![i]))
@@ -78,6 +104,8 @@ const send = () => {
     for (let i = 0; i < request.files!.length; i++) {
         formData.append('Files', request.files![i])
     }
+
+    request.tags.forEach(tag => formData.append('Tags[]', tag))
 
     formData.append('CreatorId', request.creatorId.toString())
     formData.append('Content', request.content)

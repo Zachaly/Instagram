@@ -18,14 +18,16 @@ namespace Instagram.Application.Command
         private readonly IFileService _fileService;
         private readonly IResponseFactory _responseFactory;
         private readonly IPostImageRepository _postImageRepository;
+        private readonly IPostTagRepository _postTagRepository;
 
         public DeletePostHandler(IPostRepository postRepository, IFileService fileService, IResponseFactory responseFactory,
-            IPostImageRepository postImageRepository)
+            IPostImageRepository postImageRepository, IPostTagRepository postTagRepository)
         {
             _postRepository = postRepository;
             _fileService = fileService;
             _responseFactory = responseFactory;
             _postImageRepository = postImageRepository;
+            _postTagRepository = postTagRepository;
         }
 
         public async Task<ResponseModel> Handle(DeletePostCommand request, CancellationToken cancellationToken)
@@ -50,6 +52,9 @@ namespace Instagram.Application.Command
                     {
                         await _fileService.RemovePostImageAsync(image.File);
                     }
+
+                    await _postTagRepository.DeleteByPostIdAsync(request.Id);
+
                     scope.Complete();
                 }
 
