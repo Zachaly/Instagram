@@ -23,6 +23,7 @@ const params = useRoute().params
 onMounted(() => {
     axios.get<any, AxiosResponse<PostModel>>(`post/${params.id}`).then(res => {
         post.value = res.data
+        console.log(post.value)
     }).catch((res: AxiosError<ResponseModel>) => {
         console.log(res)
     })

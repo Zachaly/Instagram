@@ -59,7 +59,8 @@ namespace Instagram.Application.Command
                         await _postImageRepository.InsertAsync(image);
                     }
 
-                    await _postTagService.AddAsync(new AddPostTagRequest { PostId = postId, Tags = request.Tags });
+                    await _postTagService.AddAsync(new AddPostTagRequest { PostId = postId, Tags = request.Tags 
+                        ?? Enumerable.Empty<string>() });
 
                     scope.Complete();
                 }

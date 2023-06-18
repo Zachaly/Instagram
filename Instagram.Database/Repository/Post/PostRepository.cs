@@ -49,7 +49,7 @@ namespace Instagram.Database.Repository
                         (model.ImageIds as List<long>)!.Add(imageId);
                     }
 
-                    if (!model.Tags.Contains(tag))
+                    if (!model.Tags.Contains(tag) && tag is not null)
                     {
                         (model.Tags as List<string>)!.Add(tag);
                     }
@@ -88,7 +88,7 @@ namespace Instagram.Database.Repository
                         (model.ImageIds as List<long>)!.Add(imageId);
                     }
 
-                    if (!model.Tags.Contains(tag))
+                    if (!model.Tags.Contains(tag) && tag is not null)
                     {
                         (model.Tags as List<string>)!.Add(tag);
                     }

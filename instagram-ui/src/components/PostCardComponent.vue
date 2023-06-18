@@ -20,6 +20,9 @@
 
         <div class="card-content">
             <UserLinkComponent :nickName="post.creatorName" :id="post.creatorId" />
+            <p class="mt-3 mb-3 subtitle">
+                Tags: <span v-for="tag in post.tags" :key="tag">#{{ tag }} &nbsp;</span>
+            </p>
             <p>
                 {{ post.content }}
             </p>
