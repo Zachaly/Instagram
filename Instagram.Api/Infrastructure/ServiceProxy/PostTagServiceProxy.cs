@@ -16,24 +16,40 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             _postTagService = postTagService;
         }
 
-        public Task<ResponseModel> AddAsync(AddPostTagRequest request)
+        public async Task<ResponseModel> AddAsync(AddPostTagRequest request)
         {
-            throw new NotImplementedException();
+            LogInformation("Add");
+
+            var response = await _postTagService.AddAsync(request);
+
+            LogResponse(response);
+
+            return response;
         }
 
-        public Task<ResponseModel> DeleteAsync(long postId, string tag)
+        public async Task<ResponseModel> DeleteAsync(long postId, string tag)
         {
-            throw new NotImplementedException();
+            LogInformation("Delete");
+
+            var response = await _postTagService.DeleteAsync(postId, tag);
+
+            LogResponse(response);
+
+            return response;
         }
 
         public Task<IEnumerable<PostTagModel>> GetAsync(GetPostTagRequest request)
         {
-            throw new NotImplementedException();
+            LogInformation("Get");
+
+            return _postTagService.GetAsync(request);
         }
 
         public Task<int> GetCountAsync(GetPostTagRequest request)
         {
-            throw new NotImplementedException();
+            LogInformation("Get Count");
+
+            return _postTagService.GetCountAsync(request);
         }
     }
 }

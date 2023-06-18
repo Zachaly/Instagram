@@ -71,6 +71,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostLikeServiceProxy, PostLikeServiceProxy>();
             services.AddScoped<IUserServiceProxy, UserServiceProxy>();
             services.AddScoped<IUserFollowServiceProxy, UserFollowServiceProxy>();
+            services.AddScoped<IPostTagServiceProxy, PostTagServiceProxy>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
         }
