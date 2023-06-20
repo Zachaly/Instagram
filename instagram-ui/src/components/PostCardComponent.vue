@@ -20,8 +20,9 @@
 
         <div class="card-content">
             <UserLinkComponent :nickName="post.creatorName" :id="post.creatorId" />
-            <p class="mt-3 mb-3 subtitle">
-                Tags: <span v-for="tag in post.tags" :key="tag">#{{ tag }} &nbsp;</span>
+            <p class="mt-3 mb-3 subtitle is-flex">
+                Tags:
+                <PostTagLink v-for="tag in post.tags" :key="tag" :tag="tag" />
             </p>
             <p>
                 {{ post.content }}
@@ -54,6 +55,7 @@ import axios from 'axios';
 import AddPostLikeRequest from '@/models/request/AddPostLikeRequest';
 import PostLikeListComponent from './PostLikeListComponent.vue';
 import PostCommentList from './PostCommentList.vue';
+import PostTagLink from './PostTagLink.vue';
 
 const currentImageIndex = ref(0)
 const authStore = useAuthStore()

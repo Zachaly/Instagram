@@ -21,6 +21,7 @@ namespace Instagram.Database.Repository
             var query = _sqlQueryBuilder
                 .BuildSelect<PostModel>(Table)
                 .Where(request)
+                .JoinConditional(request)
                 .WithPagination(request)
                 .OrderBy(DefaultOrderBy)
                 .Build();

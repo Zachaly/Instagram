@@ -50,10 +50,13 @@ namespace Instagram.Database.Sql
                 }
 
                 _conditionalJoin.Append($" LEFT OUTER JOIN [{join.Table}] ON {join.Condition}");
-                excludedJoins.Add(join.JoinedColumn);
+                if(!string.IsNullOrEmpty(join.JoinedColumn))
+                {
+                    excludedJoins.Add(join.JoinedColumn);
 
-                _conditionalSelect.Append(", ");
-                _conditionalSelect.Append(join.JoinedColumn);
+                    _conditionalSelect.Append(", ");
+                    _conditionalSelect.Append(join.JoinedColumn);
+                }
             }
 
             return this;
@@ -74,7 +77,8 @@ namespace Instagram.Database.Sql
         {
             var props = typeof(TRequest).GetProperties()
                 .Where(prop => prop.Name != "PageIndex" && prop.Name != "PageSize" && prop.Name != "SkipPagination")
-                .Where(prop => prop.GetValue(request) is not null && prop.GetCustomAttribute<ConditionalJoinAttribute>() is null);
+                .Where(prop => prop.GetValue(request) is not null 
+                && (prop.GetCustomAttribute<ConditionalJoinAttribute>() is null  || prop.GetCustomAttribute<WhereAttribute>() is not null) );
 
             int index = 0;
 
@@ -100,7 +104,11 @@ namespace Instagram.Database.Sql
                 } 
                 else
                 {
-                    name = $"{attribute.Condition} @{prop.Name}";
+                    if(prop.PropertyType == typeof(string))
+                    {
+                        prop.SetValue(request, $"{attribute.Decorator}{prop.GetValue(request)}{attribute.Decorator}");
+                    }
+                    name = $"{attribute.Condition} @{prop.Name} ";
                 }
 
                 if(index == 0)
@@ -112,6 +120,7 @@ namespace Instagram.Database.Sql
                     where = $"AND {name}";
                 }
                 _where.Append(where);
+                _where.Append(' ');
                 index++;
             }
             return this;

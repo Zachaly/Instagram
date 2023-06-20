@@ -5,5 +5,6 @@ export default interface GetUserRequest extends PagedRequest {
     Nickname?: string,
     Name?: string,
     UserIds?: number[],
-    SkipIds?: number[]
+    SkipIds?: number[],
+    SearchNickname?: string
 }

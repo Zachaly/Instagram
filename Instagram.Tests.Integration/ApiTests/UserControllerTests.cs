@@ -245,5 +245,33 @@ namespace Instagram.Tests.Integration.ApiTests
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Contains(updatedUsers, user => user.Id == request.Id && user.Bio == request.Bio);
         }
+
+        [Fact]
+        public async Task SearchNickname_ReturnsProperUsers()
+        {
+            const string SearchNickname = "name";
+
+            var usersToInsert = new User[]
+            {
+                new User { Nickname = "name", Bio ="", Email = "email@email.com", Name = "normal name", Gender = 0, PasswordHash = "hash" },
+                new User { Nickname = "name1", Bio ="", Email = "email@email.com", Name = "normal name", Gender = 0, PasswordHash = "hash" },
+                new User { Nickname = "name2", Bio ="", Email = "email@email.com", Name = "normal name", Gender = 0, PasswordHash = "hash" },
+                new User { Nickname = "enam4", Bio ="", Email = "email@email.com", Name = "normal name", Gender = 0, PasswordHash = "hash" },
+                new User { Nickname = "enam3", Bio ="", Email = "email@email.com", Name = "normal name", Gender = 0, PasswordHash = "hash" },
+                new User { Nickname = "name3", Bio ="", Email = "email@email.com", Name = "normal name", Gender = 0, PasswordHash = "hash" },
+                new User { Nickname = "eman", Bio ="", Email = "email@email.com", Name = "normal name", Gender = 0, PasswordHash = "hash" },
+                new User { Nickname = "eman2", Bio ="", Email = "email@email.com", Name = "normal name", Gender = 0, PasswordHash = "hash" },
+            };
+
+            Insert("User", usersToInsert);
+
+            var users = GetFromDatabase<User>("SELECT * FROM [User]");
+
+            var response = await _httpClient.GetAsync($"{Endpoint}?SearchNickname={SearchNickname}");
+            var content = await response.Content.ReadFromJsonAsync<IEnumerable<UserModel>>();
+
+            Assert.Equivalent(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equivalent(users.Where(u => u.Nickname.Contains(SearchNickname)).Select(x => x.Id), content.Select(x => x.Id));
+        }
     }
 }

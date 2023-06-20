@@ -7,6 +7,7 @@ import ProfilePage from "./pages/ProfilePage.vue";
 import UpdateProfilePage from "./pages/UpdateProfilePage.vue";
 import AddPostPage from './pages/AddPostPage.vue'
 import PostPage from "./pages/PostPage.vue";
+import SearchTagPage from './pages/SearchTagPage.vue'
 
 const createRoute = (path: string, name: string, component: Component) => ({ path, name, component })
 
@@ -17,7 +18,8 @@ const routes = [
     createRoute('/user/:id', 'user', ProfilePage),
     createRoute('/user/update', 'user-update', UpdateProfilePage),
     createRoute('/add-post', 'add-post', AddPostPage),
-    createRoute('/post/:id', 'post', PostPage)
+    createRoute('/post/:id', 'post', PostPage),
+    createRoute('/tag/:tag', 'tag', SearchTagPage)
 ]
 export default createRouter({
     routes,

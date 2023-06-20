@@ -119,5 +119,29 @@ namespace Instagram.Tests.Integration.DatabaseTests
 
             Assert.All(result, post => Assert.Equal(likes.Count(x => x.PostId == post.Id), post.LikeCount));
         }
+
+        [Fact]
+        public async Task GetAsync_WithSearchTag_ReturnsProperPosts()
+        {
+            Insert("User", FakeDataFactory.GenerateUsers(1));
+
+            var userId = GetFromDatabase<long>("SELECT Id FROM [User]").First();
+
+            Insert("Post", FakeDataFactory.GeneratePosts(10, userId));
+
+            var postIds = GetFromDatabase<long>("SELECT Id FROM Post").Take(3);
+
+            var images = postIds.Select(x => new PostImage { File = "", PostId = x });
+            Insert("PostImage", images);
+
+            const string SearchTag = "tag";
+            var tags = postIds.Select(x => new PostTag { PostId = x, Tag = SearchTag });
+
+            Insert("PostTag", tags);
+
+            var result = await _repository.GetAsync(new GetPostRequest { SearchTag = SearchTag });
+
+            Assert.Equivalent(postIds, result.Select(x => x.Id));
+        }
     }
 }
