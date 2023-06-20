@@ -13,7 +13,7 @@ import PostModel from '@/models/PostModel';
 import ResponseModel from '@/models/ResponseModel';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Ref, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import NavigationPage from './NavigationPage.vue';
 import PostCardComponent from '@/components/PostCardComponent.vue';
 
@@ -23,7 +23,14 @@ const params = useRoute().params
 onMounted(() => {
     axios.get<any, AxiosResponse<PostModel>>(`post/${params.id}`).then(res => {
         post.value = res.data
-        console.log(post.value)
+    }).catch((res: AxiosError<ResponseModel>) => {
+        console.log(res)
+    })
+})
+onBeforeRouteUpdate(() => {
+    console.log('upt', params)
+    axios.get<any, AxiosResponse<PostModel>>(`post/${params.id}`).then(res => {
+        post.value = res.data
     }).catch((res: AxiosError<ResponseModel>) => {
         console.log(res)
     })

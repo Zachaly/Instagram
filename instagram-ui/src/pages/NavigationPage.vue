@@ -4,12 +4,16 @@
             <SidebarComponent />
         </div>
         <div class="column">
+            <div class="is-flex is-justify-content-center">
+                <SearchBarComponent />
+            </div>
             <slot></slot>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import SearchBarComponent from '@/components/SearchBarComponent.vue';
 import SidebarComponent from '@/components/SidebarComponent.vue';
 import { useAuthStore } from '@/store/authStore';
 
