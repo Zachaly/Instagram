@@ -86,5 +86,31 @@ namespace Instagram.Tests.Integration.ApiTests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(PostCount, content);
         }
+
+        [Fact]
+        public async Task SearchTag_ReturnsProperPosts()
+        {
+            var user = FakeDataFactory.GenerateUsers(1);
+            Insert("User", user);
+            var userId = GetFromDatabase<long>("SELECT Id FROM [User]").First();
+
+            Insert("Post", FakeDataFactory.GeneratePosts(10, userId));
+
+            var postIds = GetFromDatabase<long>("SELECT Id FROM Post").Take(3);
+
+            var images = postIds.Select(x => new PostImage { PostId = x, File = "" });
+            Insert("PostImage", images);
+
+            const string SearchTag = "tag";
+            var tags = postIds.Select(x => new PostTag { PostId = x, Tag = SearchTag });
+            Insert("PostTag", tags);
+
+            var response = await _httpClient.GetAsync($"{Endpoint}?SearchTag={SearchTag}");
+            var content = await response.Content.ReadFromJsonAsync<IEnumerable<PostModel>>();
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equivalent(postIds, content.Select(x => x.Id));
+            Assert.Equal(postIds.Count(), content.Count());
+        }
     }
 }

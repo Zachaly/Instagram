@@ -62,7 +62,7 @@ namespace Instagram.Database.Sql
 
         private ISqlBuilderQuery BuildSelectWithSubQuery<T>(string table)
         {
-            var select = new StringBuilder($"SELECT t.* /**outsideselect**/ FROM (SELECT /**select**/ FROM [{table}] /**subjoin**/ /**where**/ /**orderby**/ /**pagination**/) as t /**join**/ /**groupby**/");
+            var select = new StringBuilder($"SELECT t.* /**outsideselect**/ FROM (SELECT /**select**/ FROM [{table}] /**subjoin**/ /**conditionaljoin**/ /**where**/ /**orderby**/ /**pagination**/) as t /**join**/ /**groupby**/");
 
             var innerSelect = SelectValues<T>(table);
             var outerSelect = SelectOuterQueryValues<T>();

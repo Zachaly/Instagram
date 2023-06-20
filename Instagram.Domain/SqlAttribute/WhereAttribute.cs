@@ -4,5 +4,6 @@
     public class WhereAttribute : Attribute
     {
         public string Condition { get; set; }
+        public string Decorator { get; set; } = "";
     }
 }

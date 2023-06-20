@@ -16,5 +16,8 @@ namespace Instagram.Models.User.Request
         public IEnumerable<long>? UserIds { get; set; }
         [Where(Condition = "[User].[Id] NOT IN ")]
         public IEnumerable<int>? SkipIds { get; set; }
+
+        [Where(Condition = "[User].[Nickname] LIKE ", Decorator = "%")]
+        public string? SearchNickname { get; set; }
     }
 }
