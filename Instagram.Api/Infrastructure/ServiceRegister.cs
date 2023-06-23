@@ -29,6 +29,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostLikeRepository, PostLikeRepository>();
             services.AddScoped<IPostCommentRepository, PostCommentRepository>();
             services.AddScoped<IPostTagRepository, PostTagRepository>();
+            services.AddScoped<IUserClaimRepository, UserClaimRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -49,6 +50,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostLikeService, PostLikeService>();
             services.AddScoped<IPostCommentService, PostCommentService>();
             services.AddScoped<IPostTagService, PostTagService>();
+            services.AddScoped<IUserClaimService, UserClaimService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -57,6 +59,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostLikeFactory, PostLikeFactory>();
             services.AddScoped<IPostCommentFactory, PostCommentFactory>();
             services.AddScoped<IPostTagFactory, PostTagFactory>();
+            services.AddScoped<IUserClaimFactory, UserClaimFactory>();
 
             services.AddMediatR(opt =>
             {

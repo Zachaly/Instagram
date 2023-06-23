@@ -12,7 +12,8 @@
             "TRUNCATE TABLE [UserFollow]",
             "TRUNCATE TABLE [PostLike]",
             "TRUNCATE TABLE [PostComment]",
-            "TRUNCATE TABLE [PostTag]"
+            "TRUNCATE TABLE [PostTag]",
+            "TRUNCATE TABLE [UserClaim]"
         };
     }
 }

@@ -17,12 +17,26 @@ namespace Instagram.Database.Repository
 
         public Task DeleteAsync(long userId, string value)
         {
-            throw new NotImplementedException();
+            var param = new { UserId = userId, Value = value };
+
+            var query = _sqlQueryBuilder
+                .BuildDelete(Table)
+                .Where(param)
+                .Build();
+
+            return QueryAsync(query, param);
         }
 
         public Task<IEnumerable<UserClaim>> GetEntitiesAsync(GetUserClaimRequest request)
         {
-            throw new NotImplementedException();
+            var query = _sqlQueryBuilder
+                .BuildSelect<UserClaim>(Table)
+                .Where(request)
+                .WithPagination(request)
+                .OrderBy(DefaultOrderBy)
+                .Build();
+
+            return QueryManyAsync<UserClaim>(query, request);
         }
     }
 }
