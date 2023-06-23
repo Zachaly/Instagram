@@ -1,4 +1,5 @@
 ﻿using Instagram.Application;
+using Instagram.Domain.Entity;
 using Instagram.Models.User.Request;
 
 namespace Instagram.Tests.Unit.FactoryTests
@@ -42,11 +43,18 @@ namespace Instagram.Tests.Unit.FactoryTests
             const string Token = "token";
             const string Email = "email";
 
-            var response = _factory.CreateLoginResponse(UserId, Token, Email);
+            var claims = new List<UserClaim> 
+            {
+                new UserClaim { Value = "claim1" },
+                new UserClaim { Value = "claim2" },
+            };
+
+            var response = _factory.CreateLoginResponse(UserId, Token, Email, claims);
 
             Assert.Equal(UserId, response.UserId);
             Assert.Equal(Email, response.Email);
             Assert.Equal(Token, response.AuthToken);
+            Assert.Equal(claims.Select(x => x.Value), response.Claims);
         }
     }
 }

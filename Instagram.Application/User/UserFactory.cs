@@ -18,12 +18,12 @@ namespace Instagram.Application
                 PasswordHash = passwordHash
             };
 
-        public LoginResponse CreateLoginResponse(long userId, string token, string email)
+        public LoginResponse CreateLoginResponse(long userId, string token, string email, IEnumerable<UserClaim> claims)
             => new LoginResponse
             {
                 UserId = userId,
                 AuthToken = token,
-                Email = email
+                Email = email,
             };
     }
 }

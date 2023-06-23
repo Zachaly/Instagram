@@ -24,7 +24,7 @@ namespace Instagram.Application
             _encryptionKey = configuration["EncryptionKey"]!;
         }
 
-        public Task<string> GenerateTokenAsync(User user)
+        public Task<string> GenerateTokenAsync(User user, IEnumerable<UserClaim> userClaims)
         {
             var claims = new List<Claim>
             {

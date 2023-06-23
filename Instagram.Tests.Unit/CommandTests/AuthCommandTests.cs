@@ -5,6 +5,7 @@ using Instagram.Domain.Entity;
 using Instagram.Models.Response;
 using Instagram.Models.User;
 using Instagram.Models.User.Request;
+using Instagram.Models.UserClaim.Request;
 using Moq;
 
 namespace Instagram.Tests.Unit.CommandTests
@@ -15,6 +16,7 @@ namespace Instagram.Tests.Unit.CommandTests
         private readonly Mock<IUserRepository> _userRepository;
         private readonly Mock<IUserFactory> _userFactory;
         private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly Mock<IUserClaimRepository> _userClaimRepository;
 
         public AuthCommandTests()
         {
@@ -22,6 +24,7 @@ namespace Instagram.Tests.Unit.CommandTests
             _userRepository = new Mock<IUserRepository>();
             _userFactory = new Mock<IUserFactory>();
             _responseFactory = new Mock<IResponseFactory>();
+            _userClaimRepository = new Mock<IUserClaimRepository>();
         }
 
         [Fact]
@@ -36,21 +39,25 @@ namespace Instagram.Tests.Unit.CommandTests
             _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            _authService.Setup(x => x.GenerateTokenAsync(It.IsAny<User>()))
+            _authService.Setup(x => x.GenerateTokenAsync(It.IsAny<User>(), It.IsAny<IEnumerable<UserClaim>>()))
                 .ReturnsAsync(Token);
 
-            _userFactory.Setup(x => x.CreateLoginResponse(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
-                .Returns((long id, string token, string email) => new LoginResponse
+            _userFactory.Setup(x => x.CreateLoginResponse(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<UserClaim>>()))
+                .Returns((long id, string token, string email, IEnumerable<UserClaim> _) => new LoginResponse
                 {
                     AuthToken = token,
                     Email = email,
                     UserId = id
                 });
 
+            _userClaimRepository.Setup(x => x.GetEntitiesAsync(It.IsAny<GetUserClaimRequest>()))
+                .ReturnsAsync(Enumerable.Empty<UserClaim>());
+
             _responseFactory.Setup(x => x.CreateSuccess(It.IsAny<LoginResponse>()))
                 .Returns((LoginResponse data) => new DataResponseModel<LoginResponse> { Data = data, Success = true });
 
-            var res = await new LoginHandler(_userRepository.Object, _authService.Object, _userFactory.Object, _responseFactory.Object)
+            var res = await new LoginHandler(_userRepository.Object, _authService.Object,
+                _userFactory.Object, _responseFactory.Object, _userClaimRepository.Object)
                 .Handle(new LoginCommand(), default);
 
             Assert.True(res.Success);
@@ -73,7 +80,8 @@ namespace Instagram.Tests.Unit.CommandTests
             _responseFactory.Setup(x => x.CreateFailure<LoginResponse>(It.IsAny<string>()))
                 .Returns((string error) => new DataResponseModel<LoginResponse> { Error = error, Success = false, Data = null });
 
-            var res = await new LoginHandler(_userRepository.Object, _authService.Object, _userFactory.Object, _responseFactory.Object)
+            var res = await new LoginHandler(_userRepository.Object, _authService.Object,
+                _userFactory.Object, _responseFactory.Object, _userClaimRepository.Object)
                 .Handle(new LoginCommand(), default);
 
             Assert.False(res.Success);
@@ -90,7 +98,8 @@ namespace Instagram.Tests.Unit.CommandTests
             _responseFactory.Setup(x => x.CreateFailure<LoginResponse>(It.IsAny<string>()))
                 .Returns((string error) => new DataResponseModel<LoginResponse> { Error = error, Success = false, Data = null });
 
-            var res = await new LoginHandler(_userRepository.Object, _authService.Object, _userFactory.Object, _responseFactory.Object)
+            var res = await new LoginHandler(_userRepository.Object, _authService.Object, _userFactory.Object,
+                _responseFactory.Object, _userClaimRepository.Object)
                 .Handle(new LoginCommand(), default);
 
             Assert.False(res.Success);
