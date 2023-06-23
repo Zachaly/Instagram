@@ -32,6 +32,8 @@ namespace Instagram.Application
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
             };
 
+            claims.AddRange(userClaims.Select(c => new Claim("Role", c.Value)));
+
             var token = new JwtSecurityToken(
                 _authIssuer,
                 _authAudience,

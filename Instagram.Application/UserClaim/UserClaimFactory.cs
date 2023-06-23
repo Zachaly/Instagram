@@ -7,8 +7,10 @@ namespace Instagram.Application
     public class UserClaimFactory : IUserClaimFactory
     {
         public UserClaim Create(AddUserClaimRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => new UserClaim
+            {
+                UserId = request.UserId,
+                Value = request.Value,
+            };
     }
 }

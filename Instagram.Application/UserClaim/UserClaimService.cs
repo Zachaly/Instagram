@@ -18,14 +18,34 @@ namespace Instagram.Application
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> AddAsync(AddUserClaimRequest request)
+        public async Task<ResponseModel> AddAsync(AddUserClaimRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var claim = _userClaimFactory.Create(request);
+
+                await _repository.InsertAsync(claim);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
 
-        public Task<ResponseModel> DeleteAsync(long userId, string value)
+        public async Task<ResponseModel> DeleteAsync(long userId, string value)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _repository.DeleteAsync(userId, value);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }

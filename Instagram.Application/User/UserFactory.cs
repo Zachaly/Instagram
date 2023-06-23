@@ -24,6 +24,7 @@ namespace Instagram.Application
                 UserId = userId,
                 AuthToken = token,
                 Email = email,
+                Claims = claims.Select(c => c.Value)
             };
     }
 }
