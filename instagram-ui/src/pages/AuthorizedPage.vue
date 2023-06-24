@@ -9,7 +9,11 @@ import { useRouter } from "vue-router";
 const authStore = useAuthStore()
 const router = useRouter()
 
-if(!authStore.isAuthorized) {
+const props = defineProps<{
+    requiredClaim?: string
+}>()
+
+if(!authStore.isAuthorized && (!props.requiredClaim || authStore.hasClaim(props.requiredClaim))) {
     router.push('/login')
 }
 

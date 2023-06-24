@@ -33,6 +33,9 @@ const posts: Ref<PostModel[]> = ref([])
 const authStore = useAuthStore()
 
 const loadPosts = () => {
+    if(authStore.userFollowsIds.length < 1){
+        return
+    }
     const request: GetPostRequest = { CreatorIds: [...authStore.userFollowsIds] }
     axios.get<PostModel[]>('post', { params: request }).then(res => {
         posts.value = res.data
