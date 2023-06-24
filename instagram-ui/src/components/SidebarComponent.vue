@@ -14,6 +14,11 @@
                     Add post
                 </router-link>
             </li>
+            <li v-if="authStore.hasClaim('Admin')">
+                <router-link to="/admin" active-class="is-active">
+                    Admin
+                </router-link>
+            </li>
             <li>
                 <a class="button is-danger" @click="logout">Logout</a>
             </li>

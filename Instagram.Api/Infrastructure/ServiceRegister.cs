@@ -1,4 +1,5 @@
 ﻿using FluentMigrator.Runner;
+using Instagram.Api.Authorization;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application;
 using Instagram.Application.Abstraction;
@@ -29,6 +30,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostLikeRepository, PostLikeRepository>();
             services.AddScoped<IPostCommentRepository, PostCommentRepository>();
             services.AddScoped<IPostTagRepository, PostTagRepository>();
+            services.AddScoped<IUserClaimRepository, UserClaimRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -49,6 +51,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostLikeService, PostLikeService>();
             services.AddScoped<IPostCommentService, PostCommentService>();
             services.AddScoped<IPostTagService, PostTagService>();
+            services.AddScoped<IUserClaimService, UserClaimService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -57,6 +60,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostLikeFactory, PostLikeFactory>();
             services.AddScoped<IPostCommentFactory, PostCommentFactory>();
             services.AddScoped<IPostTagFactory, PostTagFactory>();
+            services.AddScoped<IUserClaimFactory, UserClaimFactory>();
 
             services.AddMediatR(opt =>
             {
@@ -72,6 +76,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserServiceProxy, UserServiceProxy>();
             services.AddScoped<IUserFollowServiceProxy, UserFollowServiceProxy>();
             services.AddScoped<IPostTagServiceProxy, PostTagServiceProxy>();
+            services.AddScoped<IUserClaimServiceProxy, UserClaimServiceProxy>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
         }
@@ -95,7 +100,12 @@ namespace Instagram.Api.Infrastructure
                     ValidIssuer = builder.Configuration["Auth:Issuer"],
                     ValidAudience = builder.Configuration["Auth:Audience"],
                 };
-            });            
+            });
+
+            builder.Services.AddAuthorization(config =>
+            {
+                config.AddPolicy(UserClaimValues.Admin, c => c.RequireClaim("Role", UserClaimValues.Admin));
+            });
         }
     }
 }

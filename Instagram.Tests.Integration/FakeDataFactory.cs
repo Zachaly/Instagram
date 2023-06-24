@@ -60,5 +60,11 @@ namespace Instagram.Tests.Integration
                 .RuleFor(t => t.PostId, _ => postId)
                 .RuleFor(t => t.Tag, f => f.Random.AlphaNumeric(15))
                 .Generate(count);
+
+        public static List<UserClaim> GenerateUserClaims(long userId, int count)
+            => new Faker<UserClaim>()
+                .RuleFor(c => c.UserId, _ => userId)
+                .RuleFor(c => c.Value, f => f.Random.AlphaNumeric(10))
+                .Generate(count);
     }
 }

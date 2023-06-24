@@ -64,7 +64,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 Email = "mail",
             };
 
-            var token = await _service.GenerateTokenAsync(user);
+            var claim = new UserClaim { UserId = 1, Value = "claim" };
+
+            var token = await _service.GenerateTokenAsync(user, new List<UserClaim> { claim });
 
             var decodedToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
@@ -72,6 +74,7 @@ namespace Instagram.Tests.Unit.ServiceTests
             Assert.Contains(decodedToken.Claims, x => x.Value == user.Email);
             Assert.Contains(decodedToken.Audiences, x => x == _config.Object["Auth:Audience"]);
             Assert.Equal(decodedToken.Issuer, _config.Object["Auth:Issuer"]);
+            Assert.Contains(decodedToken.Claims, x => x.Value == claim.Value);
         }
     }
 }

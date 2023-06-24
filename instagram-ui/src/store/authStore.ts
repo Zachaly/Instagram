@@ -10,7 +10,8 @@ export const useAuthStore = defineStore('auth', () => {
     const authInfo: Ref<LoginResponse> = ref({
         userId: 0,
         authToken: '',
-        email: ''
+        email: '',
+        claims: []
     })
 
     const userFollowsIds: Ref<number[]> = ref([])
@@ -42,11 +43,14 @@ export const useAuthStore = defineStore('auth', () => {
         authInfo.value = {
             userId: 0,
             authToken: '',
-            email: ''
+            email: '',
+            claims: []
         }
     }
 
+    const hasClaim = (claim: string): boolean => authInfo.value.claims.includes(claim)
+
     const userId = (): number => authInfo.value.userId
 
-    return { isAuthorized, authorize, logout, userId, updateFollows, userFollowsIds }
+    return { isAuthorized, authorize, logout, userId, updateFollows, userFollowsIds, hasClaim }
 })  

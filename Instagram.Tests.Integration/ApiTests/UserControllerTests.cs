@@ -29,7 +29,7 @@ namespace Instagram.Tests.Integration.ApiTests
 
             var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
 
-            var users = GetFromDatabase<User>("SELECT * FROM [User]");
+            var users = GetFromDatabase<User>("SELECT * FROM [User] WHERE Nickname!='__admin__'");
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Single(users);
@@ -67,7 +67,7 @@ namespace Instagram.Tests.Integration.ApiTests
 
             var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
 
-            var users = GetFromDatabase<User>("SELECT * FROM [User]");
+            var users = GetFromDatabase<User>("SELECT * FROM [User] WHERE Nickname!='__admin__'");
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Single(users);
@@ -202,7 +202,7 @@ namespace Instagram.Tests.Integration.ApiTests
 
             ExecuteQuery(query, user);
 
-            var userId = GetFromDatabase<long>("SELECT [Id] FROM [User]").First();
+            var userId = GetFromDatabase<long>("SELECT [Id] FROM [User] WHERE Nickname!='__admin__'").First();
 
             var response = await _httpClient.GetAsync($"{Endpoint}/{userId}");
             var content = await response.Content.ReadFromJsonAsync<UserModel>();

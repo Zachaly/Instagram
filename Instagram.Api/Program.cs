@@ -1,4 +1,3 @@
-using FluentMigrator.Runner;
 using Instagram.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +20,8 @@ builder.Services.ConfigureSwagger();
 builder.ConfigureAuthorization();
 
 var app = builder.Build().MigrateDatabase();
+
+await app.CreateAdmin();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

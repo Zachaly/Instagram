@@ -3,6 +3,7 @@ using Instagram.Database.Repository;
 using Instagram.Models.Response;
 using Instagram.Models.User;
 using Instagram.Models.User.Request;
+using Instagram.Models.UserClaim.Request;
 using MediatR;
 
 namespace Instagram.Application.Command
@@ -18,14 +19,16 @@ namespace Instagram.Application.Command
         private readonly IAuthService _authService;
         private readonly IUserFactory _userFactory;
         private readonly IResponseFactory _responseFactory;
+        private readonly IUserClaimRepository _userClaimRepository;
 
         public LoginHandler(IUserRepository userRepository, IAuthService authService,
-            IUserFactory userFactory, IResponseFactory responseFactory)
+            IUserFactory userFactory, IResponseFactory responseFactory, IUserClaimRepository userClaimRepository)
         {
             _userRepository = userRepository;
             _authService = authService;
             _userFactory = userFactory;
             _responseFactory = responseFactory;
+            _userClaimRepository = userClaimRepository;
         }
 
         public async Task<DataResponseModel<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -41,9 +44,11 @@ namespace Instagram.Application.Command
                 return _responseFactory.CreateFailure<LoginResponse>(FailMessage);
             }
 
-            var token = await _authService.GenerateTokenAsync(user);
+            var claims = await _userClaimRepository.GetEntitiesAsync(new GetUserClaimRequest { UserId = user.Id, SkipPagination = true });
 
-            return _responseFactory.CreateSuccess(_userFactory.CreateLoginResponse(user.Id, token, user.Email));
+            var token = await _authService.GenerateTokenAsync(user, claims);
+
+            return _responseFactory.CreateSuccess(_userFactory.CreateLoginResponse(user.Id, token, user.Email, claims));
         }
     }
 }

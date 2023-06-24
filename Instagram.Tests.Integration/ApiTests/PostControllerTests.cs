@@ -17,7 +17,7 @@ namespace Instagram.Tests.Integration.ApiTests
             var user = FakeDataFactory.GenerateUsers(1).First();
             Insert("User", user);
 
-            var userId = GetFromDatabase<long>("SELECT Id FROM [User]").First();
+            var userId = GetFromDatabase<long>("SELECT Id FROM [User] WHERE Nickname!='__admin__'").First();
 
             Insert("Post", FakeDataFactory.GeneratePosts(5, userId));
 
@@ -43,7 +43,7 @@ namespace Instagram.Tests.Integration.ApiTests
             var userQuery = new SqlQueryBuilder().BuildInsert("User", user).Build();
             ExecuteQuery(userQuery, user);
 
-            var userId = GetFromDatabase<long>("SELECT Id FROM [User]").First();
+            var userId = GetFromDatabase<long>("SELECT Id FROM [User] WHERE Nickname!='__admin__'").First();
 
             Insert("Post", FakeDataFactory.GeneratePosts(5, userId));
 

@@ -24,13 +24,15 @@ namespace Instagram.Application
             _encryptionKey = configuration["EncryptionKey"]!;
         }
 
-        public Task<string> GenerateTokenAsync(User user)
+        public Task<string> GenerateTokenAsync(User user, IEnumerable<UserClaim> userClaims)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
             };
+
+            claims.AddRange(userClaims.Select(c => new Claim("Role", c.Value)));
 
             var token = new JwtSecurityToken(
                 _authIssuer,

@@ -89,6 +89,20 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer", content.AuthToken);
         }
+        
+        protected async Task AuthorizeAdmin()
+        {
+            var loginRequest = new LoginRequest
+            {
+                Email = "admin@instagram.com",
+                Password = "zaq1@WSX"
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("/api/user/login", loginRequest);
+            var content = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer", content.AuthToken);
+        }
 
         public void Dispose()
         {
