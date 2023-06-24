@@ -1,4 +1,5 @@
 ﻿using FluentMigrator.Runner;
+using Instagram.Api.Authorization;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application;
 using Instagram.Application.Abstraction;
@@ -75,6 +76,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserServiceProxy, UserServiceProxy>();
             services.AddScoped<IUserFollowServiceProxy, UserFollowServiceProxy>();
             services.AddScoped<IPostTagServiceProxy, PostTagServiceProxy>();
+            services.AddScoped<IUserClaimServiceProxy, UserClaimServiceProxy>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
         }
@@ -98,7 +100,12 @@ namespace Instagram.Api.Infrastructure
                     ValidIssuer = builder.Configuration["Auth:Issuer"],
                     ValidAudience = builder.Configuration["Auth:Audience"],
                 };
-            });            
+            });
+
+            builder.Services.AddAuthorization(config =>
+            {
+                config.AddPolicy(UserClaimValues.Admin, c => c.RequireClaim("Role", UserClaimValues.Admin));
+            });
         }
     }
 }

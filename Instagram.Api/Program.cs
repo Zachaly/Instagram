@@ -1,4 +1,3 @@
-using FluentMigrator.Runner;
 using Instagram.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
