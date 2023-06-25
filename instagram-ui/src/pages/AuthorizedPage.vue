@@ -10,11 +10,13 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const props = defineProps<{
-    requiredClaim?: string
+    allowedClaims?: string[]
 }>()
 
-if(!authStore.isAuthorized && (!props.requiredClaim || !authStore.hasClaim(props.requiredClaim))) {
+if(!authStore.isAuthorized) {
     router.push('/login')
+} else if(props.allowedClaims && !props.allowedClaims.some(claim => authStore.hasClaim(claim))) {
+    router.push('/')
 }
 
 </script>

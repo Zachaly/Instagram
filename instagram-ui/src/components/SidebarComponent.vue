@@ -6,8 +6,9 @@
                 <router-link to="/" active-class="is-active">Main page</router-link>
             </li>
             <li>
-                <router-link :to="{ name: 'user', params: { id: authStore.userId() } }"
-                    active-class="is-active">Profile</router-link>
+                <router-link :to="{ name: 'user', params: { id: authStore.userId() } }" active-class="is-active">
+                    Profile
+                </router-link>
             </li>
             <li>
                 <router-link to="/add-post" active-class="is-active">
@@ -19,6 +20,11 @@
                     Admin
                 </router-link>
             </li>
+            <li v-if="authStore.hasClaim('Admin') || authStore.hasClaim(MODERATOR_CLAIM)">
+                <router-link to="/moderation" active-class="is-active">
+                    Moderation
+                </router-link>
+            </li>
             <li>
                 <a class="button is-danger" @click="logout">Logout</a>
             </li>
@@ -27,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { MODERATOR_CLAIM } from '@/constants';
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'vue-router';
 

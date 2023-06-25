@@ -1,5 +1,5 @@
 <template>
-    <AuthorizedPage requiredClaim="Admin">
+    <AuthorizedPage :allowedClaims="['Admin']">
         <NavigationPage :hideSearch="true">
             <TabsComponent :names="['Moderators', 'Add moderator']" @select="selectIndex"/>
             <ModeratorListComponent v-if="currentIndex == 0"/>
