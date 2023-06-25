@@ -19,4 +19,9 @@ img {
   left: 40%;
   z-index: 10;
 }
+
+.height-100 {
+  height: 100%;
+}
+
 </style>

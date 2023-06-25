@@ -9,6 +9,7 @@ import AddPostPage from './pages/AddPostPage.vue'
 import PostPage from "./pages/PostPage.vue";
 import SearchTagPage from './pages/SearchTagPage.vue'
 import AdminPage from './pages/AdminPage.vue'
+import ModerationPage from './pages/ModerationPage.vue'
 
 const createRoute = (path: string, name: string, component: Component) => ({ path, name, component })
 
@@ -21,7 +22,8 @@ const routes = [
     createRoute('/add-post', 'add-post', AddPostPage),
     createRoute('/post/:id', 'post', PostPage),
     createRoute('/tag/:tag', 'tag', SearchTagPage),
-    createRoute('/admin', 'admin', AdminPage)
+    createRoute('/admin', 'admin', AdminPage),
+    createRoute('/moderation', 'moderation', ModerationPage)
 ]
 export default createRouter({
     routes,
