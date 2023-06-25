@@ -4,7 +4,7 @@
             <SidebarComponent />
         </div>
         <div class="column">
-            <div class="is-flex is-justify-content-center">
+            <div class="is-flex is-justify-content-center" v-if="!hideSearch">
                 <SearchBarComponent />
             </div>
             <slot></slot>
@@ -18,5 +18,8 @@ import SidebarComponent from '@/components/SidebarComponent.vue';
 import { useAuthStore } from '@/store/authStore';
 
 const authStore = useAuthStore()
+defineProps<{
+    hideSearch?: boolean
+}>()
 
 </script>

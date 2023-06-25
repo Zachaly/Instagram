@@ -13,7 +13,7 @@ const props = defineProps<{
     requiredClaim?: string
 }>()
 
-if(!authStore.isAuthorized && (!props.requiredClaim || authStore.hasClaim(props.requiredClaim))) {
+if(!authStore.isAuthorized && (!props.requiredClaim || !authStore.hasClaim(props.requiredClaim))) {
     router.push('/login')
 }
 
