@@ -7,8 +7,13 @@ namespace Instagram.Application
     public class PostReportFactory : IPostReportFactory
     {
         public PostReport Create(AddPostReportRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => new PostReport
+            {
+                PostId = request.PostId,
+                Created = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Reason = request.Reason,
+                ReportingUserId = request.ReportingUserId,
+                Resolved = false
+            };
     }
 }

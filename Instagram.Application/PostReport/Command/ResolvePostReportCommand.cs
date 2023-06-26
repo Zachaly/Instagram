@@ -1,5 +1,6 @@
 ﻿using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
+using Instagram.Models.PostReport.Request;
 using Instagram.Models.Response;
 using MediatR;
 
@@ -23,9 +24,49 @@ namespace Instagram.Application.Command
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> Handle(ResolvePostReportCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseModel> Handle(ResolvePostReportCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if(request.Accepted)
+                {
+                    return await HandleAccepted(request);
+                }
+
+                return await HandleNotAccepted(request);
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
+        }
+
+        private async Task<ResponseModel> HandleAccepted(ResolvePostReportCommand command)
+        {
+            var request = new UpdatePostReportRequest
+            {
+                Accepted = true,
+                ResolveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Resolved = true
+            };
+
+            await _postReportRepository.UpdateByPostIdAsync(request, command.PostId);
+
+            return _responseFactory.CreateSuccess();
+        }
+
+        private async Task<ResponseModel> HandleNotAccepted(ResolvePostReportCommand command)
+        {
+            var request = new UpdatePostReportRequest
+            {
+                Accepted = false,
+                Resolved = true,
+                ResolveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            };
+
+            await _postReportRepository.UpdateByIdAsync(request, command.Id);
+
+            return _responseFactory.CreateSuccess();
         }
     }
 }

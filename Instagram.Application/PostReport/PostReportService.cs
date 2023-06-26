@@ -18,9 +18,20 @@ namespace Instagram.Application
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> AddAsync(AddPostReportRequest request)
+        public async Task<ResponseModel> AddAsync(AddPostReportRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var report = _postReportFactory.Create(request);
+
+                var id = await _repository.InsertAsync(report);
+
+                return _responseFactory.CreateSuccess(id);
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }
