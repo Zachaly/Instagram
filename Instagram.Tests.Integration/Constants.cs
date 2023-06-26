@@ -13,7 +13,8 @@
             "TRUNCATE TABLE [PostLike]",
             "TRUNCATE TABLE [PostComment]",
             "TRUNCATE TABLE [PostTag]",
-            "TRUNCATE TABLE [UserClaim]"
+            "TRUNCATE TABLE [UserClaim]",
+            "TRUNCATE TABLE [PostReport]"
         };
     }
 }

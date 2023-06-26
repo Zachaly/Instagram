@@ -1,4 +1,5 @@
-﻿using Instagram.Database.Factory;
+﻿using Dapper;
+using Instagram.Database.Factory;
 using Instagram.Database.Repository.Abstraction;
 using Instagram.Database.Sql;
 using Instagram.Domain.Entity;
@@ -7,7 +8,7 @@ using Instagram.Models.PostReport.Request;
 
 namespace Instagram.Database.Repository
 {
-    internal class PostReportRepository : RepositoryBase<PostReport, PostReportModel, GetPostReportRequest>, IPostReportRepository
+    public class PostReportRepository : RepositoryBase<PostReport, PostReportModel, GetPostReportRequest>, IPostReportRepository
     {
         public PostReportRepository(ISqlQueryBuilder sqlQueryBuilder, IConnectionFactory connectionFactory) : base(sqlQueryBuilder, connectionFactory)
         {
@@ -17,12 +18,26 @@ namespace Instagram.Database.Repository
 
         public Task UpdateByIdAsync(UpdatePostReportRequest request, long id)
         {
-            throw new NotImplementedException();
+            var query = _sqlQueryBuilder
+                .BuildUpdate(Table, request)
+                .Where(new { Id = id })
+                .Build();
+
+            request.Id = id;
+            
+            return QueryAsync(query, request);
         }
 
         public Task UpdateByPostIdAsync(UpdatePostReportRequest request, long postId)
         {
-            throw new NotImplementedException();
+            var query = _sqlQueryBuilder
+                .BuildUpdate(Table, request)
+                .Where(new { PostId = postId })
+                .Build();
+
+            request.PostId = postId;
+
+            return QueryAsync(query, request);
         }
     }
 }

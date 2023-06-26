@@ -2,6 +2,7 @@
 {
     public class UpdatePostReportRequest
     {
+        public long? Id { get; set; }
         public long? ReportingUserId { get; set; }
         public long? PostId { get; set; }
         public string? Reason { get; set; }
