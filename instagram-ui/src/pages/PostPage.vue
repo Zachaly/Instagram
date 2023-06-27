@@ -28,7 +28,6 @@ onMounted(() => {
     })
 })
 onBeforeRouteUpdate(() => {
-    console.log('upt', params)
     axios.get<any, AxiosResponse<PostModel>>(`post/${params.id}`).then(res => {
         post.value = res.data
     }).catch((res: AxiosError<ResponseModel>) => {
