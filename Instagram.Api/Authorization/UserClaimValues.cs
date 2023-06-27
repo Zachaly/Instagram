@@ -3,5 +3,6 @@
     public static class UserClaimValues
     {
         public const string Admin = "Admin";
+        public const string Moderator = "Moderator";
     }
 }

@@ -11,7 +11,7 @@ namespace Instagram.Application
             {
                 Content = request.Content,
                 CreatorId = request.CreatorId,
-                Created = DateTimeOffset.Now.ToUnixTimeSeconds()
+                Created = DateTimeOffset.Now.ToUnixTimeMilliseconds()
             };
 
         public IEnumerable<PostImage> CreateImages(IEnumerable<string> files, long postId)

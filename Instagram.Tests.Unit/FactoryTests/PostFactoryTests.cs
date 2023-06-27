@@ -25,7 +25,7 @@ namespace Instagram.Tests.Unit.FactoryTests
 
             Assert.Equal(request.Content, post.Content);
             Assert.Equal(request.CreatorId, post.CreatorId);
-            Assert.InRange(post.Created, DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 50, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 50);
+            Assert.InRange(post.Created, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - 50, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + 50);
         }
 
         [Fact]

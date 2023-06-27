@@ -19,7 +19,25 @@
         </div>
 
         <div class="card-content">
-            <UserLinkComponent :nickName="post.creatorName" :id="post.creatorId" />
+            <div class="is-flex">
+                <div class="width-100">
+                    <UserLinkComponent :nickName="post.creatorName" :id="post.creatorId" />
+                </div>
+                <div style="margin: auto;">
+                    <div class="dropdown" :class="{'is-active': showDropdown}" >
+                        <div class="dropdown-trigger">
+                            <button  class="button" @click="showDropdown = !showDropdown">
+                                More
+                            </button>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-content">
+                                <a href="#" class="dropdown-item" @click="showReport = true">Report</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <p class="mt-3 mb-3 subtitle is-flex">
                 Tags:
                 <PostTagLink v-for="tag in post.tags" :key="tag" :tag="tag" />
@@ -43,6 +61,11 @@
     <div v-if="showLikes" class="fixed-center">
         <PostLikeListComponent :postId="post.id" @close="showLikes = false" />
     </div>
+
+    <div v-if="showReport" class="fixed-center">
+        <AddReportComponent :post-id="post.id" @close="showReport = false"/>
+    </div>
+
 </template>
 
 <script setup lang="ts">
@@ -56,10 +79,13 @@ import AddPostLikeRequest from '@/models/request/AddPostLikeRequest';
 import PostLikeListComponent from './PostLikeListComponent.vue';
 import PostCommentList from './PostCommentList.vue';
 import PostTagLink from './PostTagLink.vue';
+import AddReportComponent from './AddReportComponent.vue';
 
 const currentImageIndex = ref(0)
 const authStore = useAuthStore()
 const showLikes = ref(false)
+const showDropdown = ref(false)
+const showReport = ref(false)
 
 const changeIndex = (value: number) => {
     if (currentImageIndex.value + value < 0 || currentImageIndex.value + value > props.post.imageIds.length - 1) {

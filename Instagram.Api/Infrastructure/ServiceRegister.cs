@@ -31,6 +31,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostCommentRepository, PostCommentRepository>();
             services.AddScoped<IPostTagRepository, PostTagRepository>();
             services.AddScoped<IUserClaimRepository, UserClaimRepository>();
+            services.AddScoped<IPostReportRepository, PostReportRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -52,6 +53,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostCommentService, PostCommentService>();
             services.AddScoped<IPostTagService, PostTagService>();
             services.AddScoped<IUserClaimService, UserClaimService>();
+            services.AddScoped<IPostReportService, PostReportService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -61,6 +63,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostCommentFactory, PostCommentFactory>();
             services.AddScoped<IPostTagFactory, PostTagFactory>();
             services.AddScoped<IUserClaimFactory, UserClaimFactory>();
+            services.AddScoped<IPostReportFactory, PostReportFactory>();
 
             services.AddMediatR(opt =>
             {
@@ -77,6 +80,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserFollowServiceProxy, UserFollowServiceProxy>();
             services.AddScoped<IPostTagServiceProxy, PostTagServiceProxy>();
             services.AddScoped<IUserClaimServiceProxy, UserClaimServiceProxy>();
+            services.AddScoped<IPostReportServiceProxy, PostReportServiceProxy>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
         }
@@ -105,6 +109,7 @@ namespace Instagram.Api.Infrastructure
             builder.Services.AddAuthorization(config =>
             {
                 config.AddPolicy(UserClaimValues.Admin, c => c.RequireClaim("Role", UserClaimValues.Admin));
+                config.AddPolicy(UserClaimValues.Moderator, c => c.RequireClaim("Role", UserClaimValues.Moderator, UserClaimValues.Admin));
             });
         }
     }

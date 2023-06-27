@@ -29,7 +29,7 @@ namespace Instagram.Api.Infrastructure
         {
             if(response.Success)
             {
-                return new CreatedResult(location + response.NewEntityId.ToString(), response);
+                return new CreatedResult($"/api/{location}/{response.NewEntityId}", response);
             }
 
             return new BadRequestObjectResult(response);
