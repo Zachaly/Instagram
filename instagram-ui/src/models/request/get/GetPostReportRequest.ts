@@ -4,6 +4,6 @@ export default interface GetPostReportRequest {
     PostId?: number,
     Reason?: string,
     Created?: number,
-    Resolved?: number,
+    Resolved?: boolean,
     ResolveTime?: number
 }

@@ -1,7 +1,10 @@
 <template>
     <AuthorizedPage :allowed-claims="['Admin', MODERATOR_CLAIM]">
         <NavigationPage :hide-search="true">
-            Moderation
+            <TabsComponent :names="['Unresolved', 'Resolved']" @select="selectIndex"/>
+            <div>
+                <PostReportListItemComponent v-for="report in reports" :key="report.id" :report="report"/>
+            </div>
         </NavigationPage>
     </AuthorizedPage>
 </template>
@@ -11,10 +14,37 @@ import { MODERATOR_CLAIM } from '@/constants';
 import AuthorizedPage from './AuthorizedPage.vue';
 import NavigationPage from './NavigationPage.vue';
 import axios from 'axios';
+import { Ref, onMounted, ref } from 'vue';
+import TabsComponent from '@/components/TabsComponent.vue';
+import PostReportModel from '@/models/PostReportModel';
+import GetPostReportRequest from '@/models/request/get/GetPostReportRequest';
+import PostReportListItemComponent from '@/components/PostReportListItemComponent.vue';
 
+const currentIndex = ref(0)
 
-axios.get('post-report').then(res => {
-    console.log(res.data)
+const reports: Ref<PostReportModel[]> = ref([])
+
+const selectIndex = (index: number) => {
+    currentIndex.value = index
+    loadReports()
+}
+
+const loadReports = () => {
+    const params: GetPostReportRequest = {  }
+
+    if(currentIndex.value == 0){
+        params.Resolved = false
+    } else if(currentIndex.value == 1){
+        params.Resolved = true
+    }
+
+    axios.get<PostReportModel[]>('post-report', { params }).then(res => {
+        reports.value = res.data
+    })
+}
+
+onMounted(() => {
+    loadReports()
 })
 
 </script>

@@ -46,7 +46,7 @@ namespace Instagram.Application.Command
             var request = new UpdatePostReportRequest
             {
                 Accepted = true,
-                ResolveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ResolveTime = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                 Resolved = true
             };
 
@@ -61,7 +61,7 @@ namespace Instagram.Application.Command
             {
                 Accepted = false,
                 Resolved = true,
-                ResolveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ResolveTime = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
             };
 
             await _postReportRepository.UpdateByIdAsync(request, command.Id);

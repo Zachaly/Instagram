@@ -10,7 +10,7 @@ namespace Instagram.Application
             => new PostReport
             {
                 PostId = request.PostId,
-                Created = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Created = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                 Reason = request.Reason,
                 ReportingUserId = request.ReportingUserId,
                 Resolved = false
