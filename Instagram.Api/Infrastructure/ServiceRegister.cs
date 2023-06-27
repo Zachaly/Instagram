@@ -80,6 +80,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserFollowServiceProxy, UserFollowServiceProxy>();
             services.AddScoped<IPostTagServiceProxy, PostTagServiceProxy>();
             services.AddScoped<IUserClaimServiceProxy, UserClaimServiceProxy>();
+            services.AddScoped<IPostReportServiceProxy, PostReportServiceProxy>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
         }
@@ -108,6 +109,7 @@ namespace Instagram.Api.Infrastructure
             builder.Services.AddAuthorization(config =>
             {
                 config.AddPolicy(UserClaimValues.Admin, c => c.RequireClaim("Role", UserClaimValues.Admin));
+                config.AddPolicy(UserClaimValues.Moderator, c => c.RequireClaim("Role", UserClaimValues.Moderator, UserClaimValues.Admin));
             });
         }
     }
