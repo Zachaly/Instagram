@@ -114,45 +114,6 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
-        public async Task ResolveAsync_ReportAccepted_AllSamePostReportResolvedAndAccepted()
-        {
-            await AuthorizeModerator();
-
-            const long PostId = 1;
-            var userIds = new long[] { 1, 2, 3 };
-
-            Insert("PostReport", FakeDataFactory.GeneratePostReports(PostId, userIds));
-            Insert("PostReport", FakeDataFactory.GeneratePostReports(2, userIds));
-
-            var reportId = GetFromDatabase<long>("SELECT Id FROM PostReport WHERE PostId=@PostId", new { PostId }).First();
-
-            var command = new ResolvePostReportCommand
-            {
-                Accepted = true,
-                Id = reportId,
-                PostId = PostId
-            };
-
-            var response = await _httpClient.PutAsJsonAsync($"{Endpoint}/resolve", command);
-
-            var reports = GetFromDatabase<PostReport>("SELECT * FROM PostReport");
-
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-            Assert.All(reports.Where(x => x.PostId == PostId), report =>
-            {
-                Assert.Equal(command.Accepted, report.Accepted);
-                Assert.True(report.Resolved);
-                Assert.NotNull(report.ResolveTime);
-            });
-            Assert.All(reports.Where(x => x.PostId != PostId), report =>
-            {
-                Assert.Null(report.Accepted);
-                Assert.False(report.Resolved);
-                Assert.Null(report.ResolveTime);
-            });
-        }
-
-        [Fact]
         public async Task ResolveAsync_ReportNotAccepted_SinglePostReportResolvedAndNotAccepted()
         {
             await AuthorizeModerator();

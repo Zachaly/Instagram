@@ -4,6 +4,8 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.PostReport.Request;
 using Instagram.Models.Response;
+using Instagram.Models.UserBan.Request;
+using MediatR;
 using Moq;
 
 namespace Instagram.Tests.Unit.CommandTests
@@ -12,14 +14,18 @@ namespace Instagram.Tests.Unit.CommandTests
     {
         private readonly Mock<IPostReportRepository> _postReportRepository;
         private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly Mock<IMediator> _mediator;
+        private readonly Mock<IUserBanService> _userBanService;
         private readonly ResolvePostReportHandler _handler;
 
         public ResolvePostReportCommandTests()
         {
             _postReportRepository = new Mock<IPostReportRepository>();
             _responseFactory = new Mock<IResponseFactory>();
+            _mediator = new Mock<IMediator>();
+            _userBanService = new Mock<IUserBanService>();
 
-            _handler = new ResolvePostReportHandler(_postReportRepository.Object, _responseFactory.Object);
+            _handler = new ResolvePostReportHandler(_postReportRepository.Object, _responseFactory.Object, _userBanService.Object, _mediator.Object);
         }
 
         [Fact]
@@ -36,6 +42,14 @@ namespace Instagram.Tests.Unit.CommandTests
                 new PostReport { PostId = 4 },
             };
 
+            var posts = new List<Post>
+            {
+                new Post { Id = 1, },
+                new Post { Id = PostId },
+            };
+
+            var bans = new List<UserBan>();
+
             _postReportRepository.Setup(x => x.UpdateByPostIdAsync(It.IsAny<UpdatePostReportRequest>(), It.IsAny<long>()))
                 .Callback((UpdatePostReportRequest request, long id) =>
                 {
@@ -46,14 +60,28 @@ namespace Instagram.Tests.Unit.CommandTests
                     }
                 });
 
+            _mediator.Setup(x => x.Send(It.IsAny<IRequest<ResponseModel>>(), It.IsAny<CancellationToken>()))
+                .Callback((IRequest<ResponseModel> command, CancellationToken _) =>
+                {
+                    posts.RemoveAll(x => x.Id == (command as DeletePostCommand).Id);
+                }).ReturnsAsync(new ResponseModel { Success = true });
+
+            _userBanService.Setup(x => x.AddAsync(It.IsAny<AddUserBanRequest>()))
+                .Callback((AddUserBanRequest request) =>
+                {
+                    bans.Add(new UserBan { UserId = request.UserId, EndDate = request.EndDate });
+                });
+
             _responseFactory.Setup(x => x.CreateSuccess())
                 .Returns(new ResponseModel { Success = true });
 
-            var command = new ResolvePostReportCommand { Accepted = true, Id = 1, PostId = PostId };
+            var command = new ResolvePostReportCommand { Accepted = true, Id = 1, PostId = PostId, BanEndDate = 2137, UserId = 3 };
 
             var res = await _handler.Handle(command, default);
 
             Assert.True(res.Success);
+            Assert.Contains(bans, x => x.UserId == command.UserId);
+            Assert.DoesNotContain(posts, x => x.Id == command.PostId);
             Assert.All(reports.Where(x => x.PostId == command.PostId), rep => {
                 Assert.Equal(command.Accepted, rep.Accepted);
                 Assert.True(rep.Resolved);
