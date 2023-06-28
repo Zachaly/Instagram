@@ -18,9 +18,20 @@ namespace Instagram.Application
             _userBanFactory = userBanFactory;
         }
 
-        public Task<ResponseModel> AddAsync(AddUserBanRequest request)
+        public async Task<ResponseModel> AddAsync(AddUserBanRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ban = _userBanFactory.Create(request);
+
+                await _repository.InsertAsync(ban);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }
