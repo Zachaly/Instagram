@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Instagram.Api.Controllers
 {
     [Route("/api/user-claim")]
-    [Authorize(Policy = UserClaimValues.Admin)]
+    [Authorize(Policy = AuthPolicyNames.Admin)]
     public class UserClaimController : ControllerBase
     {
         private readonly IUserClaimServiceProxy _userClaimServiceProxy;

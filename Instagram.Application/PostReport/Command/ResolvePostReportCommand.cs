@@ -70,7 +70,7 @@ namespace Instagram.Application.Command
 
                 await _mediator.Send(new DeletePostCommand { Id = command.PostId });
 
-                await _userClaimService.AddAsync(new AddUserClaimRequest { UserId = command.UserId.Value, Value = "Banned" }); 
+                await _userClaimService.AddAsync(new AddUserClaimRequest { UserId = command.UserId.Value, Value = "Ban" }); 
 
                 scope.Complete();
             }

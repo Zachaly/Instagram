@@ -10,6 +10,7 @@ using Instagram.Database.Repository;
 using Instagram.Database.Sql;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -112,9 +113,12 @@ namespace Instagram.Api.Infrastructure
 
             builder.Services.AddAuthorization(config =>
             {
-                config.AddPolicy(UserClaimValues.Admin, c => c.RequireClaim("Role", UserClaimValues.Admin));
-                config.AddPolicy(UserClaimValues.Moderator, c => c.RequireClaim("Role", UserClaimValues.Moderator, UserClaimValues.Admin));
+                config.AddPolicy(AuthPolicyNames.Admin, c => c.RequireClaim("Role", UserClaimValues.Admin));
+                config.AddPolicy(AuthPolicyNames.Moderator, c => c.RequireClaim("Role", UserClaimValues.Moderator, UserClaimValues.Admin));
+                config.AddPolicy(AuthPolicyNames.NotBanned, c => c.AddRequirements(new NotBannedRequirement()));
             });
+
+            builder.Services.AddSingleton<IAuthorizationHandler, NotBannedHandler>();
         }
     }
 }

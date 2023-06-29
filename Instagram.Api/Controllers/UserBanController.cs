@@ -67,7 +67,7 @@ namespace Instagram.Api.Controllers
         /// <response code="204">User ban successfuly created</response>
         /// <response code="400">Invalid request</response>
         [HttpPost]
-        [Authorize(UserClaimValues.Moderator)]
+        [Authorize(AuthPolicyNames.Moderator)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> PostAsync(AddUserBanRequest request)
@@ -83,7 +83,7 @@ namespace Instagram.Api.Controllers
         /// <response code="204">Ban deleted successfully</response>
         /// <response code="400">Failed to delete ban</response>
         [HttpDelete("{id}")]
-        [Authorize(UserClaimValues.Moderator)]
+        [Authorize(AuthPolicyNames.Moderator)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> DeleteAsync(long id)
