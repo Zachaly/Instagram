@@ -67,5 +67,45 @@ namespace Instagram.Tests.Unit.ServiceTests
             Assert.False(res.Success);
             Assert.Equal(Error, res.Error);
         }
+
+        [Fact]
+        public async Task DeleteAsync_Success()
+        {
+            const long Id = 2;
+            var bans = new List<UserBan>
+            {
+                new UserBan { Id = 1, },
+                new UserBan { Id = Id, },
+                new UserBan { Id = 1, },
+            };
+
+            _userBanRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
+                .Callback((long id) => bans.RemoveAll(x => x.Id == id));
+
+            _responseFactory.Setup(x => x.CreateSuccess())
+                .Returns(new ResponseModel { Success = true });
+
+            var res = await _service.DeleteAsync(Id);
+
+            Assert.True(res.Success);
+            Assert.DoesNotContain(bans, x => x.Id == Id);
+        }
+
+        [Fact]
+        public async Task DeleteAsync_ExceptionThrown_Failure()
+        {
+            const string Error = "Err";
+
+            _userBanRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
+                .Callback((long id) => throw new Exception(Error));
+
+            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
+                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+
+            var res = await _service.DeleteAsync(2137);
+
+            Assert.False(res.Success);
+            Assert.Equal(Error, res.Error);
+        }
     }
 }

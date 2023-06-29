@@ -32,6 +32,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostTagRepository, PostTagRepository>();
             services.AddScoped<IUserClaimRepository, UserClaimRepository>();
             services.AddScoped<IPostReportRepository, PostReportRepository>();
+            services.AddScoped<IUserBanRepository, UserBanRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -54,6 +55,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostTagService, PostTagService>();
             services.AddScoped<IUserClaimService, UserClaimService>();
             services.AddScoped<IPostReportService, PostReportService>();
+            services.AddScoped<IUserBanService, UserBanService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -64,6 +66,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostTagFactory, PostTagFactory>();
             services.AddScoped<IUserClaimFactory, UserClaimFactory>();
             services.AddScoped<IPostReportFactory, PostReportFactory>();
+            services.AddScoped<IUserBanFactory, UserBanFactory>();
 
             services.AddMediatR(opt =>
             {
@@ -81,6 +84,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostTagServiceProxy, PostTagServiceProxy>();
             services.AddScoped<IUserClaimServiceProxy, UserClaimServiceProxy>();
             services.AddScoped<IPostReportServiceProxy, PostReportServiceProxy>();
+            services.AddScoped<IUserBanServiceProxy, UserBanServiceProxy>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
         }

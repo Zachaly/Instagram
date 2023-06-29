@@ -77,5 +77,14 @@ namespace Instagram.Tests.Integration
                 .RuleFor(r => r.PostId, f => postId)
                 .RuleFor(r => r.Reason, f => f.Random.AlphaNumeric(20))
                 .Generate(userIds.Count());
+
+        public static List<UserBan> GenerateUserBans(IEnumerable<long> userIds)
+            => userIds
+                .Select(id => new UserBan 
+                { 
+                    UserId = id,
+                    EndDate = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+                    StartDate = DateTimeOffset.Now.ToUnixTimeMilliseconds()
+                }).ToList();
     }
 }

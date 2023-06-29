@@ -5,6 +5,7 @@ using Instagram.Domain.Entity;
 using Instagram.Models.PostReport.Request;
 using Instagram.Models.Response;
 using Instagram.Models.UserBan.Request;
+using Instagram.Models.UserClaim.Request;
 using MediatR;
 using Moq;
 
@@ -16,6 +17,7 @@ namespace Instagram.Tests.Unit.CommandTests
         private readonly Mock<IResponseFactory> _responseFactory;
         private readonly Mock<IMediator> _mediator;
         private readonly Mock<IUserBanService> _userBanService;
+        private readonly Mock<IUserClaimService> _userClaimService;
         private readonly ResolvePostReportHandler _handler;
 
         public ResolvePostReportCommandTests()
@@ -24,8 +26,11 @@ namespace Instagram.Tests.Unit.CommandTests
             _responseFactory = new Mock<IResponseFactory>();
             _mediator = new Mock<IMediator>();
             _userBanService = new Mock<IUserBanService>();
+            _userClaimService = new Mock<IUserClaimService>();
 
-            _handler = new ResolvePostReportHandler(_postReportRepository.Object, _responseFactory.Object, _userBanService.Object, _mediator.Object);
+            _handler = new ResolvePostReportHandler(_postReportRepository.Object, _responseFactory.Object,
+                _userBanService.Object, _mediator.Object,
+                _userClaimService.Object);
         }
 
         [Fact]
@@ -50,6 +55,8 @@ namespace Instagram.Tests.Unit.CommandTests
 
             var bans = new List<UserBan>();
 
+            var claims = new List<UserClaim>();
+
             _postReportRepository.Setup(x => x.UpdateByPostIdAsync(It.IsAny<UpdatePostReportRequest>(), It.IsAny<long>()))
                 .Callback((UpdatePostReportRequest request, long id) =>
                 {
@@ -72,6 +79,9 @@ namespace Instagram.Tests.Unit.CommandTests
                     bans.Add(new UserBan { UserId = request.UserId, EndDate = request.EndDate });
                 });
 
+            _userClaimService.Setup(x => x.AddAsync(It.IsAny<AddUserClaimRequest>()))
+                .Callback((AddUserClaimRequest request) => claims.Add(new UserClaim { UserId = request.UserId, Value = request.Value }));
+
             _responseFactory.Setup(x => x.CreateSuccess())
                 .Returns(new ResponseModel { Success = true });
 
@@ -81,6 +91,7 @@ namespace Instagram.Tests.Unit.CommandTests
 
             Assert.True(res.Success);
             Assert.Contains(bans, x => x.UserId == command.UserId);
+            Assert.Contains(claims, x => x.UserId == command.UserId);
             Assert.DoesNotContain(posts, x => x.Id == command.PostId);
             Assert.All(reports.Where(x => x.PostId == command.PostId), rep => {
                 Assert.Equal(command.Accepted, rep.Accepted);

@@ -2,7 +2,7 @@
 
 namespace Instagram.Models.UserBan
 {
-    [Join(Table = "User", Condition = "[User].[Id]=[UserBan].[Id]")]
+    [Join(Table = "User", Condition = "[User].[Id]=[UserBan].[UserId]")]
     public class UserBanModel : IModel
     {
         public long Id { get; set; }

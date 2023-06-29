@@ -33,5 +33,19 @@ namespace Instagram.Application
                 return _responseFactory.CreateFailure(ex.Message);
             }
         }
+
+        public async Task<ResponseModel> DeleteAsync(long id)
+        {
+            try
+            {
+                await _repository.DeleteByIdAsync(id);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
+        }
     }
 }

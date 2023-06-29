@@ -3,6 +3,7 @@ using Instagram.Database.Repository;
 using Instagram.Models.PostReport.Request;
 using Instagram.Models.Response;
 using Instagram.Models.UserBan.Request;
+using Instagram.Models.UserClaim.Request;
 using MediatR;
 using System.Transactions;
 
@@ -23,14 +24,16 @@ namespace Instagram.Application.Command
         private readonly IResponseFactory _responseFactory;
         private readonly IUserBanService _userBanService;
         private readonly IMediator _mediator;
+        private readonly IUserClaimService _userClaimService;
 
         public ResolvePostReportHandler(IPostReportRepository postReportRepository, IResponseFactory responseFactory,
-            IUserBanService userBanService, IMediator mediator)
+            IUserBanService userBanService, IMediator mediator, IUserClaimService userClaimService)
         {
             _postReportRepository = postReportRepository;
             _responseFactory = responseFactory;
             _userBanService = userBanService;
             _mediator = mediator;
+            _userClaimService = userClaimService;
         }
 
         public async Task<ResponseModel> Handle(ResolvePostReportCommand request, CancellationToken cancellationToken)
@@ -66,6 +69,8 @@ namespace Instagram.Application.Command
                 await _userBanService.AddAsync(new AddUserBanRequest { UserId = command.UserId!.Value, EndDate = command.BanEndDate!.Value });
 
                 await _mediator.Send(new DeletePostCommand { Id = command.PostId });
+
+                await _userClaimService.AddAsync(new AddUserClaimRequest { UserId = command.UserId.Value, Value = "Banned" }); 
 
                 scope.Complete();
             }

@@ -7,5 +7,6 @@ namespace Instagram.Application.Abstraction
     public interface IUserBanService : IServiceBase<UserBanModel, GetUserBanRequest>
     {
         Task<ResponseModel> AddAsync(AddUserBanRequest request);
+        Task<ResponseModel> DeleteAsync(long id);
     }
 }
