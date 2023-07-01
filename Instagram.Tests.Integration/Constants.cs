@@ -14,7 +14,8 @@
             "TRUNCATE TABLE [PostComment]",
             "TRUNCATE TABLE [PostTag]",
             "TRUNCATE TABLE [UserClaim]",
-            "TRUNCATE TABLE [PostReport]"
+            "TRUNCATE TABLE [PostReport]",
+            "TRUNCATE TABLE [UserBan]"
         };
     }
 }

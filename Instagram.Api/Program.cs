@@ -19,6 +19,8 @@ builder.Services.ConfigureSwagger();
 
 builder.ConfigureAuthorization();
 
+builder.Services.AddHostedService<BanCancellationService>();
+
 var app = builder.Build().MigrateDatabase();
 
 await app.CreateAdmin();

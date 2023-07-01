@@ -1,4 +1,5 @@
-﻿using Instagram.Api.Infrastructure;
+﻿using Instagram.Api.Authorization;
+using Instagram.Api.Infrastructure;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Models.PostTag;
 using Instagram.Models.PostTag.Request;
@@ -52,7 +53,7 @@ namespace Instagram.Api.Controllers
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        [Authorize]
+        [NotBanned]
         public async Task<ActionResult<ResponseModel>> PostAsync(AddPostTagRequest request)
         {
             var res = await _postTagServiceProxy.AddAsync(request);
@@ -66,7 +67,7 @@ namespace Instagram.Api.Controllers
         /// <response code="204">Tag deleted successfully</response>
         /// <response code="400">Failed to delete tag</response>
         [HttpDelete("{postId}/{tag}")]
-        [Authorize]
+        [NotBanned]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> DeleteAsync(long postId, string tag)

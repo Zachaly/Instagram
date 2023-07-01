@@ -137,6 +137,36 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer", content.AuthToken);
         }
 
+        protected async Task AuthorizeBanned()
+        {
+            var registerRequest = new RegisterRequest
+            {
+                Email = "email@email.com",
+                Gender = 0,
+                Name = "banned",
+                Nickname = "nickname",
+                Password = "password",
+            };
+            await _httpClient.PostAsJsonAsync("/api/user", registerRequest);
+
+            var userId = GetFromDatabase<long>("SELECT Id FROM [User] WHERE Name=@Name", new { Name = registerRequest.Name }).First();
+
+            Insert("UserClaim", new UserClaim { UserId = userId, Value = UserClaimValues.Ban });
+
+            var loginRequest = new LoginRequest
+            {
+                Email = registerRequest.Email,
+                Password = registerRequest.Password,
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("/api/user/login", loginRequest);
+            var content = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+            _authorizedUserId = content.UserId;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer", content.AuthToken);
+        }
+
+
         public void Dispose()
         {
             using (var connection = new SqlConnection(Constants.ConnectionString))

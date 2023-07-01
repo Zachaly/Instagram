@@ -10,6 +10,7 @@ using Instagram.Database.Repository;
 using Instagram.Database.Sql;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -32,6 +33,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostTagRepository, PostTagRepository>();
             services.AddScoped<IUserClaimRepository, UserClaimRepository>();
             services.AddScoped<IPostReportRepository, PostReportRepository>();
+            services.AddScoped<IUserBanRepository, UserBanRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -54,6 +56,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostTagService, PostTagService>();
             services.AddScoped<IUserClaimService, UserClaimService>();
             services.AddScoped<IPostReportService, PostReportService>();
+            services.AddScoped<IUserBanService, UserBanService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -64,6 +67,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostTagFactory, PostTagFactory>();
             services.AddScoped<IUserClaimFactory, UserClaimFactory>();
             services.AddScoped<IPostReportFactory, PostReportFactory>();
+            services.AddScoped<IUserBanFactory, UserBanFactory>();
 
             services.AddMediatR(opt =>
             {
@@ -81,6 +85,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostTagServiceProxy, PostTagServiceProxy>();
             services.AddScoped<IUserClaimServiceProxy, UserClaimServiceProxy>();
             services.AddScoped<IPostReportServiceProxy, PostReportServiceProxy>();
+            services.AddScoped<IUserBanServiceProxy, UserBanServiceProxy>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
         }
@@ -108,9 +113,12 @@ namespace Instagram.Api.Infrastructure
 
             builder.Services.AddAuthorization(config =>
             {
-                config.AddPolicy(UserClaimValues.Admin, c => c.RequireClaim("Role", UserClaimValues.Admin));
-                config.AddPolicy(UserClaimValues.Moderator, c => c.RequireClaim("Role", UserClaimValues.Moderator, UserClaimValues.Admin));
+                config.AddPolicy(AuthPolicyNames.Admin, c => c.RequireClaim("Role", UserClaimValues.Admin));
+                config.AddPolicy(AuthPolicyNames.Moderator, c => c.RequireClaim("Role", UserClaimValues.Moderator, UserClaimValues.Admin));
+                config.AddPolicy(AuthPolicyNames.NotBanned, c => c.AddRequirements(new NotBannedRequirement()));
             });
+
+            builder.Services.AddSingleton<IAuthorizationHandler, NotBannedHandler>();
         }
     }
 }

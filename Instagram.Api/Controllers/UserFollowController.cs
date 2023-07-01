@@ -1,4 +1,5 @@
-﻿using Instagram.Api.Infrastructure;
+﻿using Instagram.Api.Authorization;
+using Instagram.Api.Infrastructure;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application.Abstraction;
 using Instagram.Models.Response;
@@ -51,7 +52,7 @@ namespace Instagram.Api.Controllers
         /// <response code="204">Follow added successfully</response>
         /// <response code="400">Failed to add follow</response>
         [HttpPost]
-        [Authorize]
+        [NotBanned]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> PostAsync(AddUserFollowRequest request)
@@ -67,7 +68,7 @@ namespace Instagram.Api.Controllers
         /// <response code="204">Follow deleted successfully</response>
         /// <response code="400">Failed to delete follow</response>
         [HttpDelete("{followerId}/{followedId}")]
-        [Authorize]
+        [NotBanned]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> DeleteAsync(long followerId, long followedId)
