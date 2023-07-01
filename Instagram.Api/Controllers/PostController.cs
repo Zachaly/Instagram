@@ -1,4 +1,5 @@
-﻿using Instagram.Api.Infrastructure;
+﻿using Instagram.Api.Authorization;
+using Instagram.Api.Infrastructure;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application.Abstraction;
 using Instagram.Application.Command;
@@ -57,7 +58,7 @@ namespace Instagram.Api.Controllers
         /// <response code="201">Post added</response>
         /// <response code="400">Invalid data</response>
         [HttpPost]
-        [Authorize]
+        [NotBanned]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> PostAsync([FromForm] AddPostCommand command)
@@ -73,7 +74,7 @@ namespace Instagram.Api.Controllers
         /// <response code="204">Post removed successfully</response>
         /// <response code="400">Failed to remove the post</response>
         [HttpDelete("{id}")]
-        [Authorize]
+        [NotBanned]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> DeleteAsync(long id)

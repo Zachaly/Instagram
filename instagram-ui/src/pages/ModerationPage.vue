@@ -1,9 +1,12 @@
 <template>
     <AuthorizedPage :allowed-claims="['Admin', MODERATOR_CLAIM]">
         <NavigationPage :hide-search="true">
-            <TabsComponent :names="['Unresolved', 'Resolved']" @select="selectIndex"/>
-            <div>
-                <PostReportListItemComponent v-for="report in reports" :key="report.id" :report="report"/>
+            <TabsComponent :names="['Unresolved', 'Resolved', 'Bans']" @select="selectIndex" />
+            <div v-if="currentIndex == 0 || currentIndex == 1">
+                <PostReportListItemComponent  v-for="report in reports" :key="report.id" :report="report" />
+            </div>
+            <div v-else-if="currentIndex == 2">
+                <BanListComponent/>
             </div>
         </NavigationPage>
     </AuthorizedPage>
@@ -19,6 +22,7 @@ import TabsComponent from '@/components/TabsComponent.vue';
 import PostReportModel from '@/models/PostReportModel';
 import GetPostReportRequest from '@/models/request/get/GetPostReportRequest';
 import PostReportListItemComponent from '@/components/PostReportListItemComponent.vue';
+import BanListComponent from '@/components/BanListComponent.vue';
 
 const currentIndex = ref(0)
 
@@ -26,15 +30,19 @@ const reports: Ref<PostReportModel[]> = ref([])
 
 const selectIndex = (index: number) => {
     currentIndex.value = index
-    loadReports()
+    reports.value = []
+    if (index == 0 || index == 1) {
+        loadReports()
+    }
+
 }
 
 const loadReports = () => {
-    const params: GetPostReportRequest = {  }
+    const params: GetPostReportRequest = {}
 
-    if(currentIndex.value == 0){
+    if (currentIndex.value == 0) {
         params.Resolved = false
-    } else if(currentIndex.value == 1){
+    } else if (currentIndex.value == 1) {
         params.Resolved = true
     }
 

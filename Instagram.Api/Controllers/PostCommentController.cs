@@ -1,4 +1,5 @@
-﻿using Instagram.Api.Infrastructure;
+﻿using Instagram.Api.Authorization;
+using Instagram.Api.Infrastructure;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Models.PostComment;
 using Instagram.Models.PostComment.Request;
@@ -68,7 +69,7 @@ namespace Instagram.Api.Controllers
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        [Authorize]
+        [NotBanned]
         public async Task<ActionResult<ResponseModel>> PostAsync(AddPostCommentRequest request)
         {
             var res = await _postCommentServiceProxy.AddAsync(request);

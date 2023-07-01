@@ -1,4 +1,5 @@
-﻿using Instagram.Api.Infrastructure;
+﻿using Instagram.Api.Authorization;
+using Instagram.Api.Infrastructure;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application.Abstraction;
 using Instagram.Models.PostLike;
@@ -51,7 +52,7 @@ namespace Instagram.Api.Controllers
         /// <response code="204">Like added successfully</response>
         /// <response code="400">Invalid request</response>
         [HttpPost]
-        [Authorize]
+        [NotBanned]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> PostAsync(AddPostLikeRequest request)
@@ -67,7 +68,7 @@ namespace Instagram.Api.Controllers
         /// <response code="204">Like removed successfully</response>
         /// <response code="400">Failed to remove specified like</response>
         [HttpDelete("{postId}/{userId}")]
-        [Authorize]
+        [NotBanned]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<ResponseModel>> DeleteAsync(long postId, long userId)

@@ -12,6 +12,10 @@
                     </div>
                 </div>
                 <div class="column is-1" v-if="!report?.resolved">
+                    <div class="control">
+                        <label class="label">Ban end date</label>
+                        <input type="date" @change="setDate" class="input">
+                    </div>
                     <button class="button is-danger width-100" @click="respond(true)">Accept</button>
                     <button class="button is-warning width-100" @click="respond(false)">Deny</button>
                 </div>
@@ -40,8 +44,26 @@ const router = useRouter()
 
 const params = useRoute().params
 
+const banEndDate = ref(0)
+
+const setDate = (e: Event) => {
+    const timeStamp = Date.parse((e.target as HTMLInputElement).value)
+    console.log(timeStamp)
+    if (timeStamp < Date.now()) {
+        alert('Invalid date!')
+        return
+    }
+    banEndDate.value = timeStamp
+}
+
 const respond = (accepted: boolean) => {
-    const request: ResolvePostReportRequest = { id: report.value!.id, accepted, postId: report.value!.postId }
+    const request: ResolvePostReportRequest = {
+        id: report.value!.id,
+        accepted,
+        postId: report.value!.postId,
+        banEndDate: banEndDate.value,
+        userId: post.value?.creatorId
+    }
 
     axios.put('post-report/resolve', request).then(res => {
         router.push('/moderation')
