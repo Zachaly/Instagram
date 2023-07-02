@@ -9,6 +9,7 @@
                             <b>Reason</b>: {{ report.reason }}
                         </p>
                         <PostCardComponent v-if="post" :post="post" />
+                        <p class="title has-text-centered mt-2" v-else>Post deleted</p>
                     </div>
                 </div>
                 <div class="column is-1" v-if="!report?.resolved">
@@ -74,9 +75,11 @@ onMounted(() => {
     axios.get<PostReportModel>(`post-report/${params.id}`).then(res => {
         report.value = res.data
 
-        axios.get<PostModel>(`post/${report.value.postId}`).then(res => {
-            post.value = res.data
-        })
+        if (!report.value.accepted) {
+            axios.get<PostModel>(`post/${report.value.postId}`).then(res => {
+                post.value = res.data
+            })
+        }
     })
 })
 </script>
