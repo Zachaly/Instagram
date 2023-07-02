@@ -18,7 +18,7 @@ namespace Instagram.Tests.Integration.ApiTests
                 dbNames = connection.Query<string>("SELECT name FROM sys.databases").ToList();
             }
 
-            Assert.Contains(dbNames, x => x == DatabaseName);
+            Assert.Contains(dbNames, x => x == Constants.Database);
         }
 
         [Fact]

@@ -1,13 +1,10 @@
-﻿using Dapper;
-using Instagram.Database.Factory;
-using Instagram.Database.Sql;
-using Instagram.Domain.Entity;
+﻿using Instagram.Database.Factory;
 using Moq;
 using System.Data.SqlClient;
 
 namespace Instagram.Tests.Integration.DatabaseTests
 {
-    public class RepositoryTest : IDisposable
+    public class RepositoryTest : DatabaseTest
     {
         protected readonly IConnectionFactory _connectionFactory;
         public RepositoryTest()
@@ -15,49 +12,6 @@ namespace Instagram.Tests.Integration.DatabaseTests
             var factoryMock =  new Mock<IConnectionFactory>();
             factoryMock.Setup(x => x.CreateConnection()).Returns(new SqlConnection(Constants.ConnectionString));
             _connectionFactory = factoryMock.Object;
-        }
-
-        protected IEnumerable<T> GetFromDatabase<T>(string query, object? param = null)
-        {
-            using(var connection = new SqlConnection(Constants.ConnectionString))
-            {
-                return connection.Query<T>(query, param);
-            }
-        }
-
-        protected void ExecuteQuery(string query, object param)
-        {
-            using(var connection = new SqlConnection(Constants.ConnectionString))
-            {
-                connection.Query(query, param);
-            }
-        }
-
-        protected void Insert<T>(string table, T item) where T : IEntity
-        {
-            var query = new SqlQueryBuilder().BuildInsert(table, item).Build();
-
-            ExecuteQuery(query, item);
-        }
-
-        protected void Insert<T>(string table, IEnumerable<T> items) where T : IEntity
-        {
-            foreach(var item in items)
-            {
-                var query = new SqlQueryBuilder().BuildInsert(table, item).Build();
-                ExecuteQuery(query, item);
-            }
-        }
-
-        public void Dispose()
-        {
-            using (var connection = new SqlConnection(Constants.ConnectionString))
-            {
-                foreach (var query in Constants.TruncateQueries)
-                {
-                    connection.Query(query);
-                }
-            }
         }
     }
 }

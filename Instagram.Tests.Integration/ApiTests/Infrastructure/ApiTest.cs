@@ -1,10 +1,7 @@
-﻿using Dapper;
-using Instagram.Api.Authorization;
-using Instagram.Database.Sql;
+﻿using Instagram.Api.Authorization;
 using Instagram.Domain.Entity;
 using Instagram.Models.User;
 using Instagram.Models.User.Request;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -12,10 +9,9 @@ using System.Net.Http.Json;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Instagram.Tests.Integration.ApiTests.Infrastructure
 {
-    public class ApiTest : IDisposable
+    public class ApiTest : DatabaseTest
     {
         protected readonly HttpClient _httpClient;
-        protected const string DatabaseName = "InstagramTest";
         protected long _authorizedUserId = 0;
 
         public ApiTest()
@@ -28,44 +24,12 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
                     config.AddInMemoryCollection(new Dictionary<string, string?>
                     {
                         ["ConnectionStrings:SqlConnection"] = Constants.ConnectionString,
-                        ["DatabaseName"] = DatabaseName
+                        ["DatabaseName"] = Constants.Database
                     });
                 });
             });
 
             _httpClient = webFactory.CreateClient();
-        }
-
-        protected IEnumerable<T> GetFromDatabase<T>(string query, object param = null)
-        {
-            using(var connection = new SqlConnection(Constants.ConnectionString))
-            {
-                return connection.Query<T>(query, param);
-            }
-        }
-
-        protected void ExecuteQuery(string query, object param = null)
-        {
-            using (var connection = new SqlConnection(Constants.ConnectionString))
-            {
-                connection.Query(query, param);
-            }
-        }
-
-        protected void Insert<T>(string table, T item) where T : IEntity
-        {
-            var query = new SqlQueryBuilder().BuildInsert(table, item).Build();
-
-            ExecuteQuery(query, item);
-        }
-
-        protected void Insert<T>(string table, IEnumerable<T> items) where T : IEntity
-        {
-            foreach (var item in items)
-            {
-                var query = new SqlQueryBuilder().BuildInsert(table, item).Build();
-                ExecuteQuery(query, item);
-            }
         }
 
         protected async Task Authorize()
@@ -164,18 +128,6 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
 
             _authorizedUserId = content.UserId;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer", content.AuthToken);
-        }
-
-
-        public void Dispose()
-        {
-            using (var connection = new SqlConnection(Constants.ConnectionString))
-            {
-                foreach (var query in Constants.TruncateQueries)
-                {
-                    connection.Query(query);
-                }
-            }
         }
     }
 }

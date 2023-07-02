@@ -2,14 +2,8 @@
 using Instagram.Models.UserClaim;
 using Instagram.Models.UserClaim.Request;
 using Instagram.Tests.Integration.ApiTests.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Instagram.Tests.Integration.ApiTests
 {
