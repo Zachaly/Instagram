@@ -7,14 +7,11 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 {
     public interface IUserClaimServiceProxy : IUserClaimService { }
 
-    public class UserClaimServiceProxy : HttpLoggingProxyBase<IUserClaimService>, IUserClaimServiceProxy
+    public class UserClaimServiceProxy : HttpLoggingKeylessServiceProxyBase<UserClaimModel, GetUserClaimRequest, IUserClaimService>, IUserClaimServiceProxy
     {
-        private readonly IUserClaimService _service;
-
         public UserClaimServiceProxy(ILogger<IUserClaimService> logger, IHttpContextAccessor httpContextAccessor,
-            IUserClaimService service) : base(logger, httpContextAccessor)
+            IUserClaimService service) : base(logger, httpContextAccessor, service)
         {
-            _service = service;
         }
 
         public async Task<ResponseModel> AddAsync(AddUserClaimRequest request)
@@ -37,20 +34,6 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             LogResponse(response, "Delete");
 
             return response;
-        }
-
-        public Task<IEnumerable<UserClaimModel>> GetAsync(GetUserClaimRequest request)
-        {
-            LogInformation("Get");
-
-            return _service.GetAsync(request);
-        }
-
-        public Task<int> GetCountAsync(GetUserClaimRequest request)
-        {
-            LogInformation("Get Count");
-
-            return _service.GetCountAsync(request);
         }
     }
 }
