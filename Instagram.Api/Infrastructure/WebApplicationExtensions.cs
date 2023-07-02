@@ -84,7 +84,6 @@ namespace Instagram.Api.Infrastructure
                     logger.LogInformation("Admin created");
                 }
             }
-            
         }
     }
 }

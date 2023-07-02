@@ -4,7 +4,6 @@ using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Models.PostTag;
 using Instagram.Models.PostTag.Request;
 using Instagram.Models.Response;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Instagram.Api.Controllers

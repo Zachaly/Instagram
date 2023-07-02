@@ -1,13 +1,11 @@
 ﻿using Instagram.Api.Authorization;
 using Instagram.Api.Infrastructure;
 using Instagram.Api.Infrastructure.ServiceProxy;
-using Instagram.Application.Abstraction;
 using Instagram.Application.Command;
 using Instagram.Models.Post;
 using Instagram.Models.Post.Request;
 using Instagram.Models.Response;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Instagram.Api.Controllers

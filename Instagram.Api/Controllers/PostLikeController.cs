@@ -1,11 +1,9 @@
 ﻿using Instagram.Api.Authorization;
 using Instagram.Api.Infrastructure;
 using Instagram.Api.Infrastructure.ServiceProxy;
-using Instagram.Application.Abstraction;
 using Instagram.Models.PostLike;
 using Instagram.Models.PostLike.Request;
 using Instagram.Models.Response;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Instagram.Api.Controllers

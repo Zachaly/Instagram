@@ -4,7 +4,6 @@ using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Models.PostComment;
 using Instagram.Models.PostComment.Request;
 using Instagram.Models.Response;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Instagram.Api.Controllers
@@ -76,7 +75,5 @@ namespace Instagram.Api.Controllers
 
             return res.ReturnCreatedOrBadRequest("/api/post-comment");
         }
-
-        
     }
 }
