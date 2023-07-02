@@ -1,5 +1,4 @@
-﻿using FluentMigrator;
-using Instagram.Database.Repository;
+﻿using Instagram.Database.Repository;
 using Instagram.Database.Sql;
 using Instagram.Domain.Entity;
 using Instagram.Models.Post.Request;

@@ -1,5 +1,4 @@
-﻿using Instagram.Database.Sql;
-using Instagram.Domain.Entity;
+﻿using Instagram.Domain.Entity;
 using Instagram.Models.UserFollow;
 using Instagram.Models.UserFollow.Request;
 using Instagram.Tests.Integration.ApiTests.Infrastructure;

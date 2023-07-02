@@ -1,11 +1,13 @@
 <template>
-    <div v-for="ban in bans" :key="ban.id" class="card">
-        <div class="card-content">
-            <div class="media">
-                <UserLinkComponent :nick-name="ban.userName" :id="ban.userId"/>
-            </div>
-            <div class="content">
-                {{ new Date(ban.startDate).toDateString() }} - {{ new Date(ban.endDate).toDateString() }}
+    <div class="columns is-centered">
+        <div class="column is-6">
+            <div v-for="ban in bans" :key="ban.id" class="card">
+                <div class="card-content">
+                    <UserLinkComponent :nick-name="ban.userName" :id="ban.userId" />
+                    <div class="content">
+                        {{ new Date(ban.startDate).toDateString() }} - {{ new Date(ban.endDate).toDateString() }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

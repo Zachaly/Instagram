@@ -21,5 +21,4 @@ const authStore = useAuthStore()
 defineProps<{
     hideSearch?: boolean
 }>()
-
 </script>

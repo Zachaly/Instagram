@@ -10,14 +10,11 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         
     }
 
-    public class UserBanServiceProxy : HttpLoggingProxyBase<IUserBanService>, IUserBanServiceProxy
+    public class UserBanServiceProxy : HttpLoggingServiceProxyBase<UserBanModel, GetUserBanRequest, IUserBanService>, IUserBanServiceProxy
     {
-        private readonly IUserBanService _service;
-
         public UserBanServiceProxy(ILogger<IUserBanService> logger, IHttpContextAccessor httpContextAccessor,
-            IUserBanService userBanService) : base(logger, httpContextAccessor)
+            IUserBanService userBanService) : base(logger, httpContextAccessor, userBanService)
         {
-            _service = userBanService;
         }
 
         public async Task<ResponseModel> AddAsync(AddUserBanRequest request)
@@ -40,27 +37,6 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             LogResponse(response, "Delete");
 
             return response;
-        }
-
-        public Task<IEnumerable<UserBanModel>> GetAsync(GetUserBanRequest request)
-        {
-            LogInformation("Get");
-
-            return _service.GetAsync(request);
-        }
-
-        public Task<UserBanModel> GetByIdAsync(long id)
-        {
-            LogInformation("Get By Id");
-
-            return _service.GetByIdAsync(id);
-        }
-
-        public Task<int> GetCountAsync(GetUserBanRequest request)
-        {
-            LogInformation("Get Count");
-
-            return _service.GetCountAsync(request);
         }
     }
 }

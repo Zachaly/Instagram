@@ -21,7 +21,6 @@ const props = defineProps<{
     nickName: string,
     id: number
 }>()
-
 </script>
 
 <style scoped>

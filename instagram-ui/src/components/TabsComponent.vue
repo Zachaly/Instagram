@@ -11,7 +11,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-
 defineProps<{
     names: string[]
 }>()

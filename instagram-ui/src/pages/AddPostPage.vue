@@ -118,7 +118,6 @@ const send = () => {
         alert(err.response?.data.error)
     })
 }
-
 </script>
 
 <style scoped>

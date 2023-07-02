@@ -45,7 +45,6 @@ const login = () => {
         })
         .catch((err: AxiosError<ResponseModel>) => alert(err.response?.data.error))
 }
-
 </script>
 
 <style scoped>

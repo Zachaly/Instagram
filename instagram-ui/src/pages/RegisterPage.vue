@@ -23,7 +23,6 @@
                         <option :value="Gender.Woman">Woman</option>
                     </select>
                 </div>
-
             </div>
             <div class="control">
                 <label class="label">Password</label>
@@ -61,7 +60,6 @@ import axios, { AxiosError } from 'axios'
 import { useRouter } from 'vue-router';
 import ResponseModel from '@/models/ResponseModel'
 
-
 const request: RegisterRequest = reactive({
     name: '',
     nickname: '',
@@ -86,5 +84,4 @@ const register = () => {
         router.push('/login')
     }).catch((err: AxiosError<any, ResponseModel>) => alert(err.response!.data.error!))
 }
-
 </script>

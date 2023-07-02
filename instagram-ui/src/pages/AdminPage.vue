@@ -1,5 +1,5 @@
 <template>
-    <AuthorizedPage :allowedClaims="['Admin']">
+    <AuthorizedPage :allowedClaims="[ADMIN_CLAIM]">
         <NavigationPage :hideSearch="true">
             <TabsComponent :names="['Moderators', 'Add moderator']" @select="selectIndex"/>
             <ModeratorListComponent v-if="currentIndex == 0"/>
@@ -15,6 +15,7 @@ import NavigationPage from './NavigationPage.vue'
 import ModeratorListComponent from '@/components/ModeratorListComponent.vue'
 import AddModeratorComponent from '@/components/AddModeratorComponent.vue'
 import { ref } from 'vue';
+import { ADMIN_CLAIM } from '@/constants';
 
 const currentIndex = ref(0)
 

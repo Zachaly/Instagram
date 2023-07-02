@@ -5,7 +5,6 @@ namespace Instagram.Tests.Integration.ApiTests
 {
     public class AuthPolicyTests : ApiTest
     {
-        const string Endpoint = "/api/test";
         const string AdminEndpoint = "/api/test/admin";
         const string ModeratorEndpoint = "/api/test/moderator";
         const string NotBannedEndpoint = "/api/test/not-banned";

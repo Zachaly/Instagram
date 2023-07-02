@@ -18,5 +18,4 @@ if(!authStore.isAuthorized) {
 } else if(props.allowedClaims && !props.allowedClaims.some(claim => authStore.hasClaim(claim))) {
     router.push('/')
 }
-
 </script>

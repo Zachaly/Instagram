@@ -1,5 +1,5 @@
 <template>
-    <AuthorizedPage :allowed-claims="['Admin', MODERATOR_CLAIM]">
+    <AuthorizedPage :allowed-claims="[ADMIN_CLAIM, MODERATOR_CLAIM]">
         <NavigationPage :hide-search="true">
             <TabsComponent :names="['Unresolved', 'Resolved', 'Bans']" @select="selectIndex" />
             <div v-if="currentIndex == 0 || currentIndex == 1">
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { MODERATOR_CLAIM } from '@/constants';
+import { ADMIN_CLAIM, MODERATOR_CLAIM } from '@/constants';
 import AuthorizedPage from './AuthorizedPage.vue';
 import NavigationPage from './NavigationPage.vue';
 import axios from 'axios';
@@ -34,7 +34,6 @@ const selectIndex = (index: number) => {
     if (index == 0 || index == 1) {
         loadReports()
     }
-
 }
 
 const loadReports = () => {
@@ -54,5 +53,4 @@ const loadReports = () => {
 onMounted(() => {
     loadReports()
 })
-
 </script>

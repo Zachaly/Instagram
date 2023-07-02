@@ -10,11 +10,9 @@
                     <div style="width: 100%;">
                         <UserLinkComponent :nick-name="user.nickname" :id="user.id" />
                     </div>
-
                     <div style="margin: auto auto;">
                         <button class="button is-success" @click="addModerator(user.id)">Add moderator</button>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -31,7 +29,6 @@ import GetUserClaimRequest from '@/models/request/get/GetUserClaimRequest';
 import { MODERATOR_CLAIM } from '@/constants'
 import AddUserClaimRequest from '@/models/request/AddUserClaimRequest';
 import { useAuthStore } from '@/store/authStore';
-
 
 const users: Ref<UserModel[]> = ref([])
 const searchName = ref('')

@@ -7,21 +7,18 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 {
     public interface IUserFollowServiceProxy : IUserFollowService { }
 
-    public class UserFollowServiceProxy : HttpLoggingProxyBase<IUserFollowService>, IUserFollowServiceProxy
+    public class UserFollowServiceProxy : HttpLoggingKeylessServiceProxyBase<UserFollowModel, GetUserFollowRequest, IUserFollowService>, IUserFollowServiceProxy
     {
-        private readonly IUserFollowService _userFollowService;
-
         public UserFollowServiceProxy(ILogger<IUserFollowService> logger, IHttpContextAccessor httpContextAccessor,
-            IUserFollowService userFollowService) : base(logger, httpContextAccessor)
+            IUserFollowService userFollowService) : base(logger, httpContextAccessor, userFollowService)
         {
-            _userFollowService = userFollowService;
         }
 
         public async Task<ResponseModel> AddAsync(AddUserFollowRequest request)
         {
             LogInformation("Add");
 
-            var response = await _userFollowService.AddAsync(request);
+            var response = await _service.AddAsync(request);
 
             LogResponse(response, "Add");
 
@@ -32,25 +29,11 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         {
             LogInformation("Delete");
 
-            var response = await _userFollowService.DeleteAsync(followerId, followedId);
+            var response = await _service.DeleteAsync(followerId, followedId);
 
             LogResponse(response, "Delete");
 
             return response;
-        }
-
-        public Task<IEnumerable<UserFollowModel>> GetAsync(GetUserFollowRequest request)
-        {
-            LogInformation("Get");
-
-            return _userFollowService.GetAsync(request);
-        }
-
-        public Task<int> GetCountAsync(GetUserFollowRequest request)
-        {
-            LogInformation("Get Count");
-
-            return _userFollowService.GetCountAsync(request);
         }
     }
 }

@@ -12,5 +12,4 @@ import PostModel from '@/models/PostModel';
 const props = defineProps<{
     post: PostModel
 }>()
-
 </script>

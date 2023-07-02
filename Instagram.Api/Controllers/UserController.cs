@@ -1,6 +1,5 @@
 ﻿using Instagram.Api.Infrastructure;
 using Instagram.Api.Infrastructure.ServiceProxy;
-using Instagram.Application.Abstraction;
 using Instagram.Application.Command;
 using Instagram.Models.Response;
 using Instagram.Models.User;

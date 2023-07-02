@@ -6,21 +6,18 @@ using Instagram.Models.Response;
 namespace Instagram.Api.Infrastructure.ServiceProxy
 {
     public interface IPostTagServiceProxy : IPostTagService { }
-    public class PostTagServiceProxy : HttpLoggingProxyBase<IPostTagService>, IPostTagServiceProxy
+    public class PostTagServiceProxy : HttpLoggingKeylessServiceProxyBase<PostTagModel, GetPostTagRequest, IPostTagService>, IPostTagServiceProxy
     {
-        private readonly IPostTagService _postTagService;
-
         public PostTagServiceProxy(ILogger<IPostTagService> logger, IHttpContextAccessor httpContextAccessor,
-            IPostTagService postTagService) : base(logger, httpContextAccessor)
+            IPostTagService postTagService) : base(logger, httpContextAccessor, postTagService)
         {
-            _postTagService = postTagService;
         }
 
         public async Task<ResponseModel> AddAsync(AddPostTagRequest request)
         {
             LogInformation("Add");
 
-            var response = await _postTagService.AddAsync(request);
+            var response = await _service.AddAsync(request);
 
             LogResponse(response);
 
@@ -31,25 +28,11 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         {
             LogInformation("Delete");
 
-            var response = await _postTagService.DeleteAsync(postId, tag);
+            var response = await _service.DeleteAsync(postId, tag);
 
             LogResponse(response);
 
             return response;
-        }
-
-        public Task<IEnumerable<PostTagModel>> GetAsync(GetPostTagRequest request)
-        {
-            LogInformation("Get");
-
-            return _postTagService.GetAsync(request);
-        }
-
-        public Task<int> GetCountAsync(GetPostTagRequest request)
-        {
-            LogInformation("Get Count");
-
-            return _postTagService.GetCountAsync(request);
         }
     }
 }

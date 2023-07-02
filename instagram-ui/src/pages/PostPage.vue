@@ -27,6 +27,7 @@ onMounted(() => {
         console.log(res)
     })
 })
+
 onBeforeRouteUpdate(() => {
     axios.get<any, AxiosResponse<PostModel>>(`post/${params.id}`).then(res => {
         post.value = res.data
@@ -34,5 +35,4 @@ onBeforeRouteUpdate(() => {
         console.log(res)
     })
 })
-
 </script>

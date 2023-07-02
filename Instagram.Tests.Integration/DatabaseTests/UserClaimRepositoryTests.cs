@@ -2,11 +2,6 @@
 using Instagram.Database.Sql;
 using Instagram.Domain.Entity;
 using Instagram.Models.UserClaim.Request;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Instagram.Tests.Integration.DatabaseTests
 {

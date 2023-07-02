@@ -1,7 +1,6 @@
 ﻿using FluentValidation.Results;
 using Instagram.Models.Response;
 
-
 namespace Instagram.Application.Abstraction
 {
     public interface IResponseFactory

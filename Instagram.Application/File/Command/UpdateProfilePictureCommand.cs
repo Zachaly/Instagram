@@ -4,7 +4,6 @@ using Instagram.Models.Response;
 using Instagram.Models.User.Request;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Instagram.Application.Command
 {

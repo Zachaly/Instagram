@@ -50,5 +50,4 @@ onMounted(() => {
         posts.value = res.data
     })
 })
-
 </script>
