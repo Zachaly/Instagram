@@ -32,7 +32,6 @@
                             Reset changes
                         </button>
                     </div>
-
                     <div style="width: fit-content;">
                         <div class="file is-boxed">
                             <label class="file-label">
@@ -108,7 +107,6 @@ const loadUser = () => {
 onMounted(() => {
     loadUser()
 })
-
 </script>
 
 <style scoped>

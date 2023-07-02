@@ -16,7 +16,6 @@
                     </span>
                 </p>
             </div>
-
         </div>
     </div>
 </template>
@@ -24,9 +23,7 @@
 <script setup lang="ts">
 import PostReportModel from '@/models/PostReportModel';
 
-
 defineProps<{
     report: PostReportModel
 }>()
-
 </script>

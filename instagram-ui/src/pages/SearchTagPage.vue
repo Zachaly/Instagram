@@ -19,11 +19,7 @@ import { Ref, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import NavigationPage from './NavigationPage.vue';
 
-console.log('tag')
-
 const params = useRoute().params
-
-console.log(params)
 
 const posts: Ref<PostModel[]> = ref([])
 

@@ -112,5 +112,4 @@ onMounted(() => {
         params: postRequest
     }).then(res => postCount.value = res.data)
 })
-
 </script>

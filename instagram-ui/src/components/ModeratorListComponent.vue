@@ -41,7 +41,4 @@ const deleteModerator = (id: number) => {
 onMounted(() => {
     loadModerators()
 })
-
-
-
 </script>

@@ -19,14 +19,12 @@ import { useAuthStore } from '@/store/authStore';
 import axios from 'axios';
 import { ref } from 'vue';
 
-
 const reason = ref('')
 const props = defineProps<{
     postId: number
 }>()
 const authStore = useAuthStore()
 const emit = defineEmits(['close'])
-
 
 if(!authStore.isAuthorized){
     alert('You must be logged in to do that!')

@@ -39,7 +39,7 @@ const addComment = () => {
 }
 
 const loadComments = () => {
-    const params: GetPostCommentRequest = { postId: props.postId }
+    const params: GetPostCommentRequest = { PostId: props.postId }
     axios.get<PostCommentModel[]>('post-comment', { params }).then(res => {
         comments.value = res.data
     })
@@ -48,5 +48,4 @@ const loadComments = () => {
 onMounted(() => {
     loadComments()
 })
-
 </script>

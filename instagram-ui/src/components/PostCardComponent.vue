@@ -86,6 +86,9 @@ const authStore = useAuthStore()
 const showLikes = ref(false)
 const showDropdown = ref(false)
 const showReport = ref(false)
+const props = defineProps<{
+    post: PostModel
+}>()
 
 const changeIndex = (value: number) => {
     if (currentImageIndex.value + value < 0 || currentImageIndex.value + value > props.post.imageIds.length - 1) {
@@ -95,10 +98,6 @@ const changeIndex = (value: number) => {
 }
 
 const selectIndex = (index: number) => currentImageIndex.value = index
-
-const props = defineProps<{
-    post: PostModel
-}>()
 
 const showComments = ref(false)
 
@@ -122,5 +121,4 @@ const like = () => {
         }
     })
 }
-
 </script>

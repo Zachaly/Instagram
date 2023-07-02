@@ -53,5 +53,4 @@ onMounted(() => {
     loadUsers()
     loadPosts()
 })
-
 </script>
