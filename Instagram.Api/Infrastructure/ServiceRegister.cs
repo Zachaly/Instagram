@@ -3,6 +3,7 @@ using Instagram.Api.Authorization;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application;
 using Instagram.Application.Abstraction;
+using Instagram.Application.Auth.Abstraction;
 using Instagram.Application.Command;
 using Instagram.Database.Factory;
 using Instagram.Database.Migrations;
@@ -57,6 +58,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserClaimService, UserClaimService>();
             services.AddScoped<IPostReportService, PostReportService>();
             services.AddScoped<IUserBanService, UserBanService>();
+            services.AddScoped<IUserDataService, UserDataService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -68,7 +70,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserClaimFactory, UserClaimFactory>();
             services.AddScoped<IPostReportFactory, PostReportFactory>();
             services.AddScoped<IUserBanFactory, UserBanFactory>();
-
+            
             services.AddMediatR(opt =>
             {
                 opt.RegisterServicesFromAssemblyContaining<LoginCommand>();

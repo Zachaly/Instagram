@@ -7,6 +7,7 @@ using Instagram.Models.User;
 using Instagram.Models.User.Request;
 using Instagram.Tests.Integration.ApiTests.Infrastructure;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace Instagram.Tests.Integration.ApiTests
@@ -272,6 +273,41 @@ namespace Instagram.Tests.Integration.ApiTests
 
             Assert.Equivalent(HttpStatusCode.OK, response.StatusCode);
             Assert.Equivalent(users.Where(u => u.Nickname.Contains(SearchNickname)).Select(x => x.Id), content.Select(x => x.Id));
+        }
+
+        [Fact]
+        public async Task GetCurrentUser_ReturnsLoginData()
+        {
+            var registerRequest = new RegisterRequest
+            {
+                Email = "email@email.com",
+                Name = "name",
+                Password = "zaq1@WSX",
+                Nickname = "nickname",
+                Gender = 0,
+            };
+
+            await _httpClient.PostAsJsonAsync(Endpoint, registerRequest);
+
+            var loginRequest = new LoginRequest
+            {
+                Email = registerRequest.Email,
+                Password = registerRequest.Password,
+            };
+
+            var loginResponse = await _httpClient.PostAsJsonAsync($"{Endpoint}/login", loginRequest);
+            var loginContent = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer", loginContent.AuthToken);
+
+            var response = await _httpClient.GetAsync($"{Endpoint}/current");
+            var content = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(loginContent.Email, content.Email);
+            Assert.Equal(loginContent.UserId, content.UserId);
+            Assert.Equivalent(loginContent.Claims, content.Claims);
+            Assert.NotEmpty(content.AuthToken);
         }
     }
 }

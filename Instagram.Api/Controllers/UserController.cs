@@ -1,5 +1,6 @@
 ﻿using Instagram.Api.Infrastructure;
 using Instagram.Api.Infrastructure.ServiceProxy;
+using Instagram.Application.Auth.Command;
 using Instagram.Application.Command;
 using Instagram.Models.Response;
 using Instagram.Models.User;
@@ -94,6 +95,22 @@ namespace Instagram.Api.Controllers
             var res = await _userServiceProxy.UpdateAsync(request);
 
             return res.ReturnNoContentOrBadRequest();
+        }
+
+        /// <summary>
+        /// Returns login data of current user based on JWT token
+        /// </summary>
+        /// <response code="200">Login data</response>
+        /// <response code="400">Failed to get user data</response>
+        [HttpGet("current")]
+        [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<DataResponseModel<LoginResponse>>> GetCurrentUserAsync()
+        {
+            var res = await _mediator.Send(new GetCurrentUserQuery());
+
+            return res.ReturnOkOrBadRequest();
         }
     }
 }
