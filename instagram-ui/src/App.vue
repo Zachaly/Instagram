@@ -3,6 +3,22 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+import { useAuthStore } from './store/authStore';
+import { onMounted } from 'vue';
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+onMounted(() => {
+  if (!authStore.isAuthorized) {
+    authStore.loadFromSavedToken().then(res => {
+      if (res) {
+        router.push('/')
+      }
+    })
+  }
+})
 </script>
 
 <style>
@@ -27,5 +43,4 @@ img {
 .width-100 {
   width: 100%;
 }
-
 </style>

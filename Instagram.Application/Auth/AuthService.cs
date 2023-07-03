@@ -28,8 +28,8 @@ namespace Instagram.Application
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
             };
 
             claims.AddRange(userClaims.Select(c => new Claim("Role", c.Value)));
