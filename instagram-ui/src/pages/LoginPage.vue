@@ -10,6 +10,12 @@
                 <label class="label">Password</label>
                 <input class="input" type="password" v-model="request.password" />
             </div>
+            <div>
+                <label class="checkbox">
+                    <input type="checkbox" v-model="rememberMe">
+                    Remember me
+                </label>
+            </div>
             <button class="button is-success" @click="login">Login</button>
             <div class="control">
                 <h5>Do not have an account?</h5>
@@ -21,7 +27,7 @@
 
 <script setup lang="ts">
 import LoginRequest from '@/models/request/LoginRequest';
-import { reactive, toRaw } from 'vue';
+import { reactive, ref, toRaw } from 'vue';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import LoginResponse from '@/models/LoginResponse';
 import ResponseModel from '@/models/ResponseModel';
@@ -35,11 +41,12 @@ const request: LoginRequest = reactive({
 
 const router = useRouter()
 const authStore = useAuthStore()
+const rememberMe = ref(false)
 
 const login = () => {
     axios.post<LoginRequest, AxiosResponse<LoginResponse>>('user/login', toRaw(request))
         .then(async (res) => {
-            if (await authStore.authorize(res.data)) {
+            if (await authStore.authorize(res.data, rememberMe.value)) {
                 router.push('/')
             }
         })

@@ -5,6 +5,8 @@ import axios from "axios";
 import { defineStore } from "pinia";
 import { Ref, ref } from 'vue'
 
+const TOKEN_ITEM = 'token'
+
 export const useAuthStore = defineStore('auth', () => {
     const isAuthorized = ref(false)
     const authInfo: Ref<LoginResponse> = ref({
@@ -16,13 +18,16 @@ export const useAuthStore = defineStore('auth', () => {
 
     const userFollowsIds: Ref<number[]> = ref([])
 
-    const authorize = async (response: LoginResponse) => {
+    const authorize = async (response: LoginResponse, remember: boolean) => {
         if (!response.authToken) {
             isAuthorized.value = false
         } else {
             authInfo.value = response
             isAuthorized.value = true
             axios.defaults.headers.common.Authorization = `Bearer ${authInfo.value.authToken}`
+            if (remember) {
+                localStorage.setItem(TOKEN_ITEM, response.authToken)
+            }
             await updateFollows()
         }
 
@@ -46,11 +51,27 @@ export const useAuthStore = defineStore('auth', () => {
             email: '',
             claims: []
         }
+        localStorage.setItem(TOKEN_ITEM, '')
     }
 
     const hasClaim = (claim: string): boolean => authInfo.value.claims.includes(claim)
 
     const userId = (): number => authInfo.value.userId
 
-    return { isAuthorized, authorize, logout, userId, updateFollows, userFollowsIds, hasClaim }
+    const loadFromSavedToken = (): Promise<boolean> => new Promise((resolve, reject) => {
+        const token = localStorage.getItem(TOKEN_ITEM)
+        if (!token) {
+            resolve(false)
+            return
+        }
+        axios.get<LoginResponse>('user/current', {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        }).then(async (res) => {
+            resolve(await authorize(res.data, true))
+        })
+    })
+
+    return { isAuthorized, authorize, logout, userId, updateFollows, userFollowsIds, hasClaim, loadFromSavedToken }
 })  
