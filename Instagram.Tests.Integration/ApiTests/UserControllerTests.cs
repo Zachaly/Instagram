@@ -309,5 +309,55 @@ namespace Instagram.Tests.Integration.ApiTests
             Assert.Equivalent(loginContent.Claims, content.Claims);
             Assert.NotEmpty(content.AuthToken);
         }
+
+        [Fact]
+        public async Task ChangePassword_ChangesPassword()
+        {
+            var registerRequest = new RegisterRequest
+            {
+                Password = "zaq1@WSX",
+                Email = "email@email.com",
+                Name = "name",
+                Nickname = "nickname"
+            };
+
+            await _httpClient.PostAsJsonAsync(Endpoint, registerRequest);
+
+            var loginRequest = new LoginRequest
+            {
+                Email = registerRequest.Email,
+                Password = registerRequest.Password,
+            };
+
+            var loginResponse = await _httpClient.PostAsJsonAsync($"{Endpoint}/login", loginRequest);
+            var loginContent = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginContent.AuthToken);
+
+            var changePasswordRequest = new ChangePasswordCommand
+            {
+                NewPassword = "XSW@1qaz",
+                OldPassword = "zaq1@WSX",
+                UserId = loginContent.UserId,
+            };
+
+            var oldHash = GetFromDatabase<string>("SELECT PasswordHash FROM [User] WHERE Id=@Id", new { Id = loginContent.UserId }).First();
+
+            var response = await _httpClient.PatchAsJsonAsync($"{Endpoint}/change-password", changePasswordRequest);
+
+            var newHash = GetFromDatabase<string>("SELECT PasswordHash FROM [User] WHERE Id=@Id", new { Id = loginContent.UserId }).First();
+
+            var loginNewPasswordRequest = new LoginRequest
+            {
+                Password = changePasswordRequest.NewPassword,
+                Email = loginContent.Email,
+            };
+
+            var loginWithNewPasswordResponse = await _httpClient.PostAsJsonAsync($"{Endpoint}/login", loginNewPasswordRequest);
+
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, loginWithNewPasswordResponse.StatusCode);
+            Assert.NotEqual(oldHash, newHash);
+        }
     }
 }

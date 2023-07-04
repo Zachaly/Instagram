@@ -49,6 +49,20 @@
                         <button class="button is-info" style="width: 100%;" @click="sendProfilePicture">Update profile picture</button>
                     </div>
                 </div>
+                <div class="column is-5">
+                    <p class="title">Change password</p>
+                    <div class="control">
+                        <label class="label">Current password</label>
+                        <input type="password" class="input" v-model="changePasswordRequest.oldPassword">
+                    </div>
+                    <div class="control">
+                        <label class="label">New password</label>
+                        <input type="password" class="input" v-model="changePasswordRequest.newPassword">
+                    </div>
+                    <div class="control">
+                        <button class="button is-info" @click="changePassword">Change password</button>
+                    </div>
+                </div>
             </div>
         </NavigationPage>
     </AuthorizedPage>
@@ -59,11 +73,13 @@ import { useAuthStore } from '@/store/authStore';
 import AuthorizedPage from './AuthorizedPage.vue';
 import UpdateUserRequest from '@/models/request/UpdateUserRequest';
 import { onMounted, reactive, toRaw } from 'vue';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import UserModel from '@/models/UserModel';
 import NavigationPage from './NavigationPage.vue';
 import Gender from '@/models/enum/Gender';
 import UpdateProfilePictureRequest from '@/models/request/UpdateProfilePictureRequest';
+import ChangePasswordRequest from '@/models/request/ChangePasswordRequest';
+import ResponseModel from '@/models/ResponseModel';
 
 const authStore = useAuthStore()
 
@@ -76,10 +92,28 @@ const updatePictureRequest: UpdateProfilePictureRequest = reactive({
     file: undefined
 })
 
+const changePasswordRequest: ChangePasswordRequest = reactive({
+    userId: authStore.userId(),
+    oldPassword: '',
+    newPassword: ''
+})
+
 const send = () => {
     axios.patch('user', toRaw(request)).then(() => {
         alert('Profile updated successfully')
         loadUser()
+    })
+}
+
+const changePassword = () => {
+    axios.patch('user/change-password', toRaw(changePasswordRequest)).then(res => {
+        changePasswordRequest.newPassword = ''
+        changePasswordRequest.oldPassword = ''
+        alert("Password updated")
+    }).catch((err: AxiosError<ResponseModel>) => {
+        changePasswordRequest.newPassword = ''
+        changePasswordRequest.oldPassword = ''
+        alert(err.response?.data.error)
     })
 }
 
