@@ -112,5 +112,21 @@ namespace Instagram.Api.Controllers
 
             return res.ReturnOkOrBadRequest();
         }
+
+        /// <summary>
+        /// Changes password of specified user if old password matches
+        /// </summary>
+        /// <response code="204">Password changed successfully</response>
+        /// <response code="400">Invalid request</response>
+        [HttpPatch("change-password")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<ResponseModel>> ChangePasswordAsync(ChangePasswordCommand command)
+        {
+            var res = await _mediator.Send(command);
+
+            return res.ReturnNoContentOrBadRequest();
+        }
     }
 }

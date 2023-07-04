@@ -10,5 +10,6 @@ namespace Instagram.Models.User.Request
         public string? Bio { get; set; }
         public Gender? Gender { get; set; }
         public string? ProfilePicture { get; set; }
+        public string? PasswordHash { get; set; }
     }
 }
