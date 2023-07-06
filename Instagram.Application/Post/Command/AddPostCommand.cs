@@ -9,7 +9,7 @@ using System.Transactions;
 
 namespace Instagram.Application.Command
 {
-    public class AddPostCommand : AddPostRequest, IRequest<ResponseModel>
+    public class AddPostCommand : AddPostRequest, IValidatedRequest
     {
         public IEnumerable<IFormFile> Files { get; set; }
     }

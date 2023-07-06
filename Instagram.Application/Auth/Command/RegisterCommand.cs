@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Instagram.Application.Command
 {
-    public class RegisterCommand : RegisterRequest, IRequest<ResponseModel>
+    public class RegisterCommand : RegisterRequest, IValidatedRequest
     {
         
     }

@@ -9,7 +9,7 @@ using System.Transactions;
 
 namespace Instagram.Application.Command
 {
-    public class ResolvePostReportCommand : IRequest<ResponseModel>
+    public class ResolvePostReportCommand : IValidatedRequest
     {
         public long Id { get; set; }
         public long PostId { get; set; }
