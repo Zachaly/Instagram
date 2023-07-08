@@ -11,7 +11,6 @@ namespace Instagram.Application.Validation
                 .GreaterThan(0);
 
             RuleFor(c => c.Name)
-                .NotEmpty()
                 .MaximumLength(50)
                 .MinimumLength(5);
 
