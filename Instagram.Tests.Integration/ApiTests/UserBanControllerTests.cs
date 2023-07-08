@@ -107,6 +107,27 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
+        public async Task AddAsync_InvaliRequest_Failure()
+        {
+            await AuthorizeModerator();
+
+            var request = new AddUserBanRequest
+            {
+                EndDate = 2137,
+                UserId = 21
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+            var content = await ReadErrorResponse(response);
+
+            var bans = GetFromDatabase<UserBan>("SELECT * FROM UserBan");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "EndDate");
+            Assert.DoesNotContain(bans, x => x.UserId == request.UserId && x.EndDate == request.EndDate);
+        }
+
+        [Fact]
         public async Task DeleteAsync_RemovesCorrectBan()
         {
             await AuthorizeAdmin();

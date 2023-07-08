@@ -94,5 +94,27 @@ namespace Instagram.Tests.Integration.ApiTests
             Assert.Contains(comments, x => x.PostId == request.PostId && x.UserId == request.UserId && x.Content == request.Content);
             Assert.Single(comments);
         }
+
+        [Fact]
+        public async Task PostAsync_InvalidRequest_ReturnsErrors()
+        {
+            await Authorize();
+
+            var request = new AddPostCommentRequest
+            {
+                Content = "",
+                PostId = 1,
+                UserId = 2
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+            var content = await ReadErrorResponse(response);
+
+            var comments = GetFromDatabase<PostComment>("SELECT * FROM PostComment");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Empty(comments);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "Content");
+        }
     }
 }

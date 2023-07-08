@@ -95,6 +95,28 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
+        public async Task PostAsync_InvalidRequest_ReturnsErrors()
+        {
+            await Authorize();
+
+            var request = new AddUserFollowRequest
+            {
+                FollowedUserId = 0,
+                FollowingUserId = 3
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+            var content = await ReadErrorResponse(response);
+
+            var follows = GetFromDatabase<UserFollow>("SELECT * FROM [UserFollow]");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "FollowedUserId");
+            Assert.DoesNotContain(follows, x => x.FollowedUserId == request.FollowedUserId && x.FollowingUserId == request.FollowingUserId);
+            Assert.Empty(follows);
+        }
+
+        [Fact]
         public async Task DeleteAsync_DeletesProperFollow()
         {
             await Authorize();

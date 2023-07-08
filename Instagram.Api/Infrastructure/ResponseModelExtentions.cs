@@ -47,7 +47,7 @@ namespace Instagram.Api.Infrastructure
 
         public static ActionResult<T> ReturnOkOrNotFound<T>(T data)
         {
-            if(data is null)
+            if (data is null)
             {
                 return new NotFoundObjectResult(null);
             }

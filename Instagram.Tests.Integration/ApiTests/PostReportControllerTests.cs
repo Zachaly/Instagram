@@ -113,6 +113,30 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
+        public async Task PostAsync_InvalidRequest_ReturnsErrors()
+        {
+            await Authorize();
+
+            var request = new AddPostReportRequest
+            {
+                PostId = 1,
+                ReportingUserId = _authorizedUserId,
+                Reason = "res"
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+
+            var reports = GetFromDatabase<PostReport>("SELECT * FROM PostReport");
+            var content = await ReadErrorResponse(response);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "Reason");
+            Assert.DoesNotContain(reports, x => x.ReportingUserId == request.ReportingUserId
+                && x.PostId == request.PostId
+                && x.Reason == request.Reason);
+        }
+
+        [Fact]
         public async Task ResolveAsync_ReportNotAccepted_SinglePostReportResolvedAndNotAccepted()
         {
             await AuthorizeModerator();

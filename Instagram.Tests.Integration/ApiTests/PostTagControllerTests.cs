@@ -60,6 +60,27 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
+        public async Task AddAsync_InvalidRequest_ReturnsErrors()
+        {
+            await Authorize();
+
+            var request = new AddPostTagRequest
+            {
+                PostId = 1,
+                Tags = new string[] { "tag1", "tag2", new string('a', 51) }
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+            var content = await ReadErrorResponse(response);
+
+            var tags = GetFromDatabase<PostTag>("SELECT * FROM PostTag");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "Tags");
+            Assert.Empty(tags);
+        }
+
+        [Fact]
         public async Task DeleteAsync_DeletesProperTag()
         {
             await Authorize();
