@@ -92,7 +92,11 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             await AuthorizeModerator();
 
-            var request = new AddUserBanRequest { EndDate = 1, UserId = 2 };
+            var request = new AddUserBanRequest 
+            { 
+                EndDate = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeMilliseconds(),
+                UserId = 2 
+            };
 
             var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
 

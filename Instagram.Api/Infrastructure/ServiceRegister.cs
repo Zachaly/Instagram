@@ -1,10 +1,12 @@
 ﻿using FluentMigrator.Runner;
+using FluentValidation;
 using Instagram.Api.Authorization;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application;
 using Instagram.Application.Abstraction;
 using Instagram.Application.Auth.Abstraction;
 using Instagram.Application.Command;
+using Instagram.Application.Validation;
 using Instagram.Database.Factory;
 using Instagram.Database.Migrations;
 using Instagram.Database.Repository;
@@ -70,7 +72,9 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserClaimFactory, UserClaimFactory>();
             services.AddScoped<IPostReportFactory, PostReportFactory>();
             services.AddScoped<IUserBanFactory, UserBanFactory>();
-            
+
+            services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
+
             services.AddMediatR(opt =>
             {
                 opt.RegisterServicesFromAssemblyContaining<LoginCommand>();
@@ -89,7 +93,8 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostReportServiceProxy, PostReportServiceProxy>();
             services.AddScoped<IUserBanServiceProxy, UserBanServiceProxy>();
 
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipeline<,>));
         }
 
         public static void ConfigureAuthorization(this WebApplicationBuilder builder)

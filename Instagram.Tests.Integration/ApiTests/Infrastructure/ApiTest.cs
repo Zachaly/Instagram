@@ -38,7 +38,7 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
             {
                 Email = "email@email.com",
                 Gender = 0,
-                Name = "name",
+                Name = "username",
                 Nickname = "nickname",
                 Password = "password",
             };

@@ -1,4 +1,5 @@
-﻿using Instagram.Application.Abstraction;
+﻿using FluentValidation;
+using Instagram.Application.Abstraction;
 using Instagram.Models.Response;
 using Instagram.Models.UserFollow;
 using Instagram.Models.UserFollow.Request;
@@ -9,16 +10,24 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 
     public class UserFollowServiceProxy : HttpLoggingKeylessServiceProxyBase<UserFollowModel, GetUserFollowRequest, IUserFollowService>, IUserFollowServiceProxy
     {
+        private readonly IResponseFactory _responseFactory;
+        private readonly IValidator<AddUserFollowRequest> _addValidator;
+
         public UserFollowServiceProxy(ILogger<IUserFollowService> logger, IHttpContextAccessor httpContextAccessor,
-            IUserFollowService userFollowService) : base(logger, httpContextAccessor, userFollowService)
+            IUserFollowService userFollowService, IResponseFactory responseFactory, IValidator<AddUserFollowRequest> addValidator)
+            : base(logger, httpContextAccessor, userFollowService)
         {
+            _responseFactory = responseFactory;
+            _addValidator = addValidator;
         }
 
         public async Task<ResponseModel> AddAsync(AddUserFollowRequest request)
         {
             LogInformation("Add");
 
-            var response = await _service.AddAsync(request);
+            var validation = _addValidator.Validate(request);
+
+            var response = validation.IsValid ? await _service.AddAsync(request) : _responseFactory.CreateValidationError(validation);
 
             LogResponse(response, "Add");
 

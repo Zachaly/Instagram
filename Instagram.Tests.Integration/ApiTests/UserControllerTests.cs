@@ -281,7 +281,7 @@ namespace Instagram.Tests.Integration.ApiTests
             var registerRequest = new RegisterRequest
             {
                 Email = "email@email.com",
-                Name = "name",
+                Name = "username",
                 Password = "zaq1@WSX",
                 Nickname = "nickname",
                 Gender = 0,
@@ -317,7 +317,7 @@ namespace Instagram.Tests.Integration.ApiTests
             {
                 Password = "zaq1@WSX",
                 Email = "email@email.com",
-                Name = "name",
+                Name = "username",
                 Nickname = "nickname"
             };
 

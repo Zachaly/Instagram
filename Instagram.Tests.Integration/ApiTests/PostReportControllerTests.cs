@@ -3,7 +3,6 @@ using Instagram.Domain.Entity;
 using Instagram.Models.PostReport;
 using Instagram.Models.PostReport.Request;
 using Instagram.Tests.Integration.ApiTests.Infrastructure;
-using System.Formats.Asn1;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -100,7 +99,7 @@ namespace Instagram.Tests.Integration.ApiTests
             {
                 PostId = 1,
                 ReportingUserId = _authorizedUserId,
-                Reason = "res"
+                Reason = "min 1 letter reason"
             };
 
             var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
