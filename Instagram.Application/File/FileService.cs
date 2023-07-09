@@ -9,12 +9,14 @@ namespace Instagram.Application
         private readonly string _profilePicturePath;
         private readonly string _defaultFileName;
         private readonly string _postImagePath;
+        private readonly string _relationImagePath;
 
         public FileService(IConfiguration configuration)
         {
             _profilePicturePath = configuration["File:ProfilePicture"]!;
             _defaultFileName = configuration["File:Default"]!;
             _postImagePath = configuration["File:Post"]!;
+            _relationImagePath = configuration["File:Relation"]!;
         }
 
         private FileStream ReadFile(string path, string name)
@@ -109,6 +111,26 @@ namespace Instagram.Application
             }
 
             return names;
+        }
+
+        public Task<IEnumerable<string>> SaveRelationImagesAsync(IEnumerable<IFormFile> files)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveRelationImageAsync(string fileName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FileStream> GetRelationImageAsync(string fileName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> SaveRelationImageAsync(IFormFile file)
+        {
+            throw new NotImplementedException();
         }
     }
 }
