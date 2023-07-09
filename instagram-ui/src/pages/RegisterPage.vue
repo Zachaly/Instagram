@@ -5,14 +5,17 @@
             <div class="control">
                 <label class="label">Email</label>
                 <input class="input" v-model="request.email" />
+                <ValidationErrorListComponent v-if="validation.Email" :errors="validation.Email" />
             </div>
             <div class="control">
                 <label class="label">Name</label>
                 <input class="input" v-model="request.name" />
+                <ValidationErrorListComponent v-if="validation.Name" :errors="validation.Name" />
             </div>
             <div class="control">
                 <label class="label">Nickname</label>
                 <input class="input" v-model="request.nickname" />
+                <ValidationErrorListComponent v-if="validation.Nickname" :errors="validation.Nickname" />
             </div>
             <div>
                 <label class="label">Gender</label>
@@ -27,6 +30,7 @@
             <div class="control">
                 <label class="label">Password</label>
                 <input class="input" type="password" v-model="request.password" />
+                <ValidationErrorListComponent v-if="validation.Password" :errors="validation.Password" />
             </div>
             <div class="control">
                 <label class="label">Confirm password</label>
@@ -55,10 +59,11 @@
 <script setup lang="ts">
 import Gender from '@/models/enum/Gender';
 import RegisterRequest from '@/models/request/RegisterRequest';
-import { reactive, ref, toRaw } from 'vue';
+import { Ref, reactive, ref, toRaw } from 'vue';
 import axios, { AxiosError } from 'axios'
 import { useRouter } from 'vue-router';
 import ResponseModel from '@/models/ResponseModel'
+import ValidationErrorListComponent from '@/components/ValidationErrorListComponent.vue';
 
 const request: RegisterRequest = reactive({
     name: '',
@@ -67,6 +72,13 @@ const request: RegisterRequest = reactive({
     password: '',
     gender: Gender.NotSpecified,
 })
+
+const validation: Ref<{
+    Name?: string[],
+    Nickname?: string[],
+    Email?: string[],
+    Password?: string[]
+}> = ref({})
 
 const confirmPassword = ref('')
 
@@ -82,6 +94,11 @@ const register = () => {
     axios.post<RegisterRequest>('user', body).then(() => {
         alert('Account created!')
         router.push('/login')
-    }).catch((err: AxiosError<any, ResponseModel>) => alert(err.response!.data.error!))
+    }).catch((err: AxiosError<ResponseModel>) => {
+        validation.value = err.response?.data.validationErrors
+        if (err.response?.data.error) {
+            alert(err.response!.data.error!)
+        }
+    })
 }
 </script>

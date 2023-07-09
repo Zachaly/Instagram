@@ -6,6 +6,7 @@
         <div class="control">
             <label for="reason">Reason</label>
             <input type="text" class="input" v-model="reason">
+            <ValidationErrorListComponent :errors="validation.Reason" v-if="validation.Reason"/>
         </div>
         <div>
             <button class="button is-warning" @click="add">Add report</button>
@@ -14,10 +15,12 @@
 </template>
 
 <script setup lang="ts">
+import ResponseModel from '@/models/ResponseModel';
 import AddPostReportRequest from '@/models/request/AddPostReportRequest';
 import { useAuthStore } from '@/store/authStore';
-import axios from 'axios';
-import { ref } from 'vue';
+import axios, { AxiosError } from 'axios';
+import { Ref, ref } from 'vue';
+import ValidationErrorListComponent from './ValidationErrorListComponent.vue';
 
 const reason = ref('')
 const props = defineProps<{
@@ -25,6 +28,8 @@ const props = defineProps<{
 }>()
 const authStore = useAuthStore()
 const emit = defineEmits(['close'])
+
+const validation: Ref<{ Reason?: string[], }> = ref({})
 
 if(!authStore.isAuthorized){
     alert('You must be logged in to do that!')
@@ -41,6 +46,8 @@ const add = () => {
     axios.post('post-report', request).then(res => {
         alert('Report added!')
         emit('close')
+    }).catch((err: AxiosError<ResponseModel>) => {
+        validation.value = err.response?.data.validationErrors
     })
 }
 

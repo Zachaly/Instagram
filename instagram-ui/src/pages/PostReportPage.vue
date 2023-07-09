@@ -16,6 +16,7 @@
                     <div class="control">
                         <label class="label">Ban end date</label>
                         <input type="date" @change="setDate" class="input">
+                        <ValidationErrorListComponent v-if="validation.BanEndDate" :errors="validation.BanEndDate"/>
                     </div>
                     <button class="button is-danger width-100" @click="respond(true)">Accept</button>
                     <button class="button is-warning width-100" @click="respond(false)">Deny</button>
@@ -33,10 +34,12 @@ import { Ref, onMounted, ref } from 'vue';
 import PostReportModel from '@/models/PostReportModel';
 import PostModel from '@/models/PostModel';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import PostReportListItemComponent from '@/components/PostReportListItemComponent.vue';
 import PostCardComponent from '@/components/PostCardComponent.vue';
 import ResolvePostReportRequest from '@/models/request/ResolvePostReportRequest';
+import ValidationErrorListComponent from '@/components/ValidationErrorListComponent.vue';
+import ResponseModel from '@/models/ResponseModel';
 
 const report: Ref<PostReportModel | undefined> = ref(undefined)
 const post: Ref<PostModel | undefined> = ref(undefined)
@@ -45,11 +48,14 @@ const router = useRouter()
 
 const params = useRoute().params
 
+const validation: Ref<{
+    BanEndDate?: string[]
+}> = ref({})
+
 const banEndDate = ref(0)
 
 const setDate = (e: Event) => {
     const timeStamp = Date.parse((e.target as HTMLInputElement).value)
-    console.log(timeStamp)
     if (timeStamp < Date.now()) {
         alert('Invalid date!')
         return
@@ -62,12 +68,14 @@ const respond = (accepted: boolean) => {
         id: report.value!.id,
         accepted,
         postId: report.value!.postId,
-        banEndDate: banEndDate.value,
+        banEndDate: accepted ? banEndDate.value : undefined,
         userId: post.value?.creatorId
     }
 
     axios.put('post-report/resolve', request).then(res => {
         router.push('/moderation')
+    }).catch((err: AxiosError<ResponseModel>) => {
+        validation.value = err.response?.data.validationErrors
     })
 }
 
