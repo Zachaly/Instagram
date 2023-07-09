@@ -8,6 +8,7 @@
                         <textarea rows="2" class="textarea" v-model="request.content">
 
                         </textarea>
+                        <ValidationErrorListComponent v-if="validation.Content" :errors="validation.Content"/>
                     </div>
                     <div>
                         <label class="label">Selected images</label>
@@ -16,6 +17,7 @@
                                 <img :key="img" :src="img" alt="" />
                             </figure>
                         </div>
+                        <ValidationErrorListComponent v-if="validation.Files" :errors="validation.Files"/>
                     </div>
                     <div>
                         <p class="label">
@@ -24,6 +26,7 @@
                         <p>
                             <span v-for="tag in request.tags" :key="tag">#{{ tag }} &nbsp; </span>
                         </p>
+                        <ValidationErrorListComponent v-if="validation.Tags" :errors="validation.Tags"/>
                         <div>
                             <input type="text" class="input" v-model="newTag" />
                             <button class="button is-info" @click="addTag">Add tag</button>
@@ -62,6 +65,7 @@ import { Ref, reactive, ref } from 'vue';
 import { useAuthStore } from '@/store/authStore';
 import axios, { AxiosError } from 'axios';
 import { useRouter } from 'vue-router';
+import ValidationErrorListComponent from '@/components/ValidationErrorListComponent.vue';
 
 const router = useRouter()
 
@@ -71,6 +75,12 @@ const request: AddPostRequest = reactive({
     file: undefined,
     tags: []
 })
+
+const validation: Ref<{
+    Content?: string[],
+    Files?: string[],
+    Tags?: string[]
+}> = ref({})
 
 const newTag = ref('')
 
@@ -114,7 +124,7 @@ const send = () => {
         alert('Post added!')
         router.push('/')
     }).catch((err: AxiosError<ResponseModel>) => {
-        console.log(err)
+        validation.value = err.response?.data.validationErrors
         alert(err.response?.data.error)
     })
 }

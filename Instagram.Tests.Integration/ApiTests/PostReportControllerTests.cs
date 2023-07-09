@@ -3,7 +3,6 @@ using Instagram.Domain.Entity;
 using Instagram.Models.PostReport;
 using Instagram.Models.PostReport.Request;
 using Instagram.Tests.Integration.ApiTests.Infrastructure;
-using System.Formats.Asn1;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -100,7 +99,7 @@ namespace Instagram.Tests.Integration.ApiTests
             {
                 PostId = 1,
                 ReportingUserId = _authorizedUserId,
-                Reason = "res"
+                Reason = "min 1 letter reason"
             };
 
             var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
@@ -110,6 +109,30 @@ namespace Instagram.Tests.Integration.ApiTests
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Contains(reports, x => x.ReportingUserId == request.ReportingUserId 
                 && x.PostId == request.PostId 
+                && x.Reason == request.Reason);
+        }
+
+        [Fact]
+        public async Task PostAsync_InvalidRequest_ReturnsErrors()
+        {
+            await Authorize();
+
+            var request = new AddPostReportRequest
+            {
+                PostId = 1,
+                ReportingUserId = _authorizedUserId,
+                Reason = "res"
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+
+            var reports = GetFromDatabase<PostReport>("SELECT * FROM PostReport");
+            var content = await ReadErrorResponse(response);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "Reason");
+            Assert.DoesNotContain(reports, x => x.ReportingUserId == request.ReportingUserId
+                && x.PostId == request.PostId
                 && x.Reason == request.Reason);
         }
 

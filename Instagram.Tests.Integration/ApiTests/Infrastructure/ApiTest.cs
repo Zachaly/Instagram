@@ -1,8 +1,11 @@
 ﻿using Instagram.Api.Authorization;
 using Instagram.Domain.Entity;
+using Instagram.Models.Response;
 using Instagram.Models.User;
 using Instagram.Models.User.Request;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -38,7 +41,7 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
             {
                 Email = "email@email.com",
                 Gender = 0,
-                Name = "name",
+                Name = "username",
                 Nickname = "nickname",
                 Password = "password",
             };
@@ -128,6 +131,14 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
 
             _authorizedUserId = content.UserId;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue($"Bearer", content.AuthToken);
+        }
+        
+        // i had to create method for that beacause error response content is returned as string and cannot directly read as json
+        protected async Task<ResponseModel> ReadErrorResponse(HttpResponseMessage response)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<ResponseModel>(content);
         }
     }
 }

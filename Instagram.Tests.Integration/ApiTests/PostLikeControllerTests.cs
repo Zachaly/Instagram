@@ -60,6 +60,23 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
+        public async Task PostAsync_InvalidRequest_ReturnsErrors()
+        {
+            await Authorize();
+
+            var request = new AddPostLikeRequest { PostId = 1, UserId = -1 };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+            var content = await ReadErrorResponse(response);
+
+            var likes = GetFromDatabase<PostLike>("SELECT * FROM PostLike");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Empty(likes);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "UserId");
+        }
+
+        [Fact]
         public async Task DeleteAsync_DeletesSpecifiedPostLike()
         {
             await Authorize();

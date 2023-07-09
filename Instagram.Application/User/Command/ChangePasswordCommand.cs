@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Instagram.Application.Command
 {
-    public class ChangePasswordCommand : IRequest<ResponseModel>
+    public class ChangePasswordCommand : IValidatedRequest
     {
         public long UserId { get; set; }
         public string OldPassword { get; set; }

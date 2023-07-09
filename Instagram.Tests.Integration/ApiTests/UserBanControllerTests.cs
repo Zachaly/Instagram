@@ -92,7 +92,11 @@ namespace Instagram.Tests.Integration.ApiTests
         {
             await AuthorizeModerator();
 
-            var request = new AddUserBanRequest { EndDate = 1, UserId = 2 };
+            var request = new AddUserBanRequest 
+            { 
+                EndDate = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeMilliseconds(),
+                UserId = 2 
+            };
 
             var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
 
@@ -100,6 +104,27 @@ namespace Instagram.Tests.Integration.ApiTests
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Contains(bans, x => x.UserId == request.UserId && x.EndDate == request.EndDate);
+        }
+
+        [Fact]
+        public async Task AddAsync_InvaliRequest_Failure()
+        {
+            await AuthorizeModerator();
+
+            var request = new AddUserBanRequest
+            {
+                EndDate = 2137,
+                UserId = 21
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+            var content = await ReadErrorResponse(response);
+
+            var bans = GetFromDatabase<UserBan>("SELECT * FROM UserBan");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "EndDate");
+            Assert.DoesNotContain(bans, x => x.UserId == request.UserId && x.EndDate == request.EndDate);
         }
 
         [Fact]

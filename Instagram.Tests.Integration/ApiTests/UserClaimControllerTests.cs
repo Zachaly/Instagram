@@ -68,6 +68,25 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
+        public async Task PostAsync_InvalidRequest_Failure()
+        {
+            await AuthorizeAdmin();
+
+            var request = new AddUserClaimRequest
+            {
+                UserId = 21,
+                Value = ""
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+            var content = await ReadErrorResponse(response);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "Value");
+            Assert.DoesNotContain(GetFromDatabase<UserClaim>("SELECT * FROM UserClaim"), x => x.UserId == request.UserId && x.Value == request.Value);
+        }
+
+        [Fact]
         public async Task DeleteAsync_DeletesSpecifiedClaim()
         {
             await AuthorizeAdmin();

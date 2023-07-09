@@ -111,11 +111,9 @@ const like = () => {
 
     axios.get<number>('post-like/count', { params: getRequest }).then(res => {
         if (res.data > 0) {
-            console.log('del')
             axios.delete(`post-like/${props.post.id}/${authStore.userId()}`).then()
         }
         else {
-            console.log('add')
             const addRequest: AddPostLikeRequest = { postId: props.post.id, userId: authStore.userId() }
             axios.post('post-like', addRequest).then()
         }

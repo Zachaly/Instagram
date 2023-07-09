@@ -41,6 +41,31 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
+        public async Task RegisterAsync_InvalidRequest_ReturnsErrors()
+        {
+            var request = new RegisterCommand
+            {
+                Email = "emai",
+                Gender = Gender.Man,
+                Name = "test name",
+                Nickname = "testnickname",
+                Password = "password"
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
+            var content = await ReadErrorResponse(response);
+
+            var users = GetFromDatabase<User>("SELECT * FROM [User] WHERE Nickname!='__admin__'");
+            
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "Email");
+            Assert.DoesNotContain(users, x => x.Email == request.Email
+                && x.Gender == request.Gender
+                && x.Name == request.Name
+                && x.Nickname == request.Nickname);
+        }
+
+        [Fact]
         public async Task RegisterAsync_EmailTaken_Failure()
         {
             var existingUser = new User
@@ -248,6 +273,32 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
+        public async Task UpdateAsync_InvalidRequest_ReturnsErrors()
+        {
+            await Authorize();
+
+            Insert("User", FakeDataFactory.GenerateUsers(5));
+
+            var users = GetFromDatabase<User>("SELECT * FROM [User]");
+            var userToUpdate = users.Last();
+
+            var request = new UpdateUserRequest
+            {
+                Id = userToUpdate.Id,
+                Name = "a"
+            };
+
+            var response = await _httpClient.PatchAsJsonAsync(Endpoint, request);
+            var content = await ReadErrorResponse(response);
+
+            var updatedUsers = GetFromDatabase<User>("SELECT * FROM [User]");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "Name");
+            Assert.DoesNotContain(updatedUsers, user => user.Id == request.Id && user.Bio == request.Bio);
+        }
+
+        [Fact]
         public async Task SearchNickname_ReturnsProperUsers()
         {
             const string SearchNickname = "name";
@@ -281,7 +332,7 @@ namespace Instagram.Tests.Integration.ApiTests
             var registerRequest = new RegisterRequest
             {
                 Email = "email@email.com",
-                Name = "name",
+                Name = "username",
                 Password = "zaq1@WSX",
                 Nickname = "nickname",
                 Gender = 0,
@@ -317,7 +368,7 @@ namespace Instagram.Tests.Integration.ApiTests
             {
                 Password = "zaq1@WSX",
                 Email = "email@email.com",
-                Name = "name",
+                Name = "username",
                 Nickname = "nickname"
             };
 
@@ -358,6 +409,58 @@ namespace Instagram.Tests.Integration.ApiTests
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Equal(HttpStatusCode.OK, loginWithNewPasswordResponse.StatusCode);
             Assert.NotEqual(oldHash, newHash);
+        }
+
+        [Fact]
+        public async Task ChangePassword_InvalidNewPassword_DoesNotChangePassword()
+        {
+            var registerRequest = new RegisterRequest
+            {
+                Password = "zaq1@WSX",
+                Email = "email@email.com",
+                Name = "username",
+                Nickname = "nickname"
+            };
+
+            await _httpClient.PostAsJsonAsync(Endpoint, registerRequest);
+
+            var loginRequest = new LoginRequest
+            {
+                Email = registerRequest.Email,
+                Password = registerRequest.Password,
+            };
+
+            var loginResponse = await _httpClient.PostAsJsonAsync($"{Endpoint}/login", loginRequest);
+            var loginContent = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginContent.AuthToken);
+
+            var changePasswordRequest = new ChangePasswordCommand
+            {
+                NewPassword = "a",
+                OldPassword = "zaq1@WSX",
+                UserId = loginContent.UserId,
+            };
+
+            var oldHash = GetFromDatabase<string>("SELECT PasswordHash FROM [User] WHERE Id=@Id", new { Id = loginContent.UserId }).First();
+
+            var response = await _httpClient.PatchAsJsonAsync($"{Endpoint}/change-password", changePasswordRequest);
+            var content = await ReadErrorResponse(response);
+
+            var newHash = GetFromDatabase<string>("SELECT PasswordHash FROM [User] WHERE Id=@Id", new { Id = loginContent.UserId }).First();
+
+            var loginNewPasswordRequest = new LoginRequest
+            {
+                Password = changePasswordRequest.NewPassword,
+                Email = loginContent.Email,
+            };
+
+            var loginWithNewPasswordResponse = await _httpClient.PostAsJsonAsync($"{Endpoint}/login", loginNewPasswordRequest);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, loginWithNewPasswordResponse.StatusCode);
+            Assert.Contains(content.ValidationErrors.Keys, x => x == "NewPassword");
+            Assert.Equal(oldHash, newHash);
         }
     }
 }
