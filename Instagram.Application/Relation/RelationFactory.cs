@@ -7,13 +7,17 @@ namespace Instagram.Application
     public class RelationFactory : IRelationFactory
     {
         public Relation Create(AddRelationRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => new Relation
+            {
+                Name = request.Name,
+                UserId = request.UserId,
+            };
 
         public RelationImage CreateImage(long relationId, string fileName)
-        {
-            throw new NotImplementedException();
-        }
+            => new RelationImage
+            {
+                RelationId = relationId,
+                FileName = fileName,
+            };
     }
 }

@@ -5,9 +5,7 @@ using Instagram.Domain.Entity;
 using Instagram.Models.RelationImage.Request;
 using Instagram.Models.RelationImage;
 using Instagram.Models.Response;
-using Instagram.Models.User;
 using Moq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
@@ -40,18 +38,20 @@ namespace Instagram.Tests.Unit.CommandTests
 
             var images = new List<RelationImage>
             {
-                new RelationImage { Id = 1 },
-                new RelationImage { Id = IdToDelete },
-                new RelationImage { Id = 3 },
-                new RelationImage { Id = 4 },
+                new RelationImage { Id = 1, FileName = "fname" },
+                new RelationImage { Id = IdToDelete, FileName = "fname" },
+                new RelationImage { Id = 3, FileName = "fname" },
+                new RelationImage { Id = 4, FileName = "fname" },
             };
 
             var fileRemoved = false;
 
-            _relationImageRepository.Setup(x => x.GetAsync(It.IsAny<GetRelationImageRequest>()))
-                .ReturnsAsync((GetRelationImageRequest request)
-                => images.Where(x => x.RelationId == request.RelationId)
-                    .Select(x => new RelationImageModel { RelationId = x.RelationId }));
+            _relationImageRepository.Setup(x => x.GetByIdAsync(It.IsAny<long>()))
+                .ReturnsAsync((long id) => images.Where(x => x.Id == id).Select(x => new RelationImageModel
+                {
+                    Id = id,
+                    FileName = x.FileName,
+                }).FirstOrDefault());
 
             _relationImageRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
                 .Callback((long id) => images.RemoveAll(x => x.Id == id));
@@ -71,7 +71,7 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "Err";
 
-            _relationImageRepository.Setup(x => x.GetAsync(It.IsAny<GetRelationImageRequest>()))
+            _relationImageRepository.Setup(x => x.GetByIdAsync(It.IsAny<long>()))
                 .Callback(() => throw new Exception(Error));
 
             var res = await _handler.Handle(new DeleteRelationImageCommand(), default);

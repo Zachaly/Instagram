@@ -1,7 +1,9 @@
 ﻿using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
+using Instagram.Models.RelationImage.Request;
 using Instagram.Models.Response;
 using MediatR;
+using System.Transactions;
 
 namespace Instagram.Application.Command
 {
@@ -26,9 +28,30 @@ namespace Instagram.Application.Command
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> Handle(DeleteRelationCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseModel> Handle(DeleteRelationCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var images = await _relationImageRepository
+                    .GetAsync(new GetRelationImageRequest { RelationId = request.Id, SkipPagination = true });
+
+                foreach(var file in images.Select(x => x.FileName)) 
+                {
+                    await _fileService.RemoveRelationImageAsync(file);
+                }
+
+                using(var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    await _relationRepository.DeleteByIdAsync(request.Id);
+                    await _relationImageRepository.DeleteByRelationIdAsync(request.Id);
+                }
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }

@@ -80,7 +80,7 @@ namespace Instagram.Tests.Unit.CommandTests
             Assert.Equivalent(images.Select(x => x.FileName), command.Files.Select(x => x.Name));
             Assert.All(images, image =>
             {
-                Assert.Equal(NewId, image.Id);
+                Assert.Equal(NewId, image.RelationId);
             });
         }
 

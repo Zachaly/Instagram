@@ -24,9 +24,22 @@ namespace Instagram.Application.Command
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> Handle(DeleteRelationImageCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseModel> Handle(DeleteRelationImageCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var fileName = (await _relationImageRepository.GetByIdAsync(request.Id)).FileName;
+
+                await _fileService.RemoveRelationImageAsync(fileName);
+
+                await _relationImageRepository.DeleteByIdAsync(request.Id);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }
