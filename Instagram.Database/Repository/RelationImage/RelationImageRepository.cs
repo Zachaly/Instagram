@@ -7,16 +7,24 @@ using Instagram.Models.RelationImage.Request;
 
 namespace Instagram.Database.Repository
 {
-    internal class RelationImageRepository : RepositoryBase<RelationImage, RelationImageModel, GetRelationImageRequest>, IRelationImageRepository
+    public class RelationImageRepository : RepositoryBase<RelationImage, RelationImageModel, GetRelationImageRequest>, IRelationImageRepository
     {
         public RelationImageRepository(ISqlQueryBuilder sqlQueryBuilder, IConnectionFactory connectionFactory) : base(sqlQueryBuilder, connectionFactory)
         {
             Table = "RelationImage";
+            DefaultOrderBy = "[RelationImage].[Id]";
         }
 
         public Task DeleteByRelationIdAsync(long relationId)
         {
-            throw new NotImplementedException();
+            var param = new { RelationId = relationId };
+
+            var query = _sqlQueryBuilder
+                .BuildDelete(Table)
+                .Where(param)
+                .Build();
+
+            return QueryAsync(query, param);
         }
     }
 }

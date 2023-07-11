@@ -15,6 +15,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text;
 
 namespace Instagram.Api.Infrastructure
@@ -37,6 +38,8 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserClaimRepository, UserClaimRepository>();
             services.AddScoped<IPostReportRepository, PostReportRepository>();
             services.AddScoped<IUserBanRepository, UserBanRepository>();
+            services.AddScoped<IRelationRepository, RelationRepository>();
+            services.AddScoped<IRelationImageRepository, RelationImageRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -61,6 +64,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostReportService, PostReportService>();
             services.AddScoped<IUserBanService, UserBanService>();
             services.AddScoped<IUserDataService, UserDataService>();
+            services.AddScoped<IRelationService, RelationService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -72,6 +76,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserClaimFactory, UserClaimFactory>();
             services.AddScoped<IPostReportFactory, PostReportFactory>();
             services.AddScoped<IUserBanFactory, UserBanFactory>();
+            services.AddScoped<IRelationFactory, RelationFactory>();
 
             services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
 
