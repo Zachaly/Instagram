@@ -97,6 +97,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserClaimServiceProxy, UserClaimServiceProxy>();
             services.AddScoped<IPostReportServiceProxy, PostReportServiceProxy>();
             services.AddScoped<IUserBanServiceProxy, UserBanServiceProxy>();
+            services.AddScoped<IRelationServiceProxy, RelationServiceProxy>();
 
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipeline<,>));
