@@ -7,7 +7,8 @@ namespace Instagram.Application.Validation
     {
         public AddRelationImageCommandValidator()
         {
-
+            RuleFor(c => c.RelationId).GreaterThan(0);
+            RuleFor(c => c.File).NotNull();
         }
     }
 }
