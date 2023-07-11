@@ -113,24 +113,52 @@ namespace Instagram.Application
             return names;
         }
 
-        public Task<IEnumerable<string>> SaveRelationImagesAsync(IEnumerable<IFormFile> files)
+        public async Task<IEnumerable<string>> SaveRelationImagesAsync(IEnumerable<IFormFile> files)
         {
-            throw new NotImplementedException();
+            Directory.CreateDirectory(_relationImagePath);
+
+            var names = new List<string>();
+
+            foreach (var file in files)
+            {
+                var newName = $"{Guid.NewGuid()}.png";
+
+                var path = Path.Combine(_relationImagePath, newName);
+
+                using (var stream = File.Create(path))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                names.Add(newName);
+            }
+
+            return names;
         }
 
         public Task RemoveRelationImageAsync(string fileName)
         {
-            throw new NotImplementedException();
+            File.Delete(Path.Join(_relationImagePath, fileName));
+
+            return Task.CompletedTask;
         }
 
         public Task<FileStream> GetRelationImageAsync(string fileName)
-        {
-            throw new NotImplementedException();
-        }
+            => Task.FromResult(ReadFile(_relationImagePath, fileName));
 
-        public Task<string> SaveRelationImageAsync(IFormFile file)
+        public async Task<string> SaveRelationImageAsync(IFormFile file)
         {
-            throw new NotImplementedException();
+            Directory.CreateDirectory(_relationImagePath);
+
+            var newName = $"{Guid.NewGuid()}.png";
+
+            var path = Path.Combine(_relationImagePath, newName);
+
+            using (var stream = File.Create(path))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return newName;
         }
     }
 }

@@ -20,9 +20,11 @@ namespace Instagram.Application.Command
             _fileService = fileService;
         }
 
-        public Task<FileStream> Handle(GetRelationImageQuery request, CancellationToken cancellationToken)
+        public async Task<FileStream> Handle(GetRelationImageQuery request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var image = await _relationImageRepository.GetEntityByIdAsync(request.Id);
+
+            return await _fileService.GetRelationImageAsync(image.FileName);
         }
     }
 }

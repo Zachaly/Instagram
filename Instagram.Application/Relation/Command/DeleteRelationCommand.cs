@@ -44,6 +44,8 @@ namespace Instagram.Application.Command
                 {
                     await _relationRepository.DeleteByIdAsync(request.Id);
                     await _relationImageRepository.DeleteByRelationIdAsync(request.Id);
+
+                    scope.Complete();
                 }
 
                 return _responseFactory.CreateSuccess();
