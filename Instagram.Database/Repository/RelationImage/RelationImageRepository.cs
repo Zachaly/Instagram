@@ -13,5 +13,10 @@ namespace Instagram.Database.Repository
         {
             Table = "RelationImage";
         }
+
+        public Task DeleteByRelationIdAsync(long relationId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

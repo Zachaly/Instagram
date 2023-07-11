@@ -18,14 +18,17 @@ namespace Instagram.Application.Command
         private readonly IRelationFactory _relationFactory;
         private readonly IFileService _fileService;
         private readonly IResponseFactory _responseFactory;
+        private readonly IRelationImageRepository _relationImageRepository;
 
         public AddRelationHandler(IRelationRepository relationRepository, IRelationFactory relationFactory,
+            IRelationImageRepository relationImageRepository,
             IFileService fileService, IResponseFactory responseFactory) 
         {
             _relationRepository = relationRepository;
             _relationFactory = relationFactory;
             _fileService = fileService;
             _responseFactory = responseFactory;
+            _relationImageRepository = relationImageRepository;
         }
 
         public Task<ResponseModel> Handle(AddRelationCommand request, CancellationToken cancellationToken)
