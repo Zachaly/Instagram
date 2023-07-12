@@ -11,5 +11,10 @@ namespace Instagram.Application.Abstraction
         Task<IEnumerable<string>> SavePostImagesAsync(IEnumerable<IFormFile> files);
         Task RemovePostImageAsync(string fileName);
         Task<FileStream> GetPostImageAsync(string fileName);
+
+        Task<IEnumerable<string>> SaveRelationImagesAsync(IEnumerable<IFormFile> files);
+        Task<string> SaveRelationImageAsync(IFormFile file);
+        Task RemoveRelationImageAsync(string fileName);
+        Task<FileStream> GetRelationImageAsync(string fileName);
     }
 }

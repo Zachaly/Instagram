@@ -58,5 +58,13 @@ namespace Instagram.Api.Controllers
 
             return new FileStreamResult(res, "image/png");
         }
+
+        [HttpGet("relation/{id}")]
+        public async Task<FileStreamResult> GetRelationImageAsync(long id)
+        {
+            var res = await _mediator.Send(new GetRelationImageQuery { Id = id });
+
+            return new FileStreamResult(res, "image/png");
+        }
     }
 }

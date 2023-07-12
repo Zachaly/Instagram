@@ -9,12 +9,14 @@ namespace Instagram.Application
         private readonly string _profilePicturePath;
         private readonly string _defaultFileName;
         private readonly string _postImagePath;
+        private readonly string _relationImagePath;
 
         public FileService(IConfiguration configuration)
         {
             _profilePicturePath = configuration["File:ProfilePicture"]!;
             _defaultFileName = configuration["File:Default"]!;
             _postImagePath = configuration["File:Post"]!;
+            _relationImagePath = configuration["File:Relation"]!;
         }
 
         private FileStream ReadFile(string path, string name)
@@ -109,6 +111,54 @@ namespace Instagram.Application
             }
 
             return names;
+        }
+
+        public async Task<IEnumerable<string>> SaveRelationImagesAsync(IEnumerable<IFormFile> files)
+        {
+            Directory.CreateDirectory(_relationImagePath);
+
+            var names = new List<string>();
+
+            foreach (var file in files)
+            {
+                var newName = $"{Guid.NewGuid()}.png";
+
+                var path = Path.Combine(_relationImagePath, newName);
+
+                using (var stream = File.Create(path))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                names.Add(newName);
+            }
+
+            return names;
+        }
+
+        public Task RemoveRelationImageAsync(string fileName)
+        {
+            File.Delete(Path.Join(_relationImagePath, fileName));
+
+            return Task.CompletedTask;
+        }
+
+        public Task<FileStream> GetRelationImageAsync(string fileName)
+            => Task.FromResult(ReadFile(_relationImagePath, fileName));
+
+        public async Task<string> SaveRelationImageAsync(IFormFile file)
+        {
+            Directory.CreateDirectory(_relationImagePath);
+
+            var newName = $"{Guid.NewGuid()}.png";
+
+            var path = Path.Combine(_relationImagePath, newName);
+
+            using (var stream = File.Create(path))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return newName;
         }
     }
 }

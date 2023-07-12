@@ -86,5 +86,17 @@ namespace Instagram.Tests.Integration
                     EndDate = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                     StartDate = DateTimeOffset.Now.ToUnixTimeMilliseconds()
                 }).ToList();
+
+        public static List<Relation> GenerateRelations(long userId, int count)
+            => new Faker<Relation>()
+                .RuleFor(r => r.UserId, _ => userId)
+                .RuleFor(r => r.Name, f => f.Random.AlphaNumeric(20))
+                .Generate(count);
+
+        public static List<RelationImage> GenerateRelationImages(long relationId, int count)
+            => new Faker<RelationImage>()
+                .RuleFor(i => i.RelationId, _ => relationId)
+                .RuleFor(i => i.FileName, f => f.Random.AlphaNumeric(15))
+                .Generate(count);
     }
 }
