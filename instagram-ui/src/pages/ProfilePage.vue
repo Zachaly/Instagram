@@ -3,6 +3,7 @@
         <div class="columns is-centered">
             <div class="column is-6">
                 <UserCardComponent v-if="!loading" :user="user" />
+                <RelationListComponent v-if="!loading" :user-id="user.id"/>
                 <p class="title">Posts</p>
                 <div class="is-flex is-flex-wrap-wrap">
                     <PostListItemComponent v-for="post of posts" :key="post.id" :post="post" />
@@ -23,6 +24,7 @@ import GetPostRequest from '@/models/request/get/GetPostRequest';
 import axios from 'axios';
 import { Ref, onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router'
+import RelationListComponent from '@/components/RelationListComponent.vue';
 
 const params = useRoute().params
 const loading: Ref<boolean> = ref(true)
