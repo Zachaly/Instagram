@@ -19,19 +19,48 @@ namespace Instagram.Application
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> AddAsync(AddDirectMessageRequest request)
+        public async Task<ResponseModel> AddAsync(AddDirectMessageRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var message = _directMessageFactory.Create(request);
+
+                var id = await _repository.InsertAsync(message);
+
+                return _responseFactory.CreateSuccess(id);
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
 
-        public Task<ResponseModel> DeleteByIdAsync(long id)
+        public async Task<ResponseModel> DeleteByIdAsync(long id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _repository.DeleteByIdAsync(id);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
 
-        public Task<ResponseModel> UpdateAsync(UpdateDirectMessageRequest request)
+        public async Task<ResponseModel> UpdateAsync(UpdateDirectMessageRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _repository.UpdateAsync(request);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }

@@ -7,8 +7,13 @@ namespace Instagram.Application
     public class DirectMessageFactory : IDirectMessageFactory
     {
         public DirectMessage Create(AddDirectMessageRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => new DirectMessage
+            {
+                Content = request.Content,
+                SenderId = request.SenderId,
+                Read = false,
+                ReceiverId = request.ReceiverId,
+                Created = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+            };
     }
 }

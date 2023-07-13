@@ -28,6 +28,7 @@ namespace Instagram.Tests.Unit.FactoryTests
             Assert.Equal(request.SenderId, message.SenderId);
             Assert.Equal(request.ReceiverId, message.ReceiverId);
             Assert.NotEqual(default, message.Created);
+            Assert.False(message.Read);
         }
     }
 }
