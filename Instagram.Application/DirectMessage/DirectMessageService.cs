@@ -7,7 +7,7 @@ using Instagram.Models.Response;
 
 namespace Instagram.Application
 {
-    internal class DirectMessageService : ServiceBase<DirectMessage, DirectMessageModel, GetDirectMessageRequest, IDirectMessageRepository>, IDirectMessageService
+    public class DirectMessageService : ServiceBase<DirectMessage, DirectMessageModel, GetDirectMessageRequest, IDirectMessageRepository>, IDirectMessageService
     {
         private readonly IDirectMessageFactory _directMessageFactory;
         private readonly IResponseFactory _responseFactory;
