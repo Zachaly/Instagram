@@ -1,4 +1,6 @@
-﻿namespace Instagram.Models.DirectMessage.Request
+﻿using Instagram.Domain.SqlAttribute;
+
+namespace Instagram.Models.DirectMessage.Request
 {
     public class GetDirectMessageRequest : PagedRequest
     {
@@ -8,5 +10,8 @@
         public long? Created { get; set; }
         public bool? Read { get; set; }
         public string? Content { get; set; }
+
+        [Where(Condition = "[DirectMessage].[SenderId] IN @UserIds AND [DirectMessage].[ReceiverId] IN ")]
+        public IEnumerable<long>? UserIds { get; set; }
     }
 }
