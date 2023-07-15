@@ -40,6 +40,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserBanRepository, UserBanRepository>();
             services.AddScoped<IRelationRepository, RelationRepository>();
             services.AddScoped<IRelationImageRepository, RelationImageRepository>();
+            services.AddScoped<IDirectMessageRepository, DirectMessageRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -65,6 +66,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IUserBanService, UserBanService>();
             services.AddScoped<IUserDataService, UserDataService>();
             services.AddScoped<IRelationService, RelationService>();
+            services.AddScoped<IDirectMessageService, DirectMessageService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -77,6 +79,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostReportFactory, PostReportFactory>();
             services.AddScoped<IUserBanFactory, UserBanFactory>();
             services.AddScoped<IRelationFactory, RelationFactory>();
+            services.AddScoped<IDirectMessageFactory, DirectMessageFactory>();
 
             services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
 
@@ -98,6 +101,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IPostReportServiceProxy, PostReportServiceProxy>();
             services.AddScoped<IUserBanServiceProxy, UserBanServiceProxy>();
             services.AddScoped<IRelationServiceProxy, RelationServiceProxy>();
+            services.AddScoped<IDirectMessageServiceProxy, DirectMessageServiceProxy>();
 
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipeline<,>));

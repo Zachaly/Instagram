@@ -20,6 +20,9 @@
                             class="button is-warning">
                             Unfollow
                         </button>
+                        <router-link class="button is-link" :to="{ name: 'chat', params: { userId: user.id}}" v-if="authStore.isAuthorized && authStore.userId() !== user.id">
+                            Chat
+                        </router-link>
                     </p>
                     <p class="subtitle"> {{ user.name }}</p>
                 </div>

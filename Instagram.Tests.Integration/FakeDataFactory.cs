@@ -98,5 +98,14 @@ namespace Instagram.Tests.Integration
                 .RuleFor(i => i.RelationId, _ => relationId)
                 .RuleFor(i => i.FileName, f => f.Random.AlphaNumeric(15))
                 .Generate(count);
+
+        public static List<DirectMessage> GenerateDirectMessages(long senderId, long receiverId, int count)
+            => new Faker<DirectMessage>()
+                .RuleFor(m => m.SenderId, _ => senderId)
+                .RuleFor(m => m.ReceiverId, _ => receiverId)
+                .RuleFor(m => m.Read, _ => false)
+                .RuleFor(m => m.Content, f => f.Random.AlphaNumeric(20))
+                .RuleFor(m => m.Created, f => f.Random.Number(int.MaxValue))
+                .Generate(count);
     }
 }
