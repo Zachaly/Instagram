@@ -11,6 +11,7 @@ import SearchTagPage from './pages/SearchTagPage.vue'
 import AdminPage from './pages/AdminPage.vue'
 import ModerationPage from './pages/ModerationPage.vue'
 import PostReportPage from './pages/PostReportPage.vue'
+import ChatPage from './pages/ChatPage.vue'
 
 const createRoute = (path: string, name: string, component: Component) => ({ path, name, component })
 
@@ -25,7 +26,8 @@ const routes = [
     createRoute('/tag/:tag', 'tag', SearchTagPage),
     createRoute('/admin', 'admin', AdminPage),
     createRoute('/moderation', 'moderation', ModerationPage),
-    createRoute('/report/:id', 'post-report', PostReportPage)
+    createRoute('/report/:id', 'post-report', PostReportPage),
+    createRoute('/chat/:userId', 'chat', ChatPage)
 ]
 export default createRouter({
     routes,
