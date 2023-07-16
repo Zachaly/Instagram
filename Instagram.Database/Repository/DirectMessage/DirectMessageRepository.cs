@@ -12,7 +12,7 @@ namespace Instagram.Database.Repository
         public DirectMessageRepository(ISqlQueryBuilder sqlQueryBuilder, IConnectionFactory connectionFactory) : base(sqlQueryBuilder, connectionFactory)
         {
             Table = "DirectMessage";
-            DefaultOrderBy = "[DirectMessage].[Created] ASC";
+            DefaultOrderBy = "[DirectMessage].[Created] DESC";
         }
 
         public Task UpdateAsync(UpdateDirectMessageRequest request)

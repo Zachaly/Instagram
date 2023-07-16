@@ -4,11 +4,12 @@
             <div v-if="user">
                 <p class="title has-text-centered">{{ user.nickname }}</p>
             </div>
-            <div>
-                <div v-for="message in messages" :key="message.id" class="is-flex" :class="{'is-justify-content-flex-end': authStore.userId() === message.senderId}">
-                    <DirectMessageComponent :message="message"/>
+            <EndlessScrollComponent class="m-1" :style="'max-height: 60vh;'" @on-top="onTop">
+                <div v-for="message in messages" :key="message.id" class="is-flex"
+                    :class="{ 'is-justify-content-flex-end': authStore.userId() === message.senderId }">
+                    <DirectMessageComponent :message="message" />
                 </div>
-            </div>
+            </EndlessScrollComponent>
             <div>
                 <textarea class="textarea" v-model="newMessageContent" rows="5">
                 </textarea>
@@ -32,6 +33,7 @@ import AddDirectMessageRequest from '@/models/request/AddDirectMessageRequest';
 import DirectMessageComponent from '@/components/DirectMessageComponent.vue';
 import ResponseModel from '@/models/ResponseModel';
 import UpdateDirectMessageRequest from '@/models/request/UpdateDirectMessageRequest';
+import EndlessScrollComponent from '@/components/EndlessScrollComponent.vue';
 
 const authStore = useAuthStore()
 
@@ -41,13 +43,21 @@ const userId = parseInt(route.params['userId'] as string)
 
 const messages: Ref<DirectMessageModel[]> = ref([])
 const user: Ref<UserModel | undefined> = ref(undefined)
+const blockScroll = ref(false)
+
+const PAGE_SIZE = 10;
+const currentPageIndex = ref(0)
 
 const newMessageContent = ref('')
 
-const readMessage = (msg: DirectMessageModel) => {
-    messages.value.push(msg)
+const readMessage = (msg: DirectMessageModel, push: boolean = true) => {
+    if(push){
+        messages.value.push(msg)
+    } else {
+        messages.value.unshift(msg)
+    }
 
-    if(msg.senderId == authStore.userId()){
+    if (msg.senderId == authStore.userId()) {
         return
     }
 
@@ -79,19 +89,36 @@ const sendMessage = () => {
     })
 }
 
+const loadMessages = () => {
+    blockScroll.value = true
+
+    const params: GetDirectMessageRequest = {
+        UserIds: [userId, authStore.userId()],
+        PageIndex: currentPageIndex.value,
+        PageSize: PAGE_SIZE
+    }
+
+    axios.get<DirectMessageModel[]>('direct-message', { params }).then(res => {
+        currentPageIndex.value++
+        blockScroll.value = res.data.length < PAGE_SIZE
+
+        res.data.forEach(msg => {
+            readMessage(msg, false)
+        })
+    })
+}
+
+const onTop = () => {
+    if(!blockScroll.value){
+        loadMessages()
+    }
+}
+
 onMounted(() => {
     axios.get<UserModel>(`user/${userId}`).then(res => {
         user.value = res.data
     })
 
-    const params: GetDirectMessageRequest = {
-        UserIds: [userId, authStore.userId()]
-    }
-
-    axios.get<DirectMessageModel[]>('direct-message', { params}).then(res => {
-        res.data.forEach(msg => {
-            readMessage(msg)
-        })
-    })
+    loadMessages()
 })
 </script>
