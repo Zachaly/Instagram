@@ -47,7 +47,6 @@ const loadPosts = () => {
     }
     
     const request: GetPostRequest = { CreatorIds: [...authStore.userFollowsIds], PageIndex: currentPageIndex.value, PageSize: PAGE_SIZE  }
-    console.log('load')
     axios.get<PostModel[]>('post', { params: request }).then(res => {
         posts.value.push(...res.data)
         currentPageIndex.value++

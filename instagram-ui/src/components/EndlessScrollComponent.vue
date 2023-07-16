@@ -1,17 +1,21 @@
 <template>
-    <div class="endless-scroll" :class="$props.class ?? ''" @scroll="onScroll" :style="style">
+    <div class="endless-scroll" :class="$props.class ?? ''" @scroll="onScroll" :style="style" ref="box">
         <slot></slot>
     </div>
 </template>
 
 <script lang="ts" setup>
+import { Ref, onMounted, ref } from 'vue';
 
-defineProps<{
-    class?: string
-    style?: string
+
+const props = defineProps<{
+    class?: string,
+    style?: string,
 }>()
 
 const emit = defineEmits(['on-top', 'on-bottom'])
+
+const box: Ref<HTMLDivElement | null> = ref(null)
 
 const onScroll = (e: Event) => {
     const target = e.target as HTMLDivElement
@@ -20,7 +24,7 @@ const onScroll = (e: Event) => {
         emit('on-top')
     }
 
-    if (target.scrollTop > (target.scrollHeight - target.clientHeight)  * 0.8) {
+    if (target.scrollTop > (target.scrollHeight - target.clientHeight) * 0.8) {
         emit('on-bottom')
     }
 }
