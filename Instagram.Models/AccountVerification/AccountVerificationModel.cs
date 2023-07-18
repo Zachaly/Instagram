@@ -1,6 +1,6 @@
 ﻿using Instagram.Domain.SqlAttribute;
 
-namespace Instagram.Models.VerificationRequest
+namespace Instagram.Models.AccountVerification
 {
     [Join(Condition = "[User].[Id]=[AccountVerification].[UserId]", Table = "User")]
     public class AccountVerificationModel : IModel
@@ -12,5 +12,6 @@ namespace Instagram.Models.VerificationRequest
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public long Created { get; set; }
+        public string DateOfBirth { get; set; }
     }
 }

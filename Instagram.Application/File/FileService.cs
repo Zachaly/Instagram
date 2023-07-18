@@ -160,5 +160,20 @@ namespace Instagram.Application
 
             return newName;
         }
+
+        public Task<string> SaveVerificationDocumentAsync(IFormFile file)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveVerificationDocumentAsync(string fileName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FileStream> GetVerificationDocumentAsync(string fileName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

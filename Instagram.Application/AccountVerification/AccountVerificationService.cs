@@ -1,8 +1,8 @@
 ﻿using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
-using Instagram.Models.VerificationRequest;
-using Instagram.Models.VerificationRequest.Request;
+using Instagram.Models.AccountVerification;
+using Instagram.Models.AccountVerification.Request;
 
 namespace Instagram.Application
 {

@@ -16,5 +16,9 @@ namespace Instagram.Application.Abstraction
         Task<string> SaveRelationImageAsync(IFormFile file);
         Task RemoveRelationImageAsync(string fileName);
         Task<FileStream> GetRelationImageAsync(string fileName);
+
+        Task<string> SaveVerificationDocumentAsync(IFormFile file);
+        Task RemoveVerificationDocumentAsync(string fileName);
+        Task<FileStream> GetVerificationDocumentAsync(string fileName);
     }
 }

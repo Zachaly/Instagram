@@ -1,5 +1,5 @@
 ﻿using Instagram.Domain.Entity;
-using Instagram.Models.VerificationRequest.Request;
+using Instagram.Models.AccountVerification.Request;
 
 namespace Instagram.Application.Abstraction
 {

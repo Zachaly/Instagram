@@ -1,4 +1,4 @@
-﻿namespace Instagram.Models.VerificationRequest.Request
+﻿namespace Instagram.Models.AccountVerification.Request
 {
     public class GetAccountVerificationRequest : PagedRequest
     {
@@ -7,5 +7,6 @@
         public long? Created { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public string? DateOfBirth { get; set; }
     }
 }
