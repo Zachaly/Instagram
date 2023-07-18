@@ -19,7 +19,8 @@
             "TRUNCATE TABLE [UserBan]",
             "TRUNCATE TABLE [Relation]",
             "TRUNCATE TABLE [RelationImage]",
-            "TRUNCATE TABLE [DirectMessage]"
+            "TRUNCATE TABLE [DirectMessage]",
+            "TRUNCATE TABLE [AccountVerification]"
         };
     }
 }

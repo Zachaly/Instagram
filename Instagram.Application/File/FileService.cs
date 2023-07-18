@@ -10,6 +10,7 @@ namespace Instagram.Application
         private readonly string _defaultFileName;
         private readonly string _postImagePath;
         private readonly string _relationImagePath;
+        private readonly string _verificationDocumentPath;
 
         public FileService(IConfiguration configuration)
         {
@@ -17,6 +18,7 @@ namespace Instagram.Application
             _defaultFileName = configuration["File:Default"]!;
             _postImagePath = configuration["File:Post"]!;
             _relationImagePath = configuration["File:Relation"]!;
+            _verificationDocumentPath = configuration["File:Verification"]!;
         }
 
         private FileStream ReadFile(string path, string name)
@@ -161,19 +163,30 @@ namespace Instagram.Application
             return newName;
         }
 
-        public Task<string> SaveVerificationDocumentAsync(IFormFile file)
+        public async Task<string> SaveVerificationDocumentAsync(IFormFile file)
         {
-            throw new NotImplementedException();
+            Directory.CreateDirectory(_verificationDocumentPath);
+
+            var newName = $"{Guid.NewGuid()}.png";
+
+            var path = Path.Combine(_verificationDocumentPath, newName);
+
+            using (var stream = File.Create(path))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return newName;
         }
 
         public Task RemoveVerificationDocumentAsync(string fileName)
         {
-            throw new NotImplementedException();
+            File.Delete(Path.Join(_verificationDocumentPath, fileName));
+
+            return Task.CompletedTask;
         }
 
         public Task<FileStream> GetVerificationDocumentAsync(string fileName)
-        {
-            throw new NotImplementedException();
-        }
+            => Task.FromResult(ReadFile(_verificationDocumentPath, fileName));
     }
 }
