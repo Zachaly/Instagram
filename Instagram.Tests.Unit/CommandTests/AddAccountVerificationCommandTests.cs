@@ -76,7 +76,7 @@ namespace Instagram.Tests.Unit.CommandTests
         public async Task Handle_ExceptionThrown_Failure()
         {
             const string Error = "err";
-            _fileService.Setup(x => x.SaveProfilePictureAsync(It.IsAny<IFormFile>()))
+            _fileService.Setup(x => x.SaveVerificationDocumentAsync(It.IsAny<IFormFile>()))
                 .ThrowsAsync(new Exception(Error));
 
             var res = await _handler.Handle(new AddAccountVerificationCommand(), default);

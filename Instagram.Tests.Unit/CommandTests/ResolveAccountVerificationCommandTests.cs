@@ -55,8 +55,7 @@ namespace Instagram.Tests.Unit.CommandTests
             var command = new ResolveAccountVerificationCommand
             {
                 Accepted = true,
-                Id = 1,
-                UserId = 2
+                Id = 1
             };
 
             var res = await _handler.Handle(command, default);
@@ -85,8 +84,7 @@ namespace Instagram.Tests.Unit.CommandTests
             var command = new ResolveAccountVerificationCommand
             {
                 Accepted = false,
-                Id = 1,
-                UserId = 2
+                Id = 1
             };
 
             var res = await _handler.Handle(command, default);

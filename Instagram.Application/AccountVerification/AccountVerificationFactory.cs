@@ -7,8 +7,14 @@ namespace Instagram.Application
     public class AccountVerificationFactory : IAccountVerificationFactory
     {
         public AccountVerification Create(AddAccountVerificationRequest request, string documentFile)
-        {
-            throw new NotImplementedException();
-        }
+            => new AccountVerification
+            {
+                Created = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                DateOfBirth = request.DateOfBirth,
+                DocumentFileName = documentFile,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                UserId = request.UserId,
+            };
     }
 }

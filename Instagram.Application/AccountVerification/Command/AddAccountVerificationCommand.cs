@@ -28,9 +28,22 @@ namespace Instagram.Application.Command
             _fileService = fileService;
         }
 
-        public Task<ResponseModel> Handle(AddAccountVerificationCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseModel> Handle(AddAccountVerificationCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var fileName = await _fileService.SaveVerificationDocumentAsync(request.Document);
+
+                var verification = _accountVerificationFactory.Create(request, fileName);
+
+                var newId = await _accountVerificationRepository.InsertAsync(verification);
+
+                return _responseFactory.CreateSuccess(newId);
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }
