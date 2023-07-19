@@ -107,5 +107,15 @@ namespace Instagram.Tests.Integration
                 .RuleFor(m => m.Content, f => f.Random.AlphaNumeric(20))
                 .RuleFor(m => m.Created, f => f.Random.Number(int.MaxValue))
                 .Generate(count);
+
+        public static List<AccountVerification> GenerateAccountVerification(long userId, int count)
+            => new Faker<AccountVerification>()
+                .RuleFor(v => v.UserId, _ => userId)
+                .RuleFor(v => v.DocumentFileName, f => f.Random.AlphaNumeric(20))
+                .RuleFor(v => v.Created, f => f.Random.Long(0))
+                .RuleFor(v => v.FirstName, f => f.Name.FirstName())
+                .RuleFor(v => v.LastName, f => f.Name.LastName())
+                .RuleFor(v => v.DateOfBirth, f => "10.04.2010")
+                .Generate(count);
     }
 }

@@ -8,7 +8,7 @@
         <div class="media-content" style="margin: auto auto;">
             <p class="title is-5">
                 <router-link :to="{ name: 'user', params: { id } }">
-                    {{ nickName }}
+                    {{ nickName }} <font-awesome-icon :icon="['fas', 'check']" v-if="verified"/>
                 </router-link>
             </p>
         </div>
@@ -16,10 +16,12 @@
 </template>
 
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
     nickName: string,
-    id: number
+    id: number,
+    verified?: boolean
 }>()
 </script>
 

@@ -34,6 +34,7 @@ namespace Instagram.Tests.Unit.FactoryTests
             Assert.Equal(request.Gender, user.Gender);
             Assert.Equal(request.Nickname, user.Nickname);
             Assert.Equal(PasswordHash, user.PasswordHash);
+            Assert.False(user.Verified);
         }
 
         [Fact]

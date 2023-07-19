@@ -15,7 +15,8 @@ namespace Instagram.Application
                 Gender = request.Gender,
                 Name = request.Name,
                 Nickname = request.Nickname,
-                PasswordHash = passwordHash
+                PasswordHash = passwordHash,
+                Verified = false
             };
 
         public LoginResponse CreateLoginResponse(long userId, string token, string email, IEnumerable<UserClaim> claims)

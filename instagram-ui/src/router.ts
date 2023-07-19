@@ -12,6 +12,8 @@ import AdminPage from './pages/AdminPage.vue'
 import ModerationPage from './pages/ModerationPage.vue'
 import PostReportPage from './pages/PostReportPage.vue'
 import ChatPage from './pages/ChatPage.vue'
+import AccounterVerificationPage from './pages/AccountVerificationPage.vue'
+import VerifyAccountPage from './pages/VerifyAccountPage.vue'
 
 const createRoute = (path: string, name: string, component: Component) => ({ path, name, component })
 
@@ -27,8 +29,11 @@ const routes = [
     createRoute('/admin', 'admin', AdminPage),
     createRoute('/moderation', 'moderation', ModerationPage),
     createRoute('/report/:id', 'post-report', PostReportPage),
-    createRoute('/chat/:userId', 'chat', ChatPage)
+    createRoute('/chat/:userId', 'chat', ChatPage),
+    createRoute('/verify-account', 'verify-account', VerifyAccountPage),
+    createRoute('/account-verification/:id', 'account-verification', AccounterVerificationPage)
 ]
+
 export default createRouter({
     routes,
     history: createWebHistory()

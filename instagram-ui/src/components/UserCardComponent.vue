@@ -9,7 +9,7 @@
                 </div>
                 <div class="media-content">
                     <p class="title">
-                        {{ user.nickname }}
+                        {{ user.nickname }} <font-awesome-icon :icon="['fas', 'check']" v-if="user.verified" />
                         <button @click="follow"
                             v-if="!authStore.userFollowsIds.includes(user.id) && authStore.isAuthorized && user.id !== authStore.userId()"
                             class="button is-success">
@@ -55,6 +55,7 @@ import { useAuthStore } from '@/store/authStore';
 import axios from 'axios';
 import { Ref, onMounted, ref } from 'vue';
 import FollowerListComponent from './FollowerListComponent.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
     user: UserModel

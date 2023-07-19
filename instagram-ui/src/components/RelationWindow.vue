@@ -1,6 +1,5 @@
 <template>
     <div class="fixed-center box" style="min-width: 20vw;">
-
         <div class="has-text-centered">
             <font-awesome-icon @click="$emit('close')" :icon="['fas', 'x']" />
         </div>
