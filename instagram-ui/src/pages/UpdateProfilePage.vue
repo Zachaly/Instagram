@@ -3,22 +3,26 @@
         <NavigationPage>
             <div class="columns is-centered">
                 <div class="column is-5">
+                    <p class="title">
+                        Update profile
+                        <router-link class="button is-link" to="/verify-account" v-if="!isVerified">Verify</router-link>
+                    </p>
                     <div class="control">
                         <label class="label">Nickname</label>
                         <input class="input" v-model="request.nickname" />
-                        <ValidationErrorListComponent v-if="validation.Nickname" :errors="validation.Nickname"/>
+                        <ValidationErrorListComponent v-if="validation.Nickname" :errors="validation.Nickname" />
                     </div>
                     <div class="control">
                         <label class="label">Name</label>
                         <input class="input" v-model="request.name" />
-                        <ValidationErrorListComponent v-if="validation.Name" :errors="validation.Name"/>
+                        <ValidationErrorListComponent v-if="validation.Name" :errors="validation.Name" />
                     </div>
                     <div class="control">
                         <label class="label">Bio</label>
                         <textarea rows="4" class="textarea" v-model="request.bio">
-                            
+
                         </textarea>
-                        <ValidationErrorListComponent v-if="validation.Bio" :errors="validation.Bio"/>
+                        <ValidationErrorListComponent v-if="validation.Bio" :errors="validation.Bio" />
                     </div>
                     <div class="select mt-1">
                         <select class="select" v-model="request.gender">
@@ -62,7 +66,8 @@
                     <div class="control">
                         <label class="label">New password</label>
                         <input type="password" class="input" v-model="changePasswordRequest.newPassword">
-                        <ValidationErrorListComponent v-if="changePasswordValidation.NewPassword" :errors="changePasswordValidation.NewPassword"/>
+                        <ValidationErrorListComponent v-if="changePasswordValidation.NewPassword"
+                            :errors="changePasswordValidation.NewPassword" />
                     </div>
                     <div class="control">
                         <button class="button is-info" @click="changePassword">Change password</button>
@@ -92,6 +97,8 @@ const authStore = useAuthStore()
 const request: UpdateUserRequest = reactive({
     id: authStore.userId()
 })
+
+const isVerified = ref(false)
 
 const validation: Ref<{
     Name?: string[],
@@ -152,6 +159,7 @@ const loadUser = () => {
         request.bio = res.data.bio
         request.gender = res.data.gender
         request.nickname = res.data.nickname
+        isVerified.value = res.data.verified
     })
 }
 

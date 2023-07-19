@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Instagram.Api.Controllers
 {
     [Route("/api/account-verification")]
-    [Authorize(Policy = AuthPolicyNames.Moderator)]
+    [NotBanned]
     public class AccountVerificationController : ControllerBase
     {
         private readonly IAccountVerificationServiceProxy _accountVerificationServiceProxy;
@@ -30,6 +30,7 @@ namespace Instagram.Api.Controllers
         /// <response code="200">List of verification requests</response>
         [HttpGet]
         [ProducesResponseType(200)]
+        [Authorize(Policy = AuthPolicyNames.Moderator)]
         public async Task<ActionResult<IEnumerable<AccountVerificationModel>>> GetAsync([FromQuery] GetAccountVerificationRequest request)
         {
             var res = await _accountVerificationServiceProxy.GetAsync(request);
@@ -45,6 +46,7 @@ namespace Instagram.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
+        [Authorize(Policy = AuthPolicyNames.Moderator)]
         public async Task<ActionResult<AccountVerificationModel>> GetByIdAsync(long id)
         {
             var res = await _accountVerificationServiceProxy.GetByIdAsync(id);
@@ -58,6 +60,7 @@ namespace Instagram.Api.Controllers
         /// <response code="200">Number of requests</response>
         [HttpGet("count")]
         [ProducesResponseType(200)]
+        [Authorize(Policy = AuthPolicyNames.Moderator)]
         public async Task<ActionResult<int>> GetCountAsync([FromQuery] GetAccountVerificationRequest request)
         {
             var res = await _accountVerificationServiceProxy.GetCountAsync(request);
@@ -73,7 +76,6 @@ namespace Instagram.Api.Controllers
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        [NotBanned]
         public async Task<ActionResult<ResponseModel>> PostAsync([FromForm] AddAccountVerificationCommand command)
         {
             var res = await _mediator.Send(command);
@@ -88,6 +90,7 @@ namespace Instagram.Api.Controllers
         [HttpPut("resolve")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [Authorize(Policy = AuthPolicyNames.Moderator)]
         public async Task<ActionResult<ResponseModel>> ResolveAsync(ResolveAccountVerificationCommand command)
         {
             var res = await _mediator.Send(command);

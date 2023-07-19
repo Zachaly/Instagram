@@ -5,5 +5,6 @@ export default interface UserModel {
     name: string,
     nickname: string,
     bio: string,
-    gender: Gender
+    gender: Gender,
+    verified: boolean
 }

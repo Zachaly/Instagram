@@ -1,7 +1,7 @@
 import axios from "axios";
 import QueryString from "qs";
 import { API_URL } from "./constants";
-import { faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch, faX, faHeart } from '@fortawesome/free-solid-svg-icons'
+import { faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch, faX, faHeart, faCheck } from '@fortawesome/free-solid-svg-icons'
 import { library } from '@fortawesome/fontawesome-svg-core'
 
 export const axiosConfig = () => {
@@ -10,5 +10,5 @@ export const axiosConfig = () => {
 }
 
 export const fontAwesomeConfig = () => {
-    library.add(faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch, faX, faHeart)
+    library.add(faImage, faCaretLeft, faCaretRight, faCircle, faCircleNotch, faX, faHeart, faCheck)
 }

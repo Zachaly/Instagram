@@ -1,12 +1,15 @@
 <template>
     <AuthorizedPage :allowed-claims="[ADMIN_CLAIM, MODERATOR_CLAIM]">
         <NavigationPage :hide-search="true">
-            <TabsComponent :names="['Unresolved', 'Resolved', 'Bans']" @select="selectIndex" />
+            <TabsComponent :names="['Unresolved', 'Resolved', 'Bans', 'Account Verifications']" @select="selectIndex" />
             <div v-if="currentIndex == 0 || currentIndex == 1">
                 <PostReportListItemComponent  v-for="report in reports" :key="report.id" :report="report" />
             </div>
             <div v-else-if="currentIndex == 2">
                 <BanListComponent/>
+            </div>
+            <div v-else-if="currentIndex == 3">
+                <AccountVerificationListComponent/>
             </div>
         </NavigationPage>
     </AuthorizedPage>
@@ -23,6 +26,7 @@ import PostReportModel from '@/models/PostReportModel';
 import GetPostReportRequest from '@/models/request/get/GetPostReportRequest';
 import PostReportListItemComponent from '@/components/PostReportListItemComponent.vue';
 import BanListComponent from '@/components/BanListComponent.vue';
+import AccountVerificationListComponent from '@/components/AccountVerificationListComponent.vue';
 
 const currentIndex = ref(0)
 

@@ -17,6 +17,7 @@ namespace Instagram.Database.Migrations
             Create.Column("Verified")
                 .OnTable("User")
                 .AsBoolean()
+                .WithDefaultValue(false)
                 .NotNullable();
 
             Create.Table("AccountVerification")

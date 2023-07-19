@@ -9,5 +9,6 @@ namespace Instagram.Models.User
         public string Name { get; set; }
         public string Bio { get; set; }
         public Gender Gender { get; set; }
+        public bool Verified { get; set; }
     }
 }

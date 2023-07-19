@@ -1,4 +1,5 @@
-﻿using Instagram.Api.Infrastructure;
+﻿using Instagram.Api.Authorization;
+using Instagram.Api.Infrastructure;
 using Instagram.Application.Command;
 using Instagram.Models.Response;
 using MediatR;
@@ -77,7 +78,8 @@ namespace Instagram.Api.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("account-verificaton/{id}")]
+        [HttpGet("account-verification/{id}")]
+        [Authorize(Policy = AuthPolicyNames.Moderator)]
         public async Task<FileStreamResult> GetVerificationImage(long id)
         {
             var res = await _mediator.Send(new GetVerificationDocumentQuery { Id = id });
