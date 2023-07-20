@@ -7,5 +7,6 @@ namespace Instagram.Database.Repository
 {
     public interface INotificationRepository : IRepositoryBase<Notification, NotificationModel, GetNotificationRequest>
     {
+        Task UpdateAsync(UpdateNotificationRequest request);
     }
 }

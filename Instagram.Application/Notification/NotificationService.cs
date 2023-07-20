@@ -7,7 +7,7 @@ using Instagram.Models.Response;
 
 namespace Instagram.Application
 {
-    internal class NotificationService : ServiceBase<Notification, NotificationModel, GetNotificationRequest, INotificationRepository>,
+    public class NotificationService : ServiceBase<Notification, NotificationModel, GetNotificationRequest, INotificationRepository>,
         INotificationService
     {
         private readonly INotificationFactory _notificationFactory;
@@ -26,6 +26,11 @@ namespace Instagram.Application
         }
 
         public Task<ResponseModel> DeleteByIdAsync(long id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseModel> UpdateAsync(UpdateNotificationRequest request)
         {
             throw new NotImplementedException();
         }

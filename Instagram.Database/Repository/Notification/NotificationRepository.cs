@@ -4,6 +4,7 @@ using Instagram.Database.Sql;
 using Instagram.Domain.Entity;
 using Instagram.Models.Notification;
 using Instagram.Models.Notification.Request;
+
 namespace Instagram.Database.Repository
 {
     public class NotificationRepository : RepositoryBase<Notification, NotificationModel, GetNotificationRequest>, INotificationRepository
@@ -12,6 +13,11 @@ namespace Instagram.Database.Repository
         {
             Table = "Notification";
             DefaultOrderBy = "[Notification].[Created] DESC";
+        }
+
+        public Task UpdateAsync(UpdateNotificationRequest request)
+        {
+            throw new NotImplementedException();
         }
     }
 }
