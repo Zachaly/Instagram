@@ -117,5 +117,13 @@ namespace Instagram.Tests.Integration
                 .RuleFor(v => v.LastName, f => f.Name.LastName())
                 .RuleFor(v => v.DateOfBirth, f => "10.04.2010")
                 .Generate(count);
+
+        public static List<Notification> GenerateNotifications(long userId, int count)
+            => new Faker<Notification>()
+                .RuleFor(n => n.UserId, _ => userId)
+                .RuleFor(n => n.IsRead, _ => false)
+                .RuleFor(n => n.Created, f => f.Random.Long(0))
+                .RuleFor(n => n.Message, f => f.Random.AlphaNumeric(50))
+                .Generate(count);
     }
 }
