@@ -7,8 +7,12 @@ namespace Instagram.Application
     public class NotificationFactory : INotificationFactory
     {
         public Notification Create(AddNotificationRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => new Notification
+            {
+                Created = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                IsRead = false,
+                Message = request.Message,
+                UserId = request.UserId,
+            };
     }
 }
