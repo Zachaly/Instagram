@@ -42,6 +42,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IRelationImageRepository, RelationImageRepository>();
             services.AddScoped<IDirectMessageRepository, DirectMessageRepository>();
             services.AddScoped<IAccountVerificationRepository, AccountVerificationRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -69,6 +70,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IRelationService, RelationService>();
             services.AddScoped<IDirectMessageService, DirectMessageService>();
             services.AddScoped<IAccountVerificationService, AccountVerificationService>();
+            services.AddScoped<INotificationFactory, NotificationFactory>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -83,6 +85,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IRelationFactory, RelationFactory>();
             services.AddScoped<IDirectMessageFactory, DirectMessageFactory>();
             services.AddScoped<IAccountVerificationFactory, AccountVerificationFactory>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
 
@@ -106,6 +109,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IRelationServiceProxy, RelationServiceProxy>();
             services.AddScoped<IDirectMessageServiceProxy, DirectMessageServiceProxy>();
             services.AddScoped<IAccountVerificationServiceProxy, AccountVerificationServiceProxy>();
+            services.AddScoped<INotificationServiceProxy, NotificationServiceProxy>();
 
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipeline<,>));
