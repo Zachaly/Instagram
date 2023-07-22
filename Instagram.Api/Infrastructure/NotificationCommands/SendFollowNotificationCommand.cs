@@ -1,5 +1,4 @@
 ﻿using Instagram.Api.Hubs;
-using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
 using Instagram.Models.Notification.Request;
@@ -39,7 +38,7 @@ namespace Instagram.Api.Infrastructure.NotificationCommands
 
             var response = await _notificationService.AddAsync(addNotificationRequest);
 
-            await _notificationHub.Clients.Client(request.FollowedUserId.ToString())
+            await _notificationHub.Clients.User(request.FollowedUserId.ToString())
                 .NotificationReceived(await _notificationService.GetByIdAsync(response.NewEntityId.Value));
         }
     }

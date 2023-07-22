@@ -38,7 +38,7 @@ namespace Instagram.Api.Infrastructure.NotificationCommands
 
             var response = await _notificationService.AddAsync(addNotificationRequest);
 
-            await _notificationHub.Clients.Client(request.ReceiverId.ToString())
+            await _notificationHub.Clients.User(request.ReceiverId.ToString())
                 .NotificationReceived(await _notificationService.GetByIdAsync(response.NewEntityId.Value));
         }
     }

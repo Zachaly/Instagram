@@ -1,7 +1,7 @@
 <template>
     <div style="width: 30vw; max-width: 30%;" class="mb-4">
         <input type="text" class="input" v-model="searchVal" placeholder="search" @input="onSearch">
-        <div style="position: fixed; z-index: 1;">
+        <div v-if="users.length > 0" style="position: fixed; z-index: 1; width: 25vw; max-width: 30%;" class="has-background-light">
             <UserLinkComponent v-for="user in users" :key="user.id" :id="user.id" :nick-name="user.nickname"/>
         </div>
     </div>

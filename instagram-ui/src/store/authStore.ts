@@ -58,6 +58,8 @@ export const useAuthStore = defineStore('auth', () => {
 
     const userId = (): number => authInfo.value.userId
 
+    const token = () => authInfo.value.authToken
+
     const loadFromSavedToken = (): Promise<boolean> => new Promise((resolve, reject) => {
         const token = localStorage.getItem(TOKEN_ITEM)
         if (!token) {
@@ -73,5 +75,5 @@ export const useAuthStore = defineStore('auth', () => {
         })
     })
 
-    return { isAuthorized, authorize, logout, userId, updateFollows, userFollowsIds, hasClaim, loadFromSavedToken }
+    return { isAuthorized, authorize, logout, userId, updateFollows, userFollowsIds, hasClaim, loadFromSavedToken, token }
 })  
