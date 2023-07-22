@@ -1,6 +1,7 @@
 ﻿using FluentMigrator.Runner;
 using FluentValidation;
 using Instagram.Api.Authorization;
+using Instagram.Api.Infrastructure.NotificationCommands;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application;
 using Instagram.Application.Abstraction;
@@ -15,7 +16,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using System.Reflection;
 using System.Text;
 
 namespace Instagram.Api.Infrastructure
@@ -87,11 +87,12 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IAccountVerificationFactory, AccountVerificationFactory>();
             services.AddScoped<INotificationService, NotificationService>();
 
-            services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
+            services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();           
 
             services.AddMediatR(opt =>
             {
                 opt.RegisterServicesFromAssemblyContaining<LoginCommand>();
+                opt.RegisterServicesFromAssemblyContaining<SendFollowNotificationCommand>();
             });
         }
         
@@ -133,6 +134,37 @@ namespace Instagram.Api.Infrastructure
                     IssuerSigningKey = key,
                     ValidIssuer = builder.Configuration["Auth:Issuer"],
                     ValidAudience = builder.Configuration["Auth:Audience"],
+                };
+            }).AddJwtBearer(AuthPolicyNames.WebSocketScheme, config =>
+            {
+                var bytes = Encoding.UTF8.GetBytes(builder.Configuration["Auth:SecretKey"]);
+                var key = new SymmetricSecurityKey(bytes);
+
+                config.SaveToken = true;
+                config.RequireHttpsMetadata = false;
+                config.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = key,
+                    ValidIssuer = builder.Configuration["Auth:Issuer"],
+                    ValidAudience = builder.Configuration["Auth:Audience"],
+                };
+                config.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = (context) =>
+                    {
+                        var path = context.HttpContext.Request.Path;
+                        if (path.StartsWithSegments("/ws"))
+                        {
+                            var token = context.Request.Query["access_token"];
+
+                            if (!string.IsNullOrWhiteSpace(token))
+                            {
+                                context.Token = token;
+                            }
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 

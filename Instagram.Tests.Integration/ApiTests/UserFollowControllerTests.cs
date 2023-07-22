@@ -75,14 +75,21 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
-        public async Task PostAsync_AddsFollow()
+        public async Task PostAsync_AddsFollowAndNotification()
         {
             await Authorize();
 
+            var usersToInsert = FakeDataFactory.GenerateUsers(2);
+
+            Insert("User", usersToInsert);
+
+            var userIds = GetFromDatabase<long>("SELECT Id FROM [User] WHERE Nickname IN @Names",
+                new { Names = usersToInsert.Select(x => x.Nickname) });
+
             var request = new AddUserFollowRequest
             {
-                FollowedUserId = 2,
-                FollowingUserId = 3
+                FollowedUserId = userIds.First(),
+                FollowingUserId = userIds.Last()
             };
 
             var response = await _httpClient.PostAsJsonAsync(Endpoint, request);
@@ -92,6 +99,7 @@ namespace Instagram.Tests.Integration.ApiTests
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Contains(follows, x => x.FollowedUserId == request.FollowedUserId && x.FollowingUserId == request.FollowingUserId);
             Assert.Single(follows);
+            Assert.Contains(GetFromDatabase<Notification>("SELECT * FROM Notification"), x => x.UserId == request.FollowedUserId);
         }
 
         [Fact]
