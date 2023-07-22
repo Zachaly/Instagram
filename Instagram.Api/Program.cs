@@ -1,3 +1,4 @@
+using Instagram.Api.Hubs;
 using Instagram.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,8 @@ builder.Services.RegisterProxies();
 builder.Services.ConfigureSwagger();
 
 builder.ConfigureAuthorization();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddHostedService<BanCancellationService>();
 
@@ -42,6 +45,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<NotificationHub>("ws/notification");
 
 app.Run();
 

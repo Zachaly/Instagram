@@ -80,14 +80,21 @@ namespace Instagram.Tests.Integration.ApiTests
         }
 
         [Fact]
-        public async Task PostAsync_AddsMessage()
+        public async Task PostAsync_AddsMessageAndNotification()
         {
             await Authorize();
 
+            var usersToInsert = FakeDataFactory.GenerateUsers(2);
+
+            Insert("User", usersToInsert);
+
+            var userIds = GetFromDatabase<long>("SELECT Id FROM [User] WHERE Nickname IN @Names",
+                new { Names = usersToInsert.Select(x => x.Nickname) });
+
             var request = new AddDirectMessageRequest
             {
-                SenderId = 1,
-                ReceiverId = 2,
+                SenderId = userIds.First(),
+                ReceiverId = userIds.Last(),
                 Content = "content"
             };
 
@@ -97,6 +104,7 @@ namespace Instagram.Tests.Integration.ApiTests
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Contains(messages, msg => msg.Content == request.Content && msg.SenderId == request.SenderId && msg.ReceiverId == request.ReceiverId);
+            Assert.Contains(GetFromDatabase<Notification>("SELECT * FROM Notification"), x => x.UserId == request.ReceiverId);
         }
 
         [Fact]
