@@ -24,7 +24,7 @@ import { useAuthStore } from '@/store/authStore';
 import AuthorizedPage from './AuthorizedPage.vue';
 import NavigationPage from './NavigationPage.vue';
 import { useRoute } from 'vue-router';
-import { Ref, onMounted, ref } from 'vue';
+import { Ref, onMounted, onUnmounted, ref } from 'vue';
 import DirectMessageModel from '@/models/DirectMessageModel';
 import UserModel from '@/models/UserModel';
 import axios, { AxiosResponse } from 'axios';
@@ -34,8 +34,11 @@ import DirectMessageComponent from '@/components/DirectMessageComponent.vue';
 import ResponseModel from '@/models/ResponseModel';
 import UpdateDirectMessageRequest from '@/models/request/UpdateDirectMessageRequest';
 import EndlessScrollComponent from '@/components/EndlessScrollComponent.vue';
+import { useSignalRStore } from '@/store/signalrStore';
 
 const authStore = useAuthStore()
+const signalR = useSignalRStore()
+const connectionId = ref('')
 
 const route = useRoute()
 
@@ -51,7 +54,7 @@ const currentPageIndex = ref(0)
 const newMessageContent = ref('')
 
 const readMessage = (msg: DirectMessageModel, push: boolean = true) => {
-    if(push){
+    if (push) {
         messages.value.push(msg)
     } else {
         messages.value.unshift(msg)
@@ -67,9 +70,7 @@ const readMessage = (msg: DirectMessageModel, push: boolean = true) => {
         read: true
     }
 
-    axios.patch('direct-message', patchRequest).then(() => {
-
-    })
+    axios.patch('direct-message', patchRequest).then()
 }
 
 const sendMessage = () => {
@@ -81,12 +82,7 @@ const sendMessage = () => {
 
     axios.post('direct-message', request).then((res: AxiosResponse<ResponseModel>) => {
         newMessageContent.value = ''
-        axios.get<DirectMessageModel>(`direct-message/${res.data.newEntityId}`).then(r => {
-            messages.value.push(r.data)
-        })
-    }).catch(() => {
-
-    })
+    }).catch()
 }
 
 const loadMessages = () => {
@@ -109,9 +105,28 @@ const loadMessages = () => {
 }
 
 const onTop = () => {
-    if(!blockScroll.value){
+    if (!blockScroll.value) {
         loadMessages()
     }
+}
+
+const startListening = async () => {
+    const id = await signalR.openConnection('direct-message')
+
+    signalR.addConnectionListener(id, 'MessageReceived', (msg: DirectMessageModel) => {
+        if (msg.senderId == userId || msg.senderId == authStore.userId()) {
+            readMessage(msg, true)
+        }
+    })
+
+    signalR.addConnectionListener(id, 'MessageRead', (id: number, isRead: boolean) => {
+        const msg = messages.value.find(x => x.id == id)
+        if (msg) {
+            msg.read = isRead
+        }
+    })
+
+    connectionId.value = id
 }
 
 onMounted(() => {
@@ -120,5 +135,12 @@ onMounted(() => {
     })
 
     loadMessages()
+
+    startListening()
+})
+
+onUnmounted(() => {
+    console.log('unmyn')
+    signalR.stopConnection(connectionId.value)
 })
 </script>

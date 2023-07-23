@@ -45,6 +45,12 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
                     ReceiverId = request.ReceiverId,
                     SenderId = request.SenderId,
                 });
+
+                await _mediator.Send(new SendReceivedMessageCommand
+                {
+                    ReceiverId = request.ReceiverId,
+                    MessageId = response.NewEntityId!.Value
+                });
             }
 
             return response;
@@ -70,6 +76,14 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             var response = validation.IsValid ? await _service.UpdateAsync(request) : _responseFactory.CreateValidationError(validation);
 
             LogResponse(response, "Update");
+
+            if(response.Success)
+            {
+                await _mediator.Send(new SendMessageReadCommand
+                {
+                    MessageId = request.Id
+                });
+            }
 
             return response;
         }
