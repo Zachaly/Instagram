@@ -7,12 +7,12 @@ import { WS_ENDPOINT } from "@/constants";
 export const useSignalRStore = defineStore('signalR', () => {
     const authStore = useAuthStore()
 
-    const connections: Ref<{ connection: HubConnection, name: string}[]> = ref([])
+    const connections: Ref<{ connection: HubConnection, name: string }[]> = ref([])
 
     const openConnection = async (name: string): Promise<string> => {
         const existentConnection = connections.value.find(x => x.name == name)
 
-        if(existentConnection) {
+        if (existentConnection) {
             return existentConnection.connection.connectionId!
         }
 
@@ -44,6 +44,8 @@ export const useSignalRStore = defineStore('signalR', () => {
     const stopConnection = (id: string) => {
         const connection = connections.value.find(x => x.connection.connectionId == id)?.connection
         connection?.stop()
+
+        connections.value = connections.value.filter(x => x.connection.connectionId !== id)
     }
 
     const addConnectionListener = (id: string, event: string, callback: (...args: any[]) => any) => {
@@ -52,5 +54,5 @@ export const useSignalRStore = defineStore('signalR', () => {
         connection?.on(event, callback)
     }
 
-    return { openConnection, stopAllConnections, stopConnection, addConnectionListener } 
+    return { openConnection, stopAllConnections, stopConnection, addConnectionListener }
 })
