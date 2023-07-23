@@ -47,6 +47,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<NotificationHub>("ws/notification");
+app.MapHub<DirectMessageHub>("ws/direct-message");
 
 app.Run();
 
