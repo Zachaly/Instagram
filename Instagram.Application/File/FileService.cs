@@ -188,5 +188,20 @@ namespace Instagram.Application
 
         public Task<FileStream> GetVerificationDocumentAsync(string fileName)
             => Task.FromResult(ReadFile(_verificationDocumentPath, fileName));
+
+        public Task<IEnumerable<string>> SaveStoryImagesAsync(IEnumerable<IFormFile> files)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveStoryImageAsync(string fileName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FileStream> GetStoryImageAsync(string fileName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
