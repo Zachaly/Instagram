@@ -18,10 +18,5 @@ namespace Instagram.Application.UserStory
         {
             throw new NotImplementedException();
         }
-
-        public Task<UserStoryModel> GetByUserIdAsync(long userId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

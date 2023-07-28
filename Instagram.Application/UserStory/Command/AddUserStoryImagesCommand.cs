@@ -9,7 +9,7 @@ namespace Instagram.Application.Command
     public class AddUserStoryImagesCommand : IValidatedRequest
     {
         public long UserId { get; set; }
-        public IFormFile Images { get; set; }
+        public IEnumerable<IFormFile> Images { get; set; }
     }
 
     public class AddUserStoryImagesHandler : IRequestHandler<AddUserStoryImagesCommand, ResponseModel>

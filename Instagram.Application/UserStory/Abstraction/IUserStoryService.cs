@@ -5,7 +5,6 @@ namespace Instagram.Application.Abstraction
 {
     public interface IUserStoryService
     {
-        Task<UserStoryModel> GetByUserIdAsync(long userId);
         Task<IEnumerable<UserStoryModel>> GetAsync(GetUserStoryRequest request);
     }
 }
