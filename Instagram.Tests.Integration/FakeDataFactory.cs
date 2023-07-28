@@ -125,5 +125,12 @@ namespace Instagram.Tests.Integration
                 .RuleFor(n => n.Created, f => f.Random.Long(0))
                 .RuleFor(n => n.Message, f => f.Random.AlphaNumeric(50))
                 .Generate(count);
+
+        public static List<UserStoryImage> GenerateStoryImages(long userId, int count)
+            => new Faker<UserStoryImage>()
+                .RuleFor(s => s.UserId, _ => userId)
+                .RuleFor(s => s.Created, f => f.Random.Long(0))
+                .RuleFor(s => s.FileName, f => f.Random.AlphaNumeric(20))
+                .Generate(count);
     }
 }

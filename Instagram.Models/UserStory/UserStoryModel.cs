@@ -2,7 +2,7 @@
 
 namespace Instagram.Models.UserStory
 {
-    [Join(Condition = "[User].[Id]=[UserStoryImage].[UserId]", Table = "UserStoryImage", OutsideJoin = true)]
+    [Join(Condition = "t.[UserId]=[UserStoryImage].[UserId]", Table = "UserStoryImage", OutsideJoin = true)]
     public class UserStoryModel : IModel
     {
         [SqlName("[User].[Id]")]
@@ -11,7 +11,7 @@ namespace Instagram.Models.UserStory
         [SqlName("[User].[Nickname]")]
         public string UserName { get; set; }
 
-        [SqlName("[UserStoryImage].*")]
+        [SqlName("[UserStoryImage].*", OuterQuery = true)]
         public IEnumerable<UserStoryImageModel> Images { get; set; }
     }
 }

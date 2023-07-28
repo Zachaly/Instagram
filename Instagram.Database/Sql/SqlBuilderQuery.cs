@@ -13,6 +13,7 @@ namespace Instagram.Database.Sql
         private readonly StringBuilder _orderBy = new StringBuilder("");
         private readonly StringBuilder _conditionalJoin = new StringBuilder("");
         private readonly StringBuilder _conditionalSelect = new StringBuilder("");
+        private readonly StringBuilder _outerOrderBy = new StringBuilder("");
         private string _pagination = "";
 
         public SqlBuilderQuery(string template, string table)
@@ -29,6 +30,7 @@ namespace Instagram.Database.Sql
                 .Replace("/**pagination**/", _pagination)
                 .Replace("/**conditionaljoin**/", _conditionalJoin.ToString())
                 .Replace("/**conditionalselect**/", _conditionalSelect.ToString())
+                .Replace("/**outerOrderBy**/", _outerOrderBy.ToString())
                 .ToString();
         }
 
@@ -69,6 +71,17 @@ namespace Instagram.Database.Sql
                 _orderBy.Append("ORDER BY ");
             }
             _orderBy.Append(orderBy);
+
+            return this;
+        }
+
+        public ISqlBuilderQuery OuterOrderBy(string orderBy)
+        {
+            if (_outerOrderBy.ToString() == "")
+            {
+                _outerOrderBy.Append("ORDER BY ");
+            }
+            _outerOrderBy.Append(orderBy);
 
             return this;
         }

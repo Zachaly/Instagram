@@ -7,6 +7,7 @@ using Instagram.Application;
 using Instagram.Application.Abstraction;
 using Instagram.Application.Auth.Abstraction;
 using Instagram.Application.Command;
+using Instagram.Application.UserStory;
 using Instagram.Application.Validation;
 using Instagram.Database.Factory;
 using Instagram.Database.Migrations;
@@ -43,6 +44,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IDirectMessageRepository, DirectMessageRepository>();
             services.AddScoped<IAccountVerificationRepository, AccountVerificationRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<IUserStoryImageRepository, UserStoryImageRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -71,6 +73,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IDirectMessageService, DirectMessageService>();
             services.AddScoped<IAccountVerificationService, AccountVerificationService>();
             services.AddScoped<INotificationFactory, NotificationFactory>();
+            services.AddScoped<IUserStoryService, UserStoryService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -86,6 +89,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IDirectMessageFactory, DirectMessageFactory>();
             services.AddScoped<IAccountVerificationFactory, AccountVerificationFactory>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IUserStoryFactory, UserStoryFactory>();
 
             services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();           
 
