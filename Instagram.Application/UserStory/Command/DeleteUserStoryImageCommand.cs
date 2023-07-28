@@ -2,11 +2,6 @@
 using Instagram.Database.Repository;
 using Instagram.Models.Response;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Instagram.Application.Command
 {
@@ -29,9 +24,22 @@ namespace Instagram.Application.Command
             _responseFactory = responseFactory;
         }
 
-        public Task<ResponseModel> Handle(DeleteUserStoryImageCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseModel> Handle(DeleteUserStoryImageCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var image = await _userStoryImageRepository.GetEntityByIdAsync(request.Id);
+
+                await _userStoryImageRepository.DeleteByIdAsync(request.Id);
+
+                await _fileService.RemoveStoryImageAsync(image.FileName);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch(Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }

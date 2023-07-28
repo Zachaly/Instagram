@@ -3,6 +3,7 @@ using Instagram.Database.Repository;
 using Instagram.Models.Response;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using System.Transactions;
 
 namespace Instagram.Application.Command
 {
@@ -28,9 +29,30 @@ namespace Instagram.Application.Command
             _fileService = fileService;
         }
 
-        public Task<ResponseModel> Handle(AddUserStoryImagesCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseModel> Handle(AddUserStoryImagesCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var fileNames = await _fileService.SaveStoryImagesAsync(request.Images);
+
+                var images = fileNames.Select(name => _userStoryFactory.Create(request.UserId, name));
+
+                using(var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    foreach(var image in images)
+                    {
+                        await _userStoryImageRepository.InsertAsync(image);
+                    }
+
+                    scope.Complete();
+                }
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }

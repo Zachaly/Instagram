@@ -15,8 +15,6 @@ namespace Instagram.Application.UserStory
         }
 
         public Task<IEnumerable<UserStoryModel>> GetAsync(GetUserStoryRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => _repository.GetStoriesAsync(request);
     }
 }
