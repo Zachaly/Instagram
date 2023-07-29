@@ -86,5 +86,16 @@ namespace Instagram.Api.Controllers
 
             return new FileStreamResult(res, "image/jpg");
         }
+
+        /// <summary>
+        /// Returns story image with specified id
+        /// </summary>
+        [HttpGet("story-image/{id}")]
+        public async Task<FileStreamResult> GetStoryImage(long id)
+        {
+            var res = await _mediator.Send(new GetUserStoryImageQuery { Id = id });
+
+            return new FileStreamResult(res, "image/jpg");
+        }
     }
 }

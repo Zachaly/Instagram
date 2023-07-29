@@ -21,6 +21,7 @@ builder.ConfigureAuthorization();
 builder.Services.AddSignalR();
 
 builder.Services.AddHostedService<BanCancellationService>();
+builder.Services.AddHostedService<StoryDeletionService>();
 
 var app = builder.Build().MigrateDatabase();
 

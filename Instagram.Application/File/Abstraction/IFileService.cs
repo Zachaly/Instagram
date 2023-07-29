@@ -20,5 +20,9 @@ namespace Instagram.Application.Abstraction
         Task<string> SaveVerificationDocumentAsync(IFormFile file);
         Task RemoveVerificationDocumentAsync(string fileName);
         Task<FileStream> GetVerificationDocumentAsync(string fileName);
+
+        Task<IEnumerable<string>> SaveStoryImagesAsync(IEnumerable<IFormFile> files);
+        Task RemoveStoryImageAsync(string fileName);
+        Task<FileStream> GetStoryImageAsync(string fileName);
     }
 }

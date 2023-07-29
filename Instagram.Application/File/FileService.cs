@@ -11,6 +11,7 @@ namespace Instagram.Application
         private readonly string _postImagePath;
         private readonly string _relationImagePath;
         private readonly string _verificationDocumentPath;
+        private readonly string _storyImagePath;
 
         public FileService(IConfiguration configuration)
         {
@@ -19,6 +20,7 @@ namespace Instagram.Application
             _postImagePath = configuration["File:Post"]!;
             _relationImagePath = configuration["File:Relation"]!;
             _verificationDocumentPath = configuration["File:Verification"]!;
+            _storyImagePath = configuration["File:Story"]!;
         }
 
         private FileStream ReadFile(string path, string name)
@@ -188,5 +190,37 @@ namespace Instagram.Application
 
         public Task<FileStream> GetVerificationDocumentAsync(string fileName)
             => Task.FromResult(ReadFile(_verificationDocumentPath, fileName));
+
+        public async Task<IEnumerable<string>> SaveStoryImagesAsync(IEnumerable<IFormFile> files)
+        {
+            Directory.CreateDirectory(_storyImagePath);
+
+            var names = new List<string>();
+
+            foreach (var file in files)
+            {
+                var newName = $"{Guid.NewGuid()}.png";
+
+                var path = Path.Combine(_storyImagePath, newName);
+
+                using (var stream = File.Create(path))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                names.Add(newName);
+            }
+
+            return names;
+        }
+
+        public Task RemoveStoryImageAsync(string fileName)
+        {
+            File.Delete(Path.Join(_storyImagePath, fileName));
+
+            return Task.CompletedTask;
+        }
+
+        public Task<FileStream> GetStoryImageAsync(string fileName)
+            => Task.FromResult(ReadFile(_storyImagePath, fileName));
     }
 }
