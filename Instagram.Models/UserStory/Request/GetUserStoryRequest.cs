@@ -9,7 +9,7 @@ namespace Instagram.Models.UserStory.Request
         public long? Created { get; set; }
         public string? FileName { get; set; }
 
-        [Where(Condition = "[UserStoryImage].[UserId] IN ")]
+        [Where(Condition = "[User].[Id] IN ")]
         public IEnumerable<long>? UserIds { get; set; }
     }
 }

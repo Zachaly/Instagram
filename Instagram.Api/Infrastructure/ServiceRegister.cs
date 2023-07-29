@@ -115,6 +115,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IDirectMessageServiceProxy, DirectMessageServiceProxy>();
             services.AddScoped<IAccountVerificationServiceProxy, AccountVerificationServiceProxy>();
             services.AddScoped<INotificationServiceProxy, NotificationServiceProxy>();
+            services.AddScoped<IUserStoryServiceProxy, UserStoryServiceProxy>();
 
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipeline<,>));

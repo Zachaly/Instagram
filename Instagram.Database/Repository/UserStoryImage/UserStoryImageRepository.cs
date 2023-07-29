@@ -32,6 +32,7 @@ namespace Instagram.Database.Repository
             {
                 await connection.QueryAsync<UserStoryModel, UserStoryImage, UserStoryModel>(query, (story, image) =>
                 {
+
                     UserStoryModel? model;
 
                     if(!lookup.TryGetValue(story.UserId, out model))
@@ -42,7 +43,7 @@ namespace Instagram.Database.Repository
 
                     model.Images ??= new List<UserStoryImageModel>();
 
-                    if(model.UserId == image.UserId)
+                    if(model.UserId == image?.UserId)
                     {
                         (model.Images as List<UserStoryImageModel>)!.Add(new UserStoryImageModel 
                         {
