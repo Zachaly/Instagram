@@ -34,6 +34,7 @@ const user: UserModel = reactive({
     bio: '',
     id: 0,
     gender: Gender.NotSpecified,
+    verified: false
 })
 
 const posts: Ref<PostModel[]> = ref([])

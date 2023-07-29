@@ -11,5 +11,8 @@ namespace Instagram.Models.UserStory.Request
 
         [Where(Condition = "[User].[Id] IN ")]
         public IEnumerable<long>? UserIds { get; set; }
+
+        [Where(Condition = "[UserStoryImage].[Created]<=")]
+        public long? MaxCreationTime { get; set; }
     }
 }

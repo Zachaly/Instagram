@@ -4,7 +4,8 @@
             <div class="media">
                 <div class="media-left">
                     <figure class="image is-64x64">
-                        <img :src="$image('profile', user.id)" alt="" class="is-rounded">
+                        <img @click="showStory = true && story !== null && authStore.isAuthorized"
+                            :src="$image('profile', user.id)" alt="" class="is-rounded">
                     </figure>
                 </div>
                 <div class="media-content">
@@ -20,7 +21,8 @@
                             class="button is-warning">
                             Unfollow
                         </button>
-                        <router-link class="button is-link" :to="{ name: 'chat', params: { userId: user.id}}" v-if="authStore.isAuthorized && authStore.userId() !== user.id">
+                        <router-link class="button is-link" :to="{ name: 'chat', params: { userId: user.id } }"
+                            v-if="authStore.isAuthorized && authStore.userId() !== user.id">
                             Chat
                         </router-link>
                     </p>
@@ -43,6 +45,8 @@
     <div v-if="follows.length > 0" class="fixed-center">
         <FollowerListComponent :follows="follows" :follower="showFollowed" @close="closeFollows" />
     </div>
+
+    <UserStoryWindowComponent v-if="story && showStory" :story="story" @close="showStory = false" />
 </template>
 
 <script setup lang="ts">
@@ -56,6 +60,9 @@ import axios from 'axios';
 import { Ref, onMounted, ref } from 'vue';
 import FollowerListComponent from './FollowerListComponent.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import UserStoryModel from '@/models/UserStoryModel';
+import GetUserStoryRequest from '@/models/request/get/GetUserStoryRequest';
+import UserStoryWindowComponent from './UserStoryWindowComponent.vue';
 
 const props = defineProps<{
     user: UserModel
@@ -64,6 +71,8 @@ const props = defineProps<{
 const followedCount: Ref<number> = ref(0)
 const followersCount: Ref<number> = ref(0)
 const postCount: Ref<number> = ref(0)
+const story: Ref<UserStoryModel | null> = ref(null)
+const showStory = ref(false)
 
 const authStore = useAuthStore()
 
@@ -115,5 +124,10 @@ onMounted(() => {
     axios.get<number>('post/count', {
         params: postRequest
     }).then(res => postCount.value = res.data)
+
+    const storyRequest: GetUserStoryRequest = { UserIds: [props.user.id] }
+    axios.get<UserStoryModel[]>('user-story', { params: storyRequest }).then(res => {
+        story.value = res.data[0]
+    }).catch(() => { })
 })
 </script>

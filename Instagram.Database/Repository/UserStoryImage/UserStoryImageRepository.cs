@@ -32,6 +32,10 @@ namespace Instagram.Database.Repository
             {
                 await connection.QueryAsync<UserStoryModel, UserStoryImage, UserStoryModel>(query, (story, image) =>
                 {
+                    if(image is null)
+                    {
+                        return story;
+                    }
 
                     UserStoryModel? model;
 
