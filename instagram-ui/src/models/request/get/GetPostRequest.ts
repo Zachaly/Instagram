@@ -4,5 +4,6 @@ export default interface GetPostRequest extends PagedRequest {
     CreatorId?: number,
     Id?: number
     CreatorIds?: number[],
-    SearchTag?: string
+    SearchTag?: string,
+    SkipCreators?: number[]
 }

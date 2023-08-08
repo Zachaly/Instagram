@@ -13,8 +13,10 @@ import GetUserRequest from '@/models/request/get/GetUserRequest';
 import axios from 'axios';
 import { Ref, ref } from 'vue';
 import UserLinkComponent from './UserLinkComponent.vue';
+import { useAuthStore } from '@/store/authStore';
 
 const users: Ref<UserModel[]> = ref([])
+const authStore = useAuthStore()
 
 const searchVal = ref('')
 
@@ -24,7 +26,7 @@ const onSearch = () => {
         return
     }
 
-    const request: GetUserRequest = { SearchNickname: searchVal.value }
+    const request: GetUserRequest = { SearchNickname: searchVal.value, SkipIds: [...authStore.blockerIds] }
 
     axios.get<UserModel[]>('user', { params: request }).then(res => {
         users.value = res.data

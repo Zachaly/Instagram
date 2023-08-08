@@ -21,6 +21,10 @@
                             class="button is-warning">
                             Unfollow
                         </button>
+                        <button class="button is-danger" @click="blockUser"
+                            v-if="authStore.isAuthorized && authStore.userId() !== user.id">
+                            Block
+                        </button>
                         <router-link class="button is-link" :to="{ name: 'chat', params: { userId: user.id } }"
                             v-if="authStore.isAuthorized && authStore.userId() !== user.id">
                             Chat
@@ -63,6 +67,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import UserStoryModel from '@/models/UserStoryModel';
 import GetUserStoryRequest from '@/models/request/get/GetUserStoryRequest';
 import UserStoryWindowComponent from './UserStoryWindowComponent.vue';
+import AddUserBlockRequest from '@/models/request/AddUserBlockRequest';
+import router from '@/router';
 
 const props = defineProps<{
     user: UserModel
@@ -107,6 +113,18 @@ const showFollows = (followed: boolean) => {
 
 const closeFollows = () => {
     follows.value = []
+}
+
+const blockUser = () => {
+    const request: AddUserBlockRequest = {
+        blockingUserId: authStore.userId(),
+        blockedUserId: props.user.id
+    }
+
+    axios.post('user-block', request).then(() => {
+        alert('User blocked')
+        router.push('/')
+    })
 }
 
 onMounted(() => {

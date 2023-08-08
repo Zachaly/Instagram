@@ -57,7 +57,7 @@
                             picture</button>
                     </div>
                 </div>
-                <div class="column is-5">
+                <div class="column is-3">
                     <p class="title">Change password</p>
                     <div class="control">
                         <label class="label">Current password</label>
@@ -71,6 +71,15 @@
                     </div>
                     <div class="control">
                         <button class="button is-info" @click="changePassword">Change password</button>
+                    </div>
+                </div>
+                <div class="column">
+                    <p class="title has-text-centered">Blocked users</p>
+                    <div>
+                        <div class="box" v-for="block in blockedUsers" :key="block.id">
+                            <UserLinkComponent :nick-name="block.userName" :id="block.userId"/>
+                            <button class="button" @click="removeBlock(block.id)">Remove block</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,12 +100,17 @@ import UpdateProfilePictureRequest from '@/models/request/UpdateProfilePictureRe
 import ChangePasswordRequest from '@/models/request/ChangePasswordRequest';
 import ResponseModel from '@/models/ResponseModel';
 import ValidationErrorListComponent from '@/components/ValidationErrorListComponent.vue';
+import UserBlockModel from '@/models/UserBlockModel';
+import GetUserBlockRequest from '@/models/request/get/GetUserBlockRequest';
+import UserLinkComponent from '@/components/UserLinkComponent.vue';
 
 const authStore = useAuthStore()
 
 const request: UpdateUserRequest = reactive({
     id: authStore.userId()
 })
+
+const blockedUsers: Ref<UserBlockModel[]> = ref([])
 
 const isVerified = ref(false)
 
@@ -163,8 +177,22 @@ const loadUser = () => {
     })
 }
 
+const loadBlockedUsers = () => {
+    const params: GetUserBlockRequest = { BlockingUserId: authStore.userId(), SkipPagination: true }
+    axios.get<UserBlockModel[]>('user-block', { params }).then(res => {
+        blockedUsers.value = res.data
+    })
+}
+
+const removeBlock = (id: number) => {
+    axios.delete(`user-block/${id}`).then(() => {
+        blockedUsers.value = blockedUsers.value.filter(x => x.id !== id)
+    })
+}
+
 onMounted(() => {
     loadUser()
+    loadBlockedUsers()
 })
 </script>
 
