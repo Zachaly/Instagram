@@ -12,5 +12,8 @@ namespace Instagram.Models.Post.Request
         [ConditionalJoin(Condition = "[Post].[Id]=[PostTag].[PostId]", Table = "PostTag")]
         [Where(Condition = "[PostTag].[Tag]=")]
         public string? SearchTag { get; set; }
+
+        [Where(Condition = "[Post].[CreatorId] NOT IN ")]
+        public IEnumerable<long>? SkipCreators { get; set; }
     }
 }

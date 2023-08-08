@@ -1,5 +1,7 @@
 import LoginResponse from "@/models/LoginResponse";
+import UserBlockModel from "@/models/UserBlockModel";
 import UserFollowModel from "@/models/UserFollowModel";
+import GetUserBlockRequest from "@/models/request/get/GetUserBlockRequest";
 import GetUserFollowRequest from "@/models/request/get/GetUserFollowRequest";
 import axios from "axios";
 import { defineStore } from "pinia";
@@ -17,6 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
     })
 
     const userFollowsIds: Ref<number[]> = ref([])
+    const blockerIds: Ref<number[]> = ref([])
 
     const authorize = async (response: LoginResponse, remember: boolean) => {
         if (!response.authToken) {
@@ -29,6 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
                 localStorage.setItem(TOKEN_ITEM, response.authToken)
             }
             await updateFollows()
+            await updateBlockers()
         }
 
         return isAuthorized.value
@@ -41,6 +45,17 @@ export const useAuthStore = defineStore('auth', () => {
         }).then(res => {
             userFollowsIds.value = res.data.map(x => x.followedUserId)
             resolve(true)
+        })
+    })
+
+    const updateBlockers = (): Promise<any> => new Promise((resolve, reject) => {
+        const blockRequest: GetUserBlockRequest = { BlockedUserId: authInfo.value.userId, SkipPagination: true }
+
+        axios.get<UserBlockModel[]>('user-block', {
+            params: blockRequest
+        }).then(res => {
+            blockerIds.value = res.data.map(x => x.blockingUserId)
+            resolve(null)
         })
     })
 
@@ -75,5 +90,5 @@ export const useAuthStore = defineStore('auth', () => {
         })
     })
 
-    return { isAuthorized, authorize, logout, userId, updateFollows, userFollowsIds, hasClaim, loadFromSavedToken, token }
+    return { isAuthorized, authorize, logout, userId, updateFollows, userFollowsIds, hasClaim, loadFromSavedToken, token, blockerIds }
 })  

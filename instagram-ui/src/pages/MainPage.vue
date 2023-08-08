@@ -18,7 +18,7 @@
                 </div>
             </div>
 
-            <AddStoryImageWindowComponent v-if="showAddStoryWindow" @close="showAddStoryWindow = false"/>
+            <AddStoryImageWindowComponent v-if="showAddStoryWindow" @close="showAddStoryWindow = false" />
         </NavigationPage>
     </AuthorizedPage>
 </template>
@@ -58,7 +58,12 @@ const loadPosts = () => {
         return
     }
 
-    const request: GetPostRequest = { CreatorIds: [...authStore.userFollowsIds], PageIndex: currentPageIndex.value, PageSize: PAGE_SIZE }
+    const request: GetPostRequest = {
+        CreatorIds: [...authStore.userFollowsIds],
+        SkipCreators: [...authStore.blockerIds ],
+        PageIndex: currentPageIndex.value,
+        PageSize: PAGE_SIZE
+    }
     axios.get<PostModel[]>('post', { params: request }).then(res => {
         posts.value.push(...res.data)
         currentPageIndex.value++
@@ -67,7 +72,7 @@ const loadPosts = () => {
 }
 
 const loadUsers = () => {
-    const request: GetUserRequest = { SkipIds: [...authStore.userFollowsIds, authStore.userId()] }
+    const request: GetUserRequest = { SkipIds: [...authStore.userFollowsIds, authStore.userId(), ...authStore.blockerIds] }
     axios.get<UserModel[]>('user', {
         params: request
     }).then(res => users.value = res.data)

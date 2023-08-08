@@ -45,6 +45,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IAccountVerificationRepository, AccountVerificationRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<IUserStoryImageRepository, UserStoryImageRepository>();
+            services.AddScoped<IUserBlockRepository, UserBlockRepository>();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(c =>
@@ -74,6 +75,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IAccountVerificationService, AccountVerificationService>();
             services.AddScoped<INotificationFactory, NotificationFactory>();
             services.AddScoped<IUserStoryService, UserStoryService>();
+            services.AddScoped<IUserBlockService, UserBlockService>();
 
             services.AddScoped<IUserFactory, UserFactory>();
             services.AddScoped<IResponseFactory, ResponseFactory>();
@@ -90,6 +92,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IAccountVerificationFactory, AccountVerificationFactory>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IUserStoryFactory, UserStoryFactory>();
+            services.AddScoped<IUserBlockFactory, UserBlockFactory>();
 
             services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();           
 
@@ -116,6 +119,7 @@ namespace Instagram.Api.Infrastructure
             services.AddScoped<IAccountVerificationServiceProxy, AccountVerificationServiceProxy>();
             services.AddScoped<INotificationServiceProxy, NotificationServiceProxy>();
             services.AddScoped<IUserStoryServiceProxy, UserStoryServiceProxy>();
+            services.AddScoped<IUserBlockServiceProxy, UserBlockServiceProxy>();
 
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipeline<,>));
