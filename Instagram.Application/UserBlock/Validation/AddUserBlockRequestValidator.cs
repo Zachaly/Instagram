@@ -7,7 +7,8 @@ namespace Instagram.Application.Validation
     {
         public AddUserBlockRequestValidator()
         {
-
+            RuleFor(r => r.BlockedUserId).GreaterThan(0);
+            RuleFor(r => r.BlockingUserId).GreaterThan(0);
         }
     }
 }

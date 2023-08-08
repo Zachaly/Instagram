@@ -132,5 +132,8 @@ namespace Instagram.Tests.Integration
                 .RuleFor(s => s.Created, f => f.Random.Long(0))
                 .RuleFor(s => s.FileName, f => f.Random.AlphaNumeric(20))
                 .Generate(count);
+
+        public static List<UserBlock> GenerateUserBlocks(long blockingUserId, IEnumerable<long> blockedUserIds)
+            => blockedUserIds.Select(id => new UserBlock { BlockingUserId = blockingUserId, BlockedUserId = id }).ToList();
     }
 }

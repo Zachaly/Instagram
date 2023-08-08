@@ -21,7 +21,8 @@
             "TRUNCATE TABLE [RelationImage]",
             "TRUNCATE TABLE [DirectMessage]",
             "TRUNCATE TABLE [AccountVerification]",
-            "TRUNCATE TABLE [Notification]"
+            "TRUNCATE TABLE [Notification]",
+            "TRUNCATE TABLE [UserBlock]"
         };
     }
 }
