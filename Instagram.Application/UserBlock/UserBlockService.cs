@@ -19,14 +19,33 @@ namespace Instagram.Application
             _userBlockFactory = userBlockFactory;
         }
 
-        public Task<ResponseModel> AddAsync(AddUserBlockRequest request)
+        public async Task<ResponseModel> AddAsync(AddUserBlockRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var block = _userBlockFactory.Create(request);
+                var id = await _repository.InsertAsync(block);
+
+                return _responseFactory.CreateSuccess(id);
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
 
-        public Task<ResponseModel> DeleteByIdAsync(long id)
+        public async Task<ResponseModel> DeleteByIdAsync(long id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _repository.DeleteByIdAsync(id);
+
+                return _responseFactory.CreateSuccess();
+            }
+            catch (Exception ex)
+            {
+                return _responseFactory.CreateFailure(ex.Message);
+            }
         }
     }
 }

@@ -7,8 +7,10 @@ namespace Instagram.Application
     public class UserBlockFactory : IUserBlockFactory
     {
         public UserBlock Create(AddUserBlockRequest request)
-        {
-            throw new NotImplementedException();
-        }
+            => new UserBlock
+            {
+                BlockedUserId = request.BlockedUserId,
+                BlockingUserId = request.BlockingUserId,
+            };
     }
 }
