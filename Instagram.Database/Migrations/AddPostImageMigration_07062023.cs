@@ -2,7 +2,7 @@
 
 namespace Instagram.Database.Migrations
 {
-    [Migration(07062023)]
+    [Migration(4)]
     public class AddPostImageMigration_07062023 : Migration
     {
         public override void Down()
