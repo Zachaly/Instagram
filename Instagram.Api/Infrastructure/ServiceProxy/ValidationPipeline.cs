@@ -20,7 +20,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             ServiceName = typeof(TRequest).Name;
         }
 
-        public Task<ResponseModel> Handle(TRequest request, RequestHandlerDelegate<ResponseModel> next, CancellationToken cancellationToken)
+        public async Task<ResponseModel> Handle(TRequest request, RequestHandlerDelegate<ResponseModel> next, CancellationToken cancellationToken)
         {
             var validation = _validator.Validate(request);
 
@@ -30,10 +30,10 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 
                 LogResponse(response, "Validation failure");
 
-                return Task.FromResult(response);
+                return response;
             }
 
-            return next();
+            return await next();
         }
     }
 }
