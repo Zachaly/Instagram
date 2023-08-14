@@ -6,13 +6,14 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
     {
         public LoggingPipeline(ILogger<TRequest> logger, IHttpContextAccessor httpContextAccessor) : base(logger, httpContextAccessor)
         {
+            ServiceName = typeof(TRequest).Name;
         }
 
-        public Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             LogInformation("Handle");
 
-            return next();
+            return await next();
         }
     }
 }

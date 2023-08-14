@@ -13,6 +13,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         public AccountVerificationServiceProxy(ILogger<IAccountVerificationService> logger, IHttpContextAccessor httpContextAccessor,
             IAccountVerificationService service) : base(logger, httpContextAccessor, service)
         {
+            ServiceName = "AccountVerification";
         }
     }
 }

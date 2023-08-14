@@ -17,6 +17,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         {
             _responseFactory = responseFactory;
             _validator = validator;
+            ServiceName = typeof(TRequest).Name;
         }
 
         public Task<ResponseModel> Handle(TRequest request, RequestHandlerDelegate<ResponseModel> next, CancellationToken cancellationToken)

@@ -14,6 +14,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         public RelationServiceProxy(ILogger<IRelationServiceProxy> logger, IHttpContextAccessor httpContextAccessor, IRelationService relationService) 
             : base(logger, httpContextAccessor, relationService)
         {
+            ServiceName = "Relation";
         }
     }
 }

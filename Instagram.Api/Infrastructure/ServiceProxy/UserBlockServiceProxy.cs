@@ -21,6 +21,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         {
             _addValidator = addValidator;
             _responseFactory = responseFactory;
+            ServiceName = "UserBlock";
         }
 
         public async Task<ResponseModel> AddAsync(AddUserBlockRequest request)

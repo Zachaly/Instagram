@@ -1,6 +1,7 @@
 ﻿using Instagram.Application;
 using Instagram.Models;
 using Instagram.Models.Response;
+using System.Security.Authentication.ExtendedProtection;
 
 namespace Instagram.Api.Infrastructure.ServiceProxy
 {
@@ -8,6 +9,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
     {
         private readonly ILogger<TService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        protected string ServiceName { get; set; }
 
         protected HttpLoggingProxyBase(ILogger<TService> logger, IHttpContextAccessor httpContextAccessor)
         {
@@ -18,7 +20,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         protected void LogInformation(string message = "")
         {
             var ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-            _logger.LogInformation("{Message} : {Time} : {IP}", message, DateTime.Now, ip);
+            _logger.LogInformation("{ServiceName}: {Message}: {IP}", ServiceName, message, ip);
         }
 
         protected void LogResponse(ResponseModel response, string message = "")
@@ -27,12 +29,11 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 
             if (response.Success)
             {
-                _logger.LogInformation("{Message}: Success: {Time}: {IP}", message, DateTime.Now, ip);
+                _logger.LogInformation("{Service}: {Message}: Success: {IP}", ServiceName, message, ip);
                 return;
             }
 
-            _logger.LogWarning("{Message} - Error: {Error} : {Time}: {IP}", message, response.Error,
-                    DateTime.Now, ip);
+            _logger.LogWarning("{ServiceName}: {Message} - Error: {Error}: {IP}", ServiceName, message, response.Error, ip);
         }
     }
 
@@ -49,18 +50,18 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             _service = service;
         }
 
-        public Task<IEnumerable<TModel>> GetAsync(TGetRequest request)
+        public async Task<IEnumerable<TModel>> GetAsync(TGetRequest request)
         {
             LogInformation("Get");
 
-            return _service.GetAsync(request);
+            return await _service.GetAsync(request);
         }
 
-        public Task<int> GetCountAsync(TGetRequest request)
+        public async Task<int> GetCountAsync(TGetRequest request)
         {
             LogInformation("Get Count");
 
-            return _service.GetCountAsync(request);
+            return await _service.GetCountAsync(request);
         }
     }
 
@@ -74,11 +75,11 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         {
         }
 
-        public Task<TModel> GetByIdAsync(long id)
+        public async Task<TModel> GetByIdAsync(long id)
         {
             LogInformation("Get By Id");
 
-            return _service.GetByIdAsync(id);
+            return await _service.GetByIdAsync(id);
         }
     }
 }

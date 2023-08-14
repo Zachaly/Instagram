@@ -18,6 +18,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         {
             _responseFactory = responseFactory;
             _addValidator = addValidator;
+            ServiceName = "UserClaim";
         }
 
         public async Task<ResponseModel> AddAsync(AddUserClaimRequest request)

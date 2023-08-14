@@ -24,6 +24,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             _responseFactory = responseFactory;
             _addValidator = addValidator;
             _mediator = mediator;
+            ServiceName = "UserFollow";
         }
 
         public async Task<ResponseModel> AddAsync(AddUserFollowRequest request)

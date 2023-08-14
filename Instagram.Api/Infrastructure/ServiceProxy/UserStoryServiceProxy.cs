@@ -14,6 +14,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             IUserStoryService service) : base(logger, httpContextAccessor)
         {
             _service = service;
+            ServiceName = "UserStory";
         }
 
         public Task<IEnumerable<UserStoryModel>> GetAsync(GetUserStoryRequest request)

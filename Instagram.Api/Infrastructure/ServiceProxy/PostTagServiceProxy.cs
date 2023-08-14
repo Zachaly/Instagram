@@ -18,6 +18,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         {
             _responseFactory = responseFactory;
             _addValidator = addValidator;
+            ServiceName = "PostTag";
         }
 
         public async Task<ResponseModel> AddAsync(AddPostTagRequest request)
