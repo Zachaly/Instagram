@@ -1,7 +1,6 @@
 ﻿using Instagram.Application;
 using Instagram.Models;
 using Instagram.Models.Response;
-using System.Security.Authentication.ExtendedProtection;
 
 namespace Instagram.Api.Infrastructure.ServiceProxy
 {
