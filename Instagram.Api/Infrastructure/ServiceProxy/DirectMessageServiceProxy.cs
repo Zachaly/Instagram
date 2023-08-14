@@ -26,6 +26,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             _updateValidator = updateValidator;
             _responseFactory = responseFactory;
             _mediator = mediator;
+            ServiceName = "AccountVerification";
         }
 
         public async Task<ResponseModel> AddAsync(AddDirectMessageRequest request)

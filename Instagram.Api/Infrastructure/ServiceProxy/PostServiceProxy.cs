@@ -11,6 +11,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         public PostServiceProxy(ILogger<IPostService> logger, IHttpContextAccessor httpContextAccessor,
             IPostService postService) : base(logger, httpContextAccessor, postService)
         {
+            ServiceName = "Post";
         }
     }
 }

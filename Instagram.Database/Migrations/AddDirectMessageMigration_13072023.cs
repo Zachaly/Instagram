@@ -2,7 +2,7 @@
 
 namespace Instagram.Database.Migrations
 {
-    [Migration(13072023)]
+    [Migration(13)]
     public class AddDirectMessageMigration_13072023 : Migration
     {
         public override void Down()

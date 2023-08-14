@@ -19,6 +19,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
         {
             _responseFactory = responseFactory;
             _updateValidator = updateValidator;
+            ServiceName = "User";
         }
 
         public async Task<ResponseModel> UpdateAsync(UpdateUserRequest request)

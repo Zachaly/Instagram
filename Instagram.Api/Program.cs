@@ -1,6 +1,7 @@
 using Instagram.Api.Hubs;
 using Instagram.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 [assembly: ApiController]
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,12 @@ builder.Services.ConfigureSwagger();
 
 builder.ConfigureAuthorization();
 
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Services.AddSerilog();
+
 builder.Services.AddSignalR();
 
 builder.Services.AddHostedService<BanCancellationService>();
@@ -33,6 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseCors(opt =>
 {
     opt.AllowAnyMethod()
@@ -45,6 +53,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.UseSerilogRequestLogging();
 app.MapControllers();
 
 app.MapHub<NotificationHub>("ws/notification");

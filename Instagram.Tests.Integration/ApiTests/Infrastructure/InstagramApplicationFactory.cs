@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace Instagram.Tests.Integration.ApiTests.Infrastructure
 {
@@ -17,6 +18,7 @@ namespace Instagram.Tests.Integration.ApiTests.Infrastructure
                     {
                         c.WithGlobalConnectionString(Constants.ConnectionString);
                     });
+                Log.Logger = new LoggerConfiguration().CreateLogger();
             });
         }
     }

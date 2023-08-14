@@ -123,6 +123,7 @@ namespace Instagram.Api.Infrastructure
 
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipeline<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoginCommandPipeline<,>));
         }
 
         public static void ConfigureAuthorization(this WebApplicationBuilder builder)

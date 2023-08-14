@@ -21,6 +21,7 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
             _addValidator = addValidator;
             _updateValidator = updateValidator;
             _responseFactory = responseFactory;
+            ServiceName = "Notification";
         }
 
         public async Task<ResponseModel> AddAsync(AddNotificationRequest request)
