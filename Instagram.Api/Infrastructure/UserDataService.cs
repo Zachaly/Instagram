@@ -16,8 +16,6 @@ namespace Instagram.Api.Infrastructure
         {
             var idClaim = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
 
-            var claims = _httpContextAccessor.HttpContext.User.Claims.ToList();
-
             long? id = idClaim is null ? null : long.Parse(idClaim.Value);
 
             return Task.FromResult(id);
