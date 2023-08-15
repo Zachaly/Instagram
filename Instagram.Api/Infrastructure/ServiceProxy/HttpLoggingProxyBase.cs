@@ -1,6 +1,8 @@
 ﻿using Instagram.Application;
 using Instagram.Models;
 using Instagram.Models.Response;
+using Serilog.Context;
+using System.Security.Claims;
 
 namespace Instagram.Api.Infrastructure.ServiceProxy
 {
@@ -18,22 +20,43 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 
         protected void LogInformation(string message = "")
         {
-            var ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-            _logger.LogInformation("{ServiceName}: {Message}: {IP}", ServiceName, message, ip);
+            var ip = GetRequestIpAddress();
+            var userId = GetRequestUserId();
+
+            using (LogContext.PushProperty("IP", ip))
+            using (LogContext.PushProperty("UserId", userId))
+            {
+                _logger.LogInformation("{ServiceName}: {Message}: {IP}", ServiceName, message, ip);
+            }
         }
 
         protected void LogResponse(ResponseModel response, string message = "")
         {
-            var ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            var ip = GetRequestIpAddress();
+            var userId = GetRequestUserId();
 
-            if (response.Success)
+            using (LogContext.PushProperty("IP", ip))
+            using (LogContext.PushProperty("UserId", userId.Value))
             {
-                _logger.LogInformation("{Service}: {Message}: Success: {IP}", ServiceName, message, ip);
-                return;
-            }
+                if (response.Success)
+                {
+                    _logger.LogInformation("{Service}: {Message}: {IP}", ServiceName, message, ip);
+                    return;
+                }
 
-            _logger.LogWarning("{ServiceName}: {Message} - Error: {Error}: {IP}", ServiceName, message, response.Error, ip);
+                using(LogContext.PushProperty("Error", response.Error))
+                _logger.LogWarning("{ServiceName}: {Message} - Error: {Error}: {IP}", ServiceName, message, response.Error, ip);
+            }
         }
+        
+        protected string? GetRequestIpAddress() 
+            => _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+
+        protected long? GetRequestUserId() 
+            => _httpContextAccessor.HttpContext?.User.Claims
+                .Where(c => c.Type == ClaimTypes.NameIdentifier)
+                .Select(c => long.Parse(c.Value))
+                .FirstOrDefault();
     }
 
     public abstract class HttpLoggingKeylessServiceProxyBase<TModel, TGetRequest, TService> : HttpLoggingProxyBase<TService>, IKeylessServiceBase<TModel, TGetRequest>
