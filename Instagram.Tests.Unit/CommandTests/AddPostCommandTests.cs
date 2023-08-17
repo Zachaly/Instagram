@@ -6,30 +6,31 @@ using Instagram.Models.Post.Request;
 using Instagram.Models.PostTag.Request;
 using Instagram.Models.Response;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class AddPostCommandTests
     {
-        private readonly Mock<IPostRepository> _postRepository;
-        private readonly Mock<IPostFactory> _postFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
-        private readonly Mock<IFileService> _fileService;
-        private readonly Mock<IPostImageRepository> _postImageRepository;
-        private readonly Mock<IPostTagService> _postTagService;
+        private readonly IPostRepository _postRepository;
+        private readonly IPostFactory _postFactory;
+        private readonly IResponseFactory _responseFactory;
+        private readonly IFileService _fileService;
+        private readonly IPostImageRepository _postImageRepository;
+        private readonly IPostTagService _postTagService;
         private readonly AddPostHandler _handler;
 
         public AddPostCommandTests()
         {
-            _postRepository = new Mock<IPostRepository>();
-            _postFactory = new Mock<IPostFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _fileService = new Mock<IFileService>();
-            _postImageRepository = new Mock<IPostImageRepository>();
-            _postTagService = new Mock<IPostTagService>();
-            _handler = new AddPostHandler(_postFactory.Object, _postRepository.Object, _fileService.Object,
-                _responseFactory.Object, _postImageRepository.Object, _postTagService.Object);
+            _postRepository = Substitute.For<IPostRepository>();
+            _postFactory = Substitute.For<IPostFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
+            _fileService = Substitute.For<IFileService>();
+            _postImageRepository = Substitute.For<IPostImageRepository>();
+            _postTagService = Substitute.For<IPostTagService>();
+            _handler = new AddPostHandler(_postFactory, _postRepository, _fileService,
+                _responseFactory, _postImageRepository, _postTagService);
         }
 
         [Fact]
@@ -41,33 +42,33 @@ namespace Instagram.Tests.Unit.CommandTests
             const string FileName = "file";
             const long PostId = 1;
 
-            _fileService.Setup(x => x.SavePostImagesAsync(It.IsAny<IEnumerable<IFormFile>>())).ReturnsAsync(new string[] { FileName });
+            _fileService.SavePostImagesAsync(Arg.Any<IEnumerable<IFormFile>>())
+                .Returns(new string[] { FileName });
 
-            _postRepository.Setup(x => x.InsertAsync(It.IsAny<Post>()))
-                .Callback((Post post) => posts.Add(post))
-                .ReturnsAsync(PostId);
+            _postRepository.InsertAsync(Arg.Any<Post>())
+                .Returns(PostId)
+                .AndDoes(info => posts.Add(info.Arg<Post>()));
 
-            _postFactory.Setup(x => x.Create(It.IsAny<AddPostRequest>()))
-                .Returns((AddPostRequest request) => new Post { CreatorId = request.CreatorId });
+            _postFactory.Create(Arg.Any<AddPostRequest>())
+                .Returns(info => new Post { CreatorId = info.Arg<AddPostRequest>().CreatorId });
 
-            _postFactory.Setup(x => x.CreateImages(It.IsAny<IEnumerable<string>>(), It.IsAny<long>()))
-                .Returns((IEnumerable<string> files, long id) => files.Select(x => new PostImage { File = x, PostId = id }));
+            _postFactory.CreateImages(Arg.Any<IEnumerable<string>>(), Arg.Any<long>())
+                .Returns(info => info.Arg<IEnumerable<string>>().Select(x => new PostImage { File = x, PostId = info.Arg<long>() }));
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _postImageRepository.InsertAsync(Arg.Any<PostImage>())
+                .Returns(0)
+                .AndDoes(info => images.Add(info.Arg<PostImage>()));
 
-            _postImageRepository.Setup(x => x.InsertAsync(It.IsAny<PostImage>()))
-                .Callback((PostImage img) => images.Add(img));
+            _postTagService.AddAsync(Arg.Any<AddPostTagRequest>())
+                .Returns(new ResponseModel { Success = true })
+                .AndDoes(info => tags.AddRange(info.Arg<AddPostTagRequest>().Tags));
 
-            _postTagService.Setup(x => x.AddAsync(It.IsAny<AddPostTagRequest>()))
-                .Callback((AddPostTagRequest request) => tags.AddRange(request.Tags));
-
-            var file = new Mock<IFormFile>();
+            var file = Substitute.For<IFormFile>();
 
             var command = new AddPostCommand
             {
                 CreatorId = 1,
-                Files = new IFormFile[] { file.Object },
+                Files = new IFormFile[] { file },
                 Tags = new string[] { "tag1", "tag2", "tag3" }
             };
 
@@ -83,9 +84,6 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_FileNull_Fail()
         {
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
             var command = new AddPostCommand
             {
                 CreatorId = 1,
@@ -101,9 +99,6 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_FilesEmpty_Fail()
         {
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
             var command = new AddPostCommand
             {
                 CreatorId = 1,
@@ -121,18 +116,15 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "error";
 
-            _fileService.Setup(x => x.SavePostImagesAsync(It.IsAny<IEnumerable<IFormFile>>()))
-                .Callback(() => throw new Exception(Error));
+            _fileService.SavePostImagesAsync(Arg.Any<IEnumerable<IFormFile>>())
+                .ThrowsAsync(new Exception(Error));
 
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
-            var file = new Mock<IFormFile>();
+            var file = Substitute.For<IFormFile>();
 
             var command = new AddPostCommand
             {
                 CreatorId = 1,
-                Files = new IFormFile[] { file.Object },
+                Files = new IFormFile[] { file },
             };
 
             var res = await _handler.Handle(command, default);

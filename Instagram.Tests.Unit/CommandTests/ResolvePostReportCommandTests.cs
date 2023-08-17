@@ -7,30 +7,30 @@ using Instagram.Models.Response;
 using Instagram.Models.UserBan.Request;
 using Instagram.Models.UserClaim.Request;
 using MediatR;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class ResolvePostReportCommandTests
     {
-        private readonly Mock<IPostReportRepository> _postReportRepository;
-        private readonly Mock<IResponseFactory> _responseFactory;
-        private readonly Mock<IMediator> _mediator;
-        private readonly Mock<IUserBanService> _userBanService;
-        private readonly Mock<IUserClaimService> _userClaimService;
+        private readonly IPostReportRepository _postReportRepository;
+        private readonly IResponseFactory _responseFactory;
+        private readonly IMediator _mediator;
+        private readonly IUserBanService _userBanService;
+        private readonly IUserClaimService _userClaimService;
         private readonly ResolvePostReportHandler _handler;
 
         public ResolvePostReportCommandTests()
         {
-            _postReportRepository = new Mock<IPostReportRepository>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _mediator = new Mock<IMediator>();
-            _userBanService = new Mock<IUserBanService>();
-            _userClaimService = new Mock<IUserClaimService>();
+            _postReportRepository = Substitute.For<IPostReportRepository>();
+            _responseFactory = ResponseFactoryMock.Create();
+            _mediator = Substitute.For<IMediator>();
+            _userBanService = Substitute.For<IUserBanService>();
+            _userClaimService = Substitute.For<IUserClaimService>();
 
-            _handler = new ResolvePostReportHandler(_postReportRepository.Object, _responseFactory.Object,
-                _userBanService.Object, _mediator.Object,
-                _userClaimService.Object);
+            _handler = new ResolvePostReportHandler(_postReportRepository, _responseFactory, _userBanService,
+                _mediator, _userClaimService);
         }
 
         [Fact]
@@ -57,33 +57,38 @@ namespace Instagram.Tests.Unit.CommandTests
 
             var claims = new List<UserClaim>();
 
-            _postReportRepository.Setup(x => x.UpdateByPostIdAsync(It.IsAny<UpdatePostReportRequest>(), It.IsAny<long>()))
-                .Callback((UpdatePostReportRequest request, long id) =>
+            _postReportRepository.UpdateByPostIdAsync(Arg.Any<UpdatePostReportRequest>(), Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => 
                 {
-                    foreach(var report in reports.Where(rep => rep.PostId == id)) 
+                    var request = info.Arg<UpdatePostReportRequest>();
+
+                    foreach (var report in reports.Where(rep => rep.PostId == info.Arg<long>()))
                     {
                         report.Accepted = request.Accepted;
                         report.Resolved = request.Resolved ?? false;
                     }
                 });
 
-            _mediator.Setup(x => x.Send(It.IsAny<IRequest<ResponseModel>>(), It.IsAny<CancellationToken>()))
-                .Callback((IRequest<ResponseModel> command, CancellationToken _) =>
-                {
-                    posts.RemoveAll(x => x.Id == (command as DeletePostCommand).Id);
-                }).ReturnsAsync(new ResponseModel { Success = true });
+            _mediator.Send(Arg.Any<DeletePostCommand>(), default)
+                .Returns(new ResponseModel { Success = true })
+                .AndDoes(info => posts.RemoveAll(p => p.Id == info.Arg<DeletePostCommand>().Id));
 
-            _userBanService.Setup(x => x.AddAsync(It.IsAny<AddUserBanRequest>()))
-                .Callback((AddUserBanRequest request) =>
-                {
-                    bans.Add(new UserBan { UserId = request.UserId, EndDate = request.EndDate });
-                });
+            _userBanService.AddAsync(Arg.Any<AddUserBanRequest>())
+                .Returns(new ResponseModel { Success = true })
+                .AndDoes(info => bans.Add(new UserBan
+                    {
+                        UserId = info.Arg<AddUserBanRequest>().UserId,
+                        EndDate = info.Arg<AddUserBanRequest>().EndDate
+                    }));
 
-            _userClaimService.Setup(x => x.AddAsync(It.IsAny<AddUserClaimRequest>()))
-                .Callback((AddUserClaimRequest request) => claims.Add(new UserClaim { UserId = request.UserId, Value = request.Value }));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _userClaimService.AddAsync(Arg.Any<AddUserClaimRequest>())
+                .Returns(new ResponseModel { Success = true })
+                .AndDoes(info => claims.Add(new UserClaim
+                    {
+                        UserId = info.Arg<AddUserClaimRequest>().UserId,
+                        Value = info.Arg<AddUserClaimRequest>().Value
+                    }));
 
             var command = new ResolvePostReportCommand { Accepted = true, Id = 1, PostId = PostId, BanEndDate = 2137, UserId = 3 };
 
@@ -103,14 +108,9 @@ namespace Instagram.Tests.Unit.CommandTests
         public async Task Handle_ReportAccepted_ExceptionThrown_Failure()
         {
             const string Error = "error";
-            _postReportRepository.Setup(x => x.UpdateByPostIdAsync(It.IsAny<UpdatePostReportRequest>(), It.IsAny<long>()))
-                .Callback((UpdatePostReportRequest request, long id) =>
-                {
-                    throw new Exception(Error);
-                });
 
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _postReportRepository.UpdateByPostIdAsync(Arg.Any<UpdatePostReportRequest>(), Arg.Any<long>())
+                .ThrowsAsync(new Exception(Error));
 
             var command = new ResolvePostReportCommand { Accepted = true, Id = 1, PostId = 2 };
 
@@ -125,16 +125,15 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             var report = new PostReport();
 
-            _postReportRepository.Setup(x => x.UpdateByIdAsync(It.IsAny<UpdatePostReportRequest>(), It.IsAny<long>()))
-                .Callback((UpdatePostReportRequest request, long id) =>
+            _postReportRepository.UpdateByIdAsync(Arg.Any<UpdatePostReportRequest>(), Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info =>
                 {
-                    report.Id = id;
+                    var request = info.Arg<UpdatePostReportRequest>();
+                    report.Id = info.Arg<long>();
                     report.Accepted = request.Accepted;
                     report.Resolved = request.Resolved ?? false;
                 });
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
 
             var command = new ResolvePostReportCommand { Accepted = false, Id = 1, PostId = 2 };
 
@@ -151,14 +150,8 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "err";
 
-            _postReportRepository.Setup(x => x.UpdateByIdAsync(It.IsAny<UpdatePostReportRequest>(), It.IsAny<long>()))
-                .Callback((UpdatePostReportRequest request, long id) =>
-                {
-                    throw new Exception(Error);
-                });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _postReportRepository.UpdateByIdAsync(Arg.Any<UpdatePostReportRequest>(), Arg.Any<long>())
+                .ThrowsAsync(new Exception(Error));
 
             var command = new ResolvePostReportCommand { Accepted = false, Id = 1, PostId = 2 };
 

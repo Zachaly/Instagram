@@ -2,33 +2,26 @@
 using Instagram.Application.Command;
 using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
-using Instagram.Models.RelationImage.Request;
 using Instagram.Models.RelationImage;
-using Instagram.Models.Response;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class DeleteRelationImageCommandTests
     {
-        private readonly Mock<IRelationImageRepository> _relationImageRepository;
-        private readonly Mock<IFileService> _fileService;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IRelationImageRepository _relationImageRepository;
+        private readonly IFileService _fileService;
+        private readonly IResponseFactory _responseFactory;
         private readonly DeleteRelationImageHandler _handler;
 
         public DeleteRelationImageCommandTests()
         {
-            _relationImageRepository = new Mock<IRelationImageRepository>();
-            _fileService = new Mock<IFileService>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _relationImageRepository = Substitute.For<IRelationImageRepository>();
+            _fileService = Substitute.For<IFileService>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(() => new ResponseModel { Success = true });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Error = err, Success = false });
-
-            _handler = new DeleteRelationImageHandler(_relationImageRepository.Object, _fileService.Object, _responseFactory.Object);
+            _handler = new DeleteRelationImageHandler(_relationImageRepository, _fileService, _responseFactory);
         }
 
         [Fact]
@@ -46,23 +39,23 @@ namespace Instagram.Tests.Unit.CommandTests
 
             var fileRemoved = false;
 
-            _relationImageRepository.Setup(x => x.GetByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync((long id) => images.Where(x => x.Id == id).Select(x => new RelationImageModel
+            _relationImageRepository.GetByIdAsync(Arg.Any<long>())
+                .Returns(info => images.Where(img => img.Id == info.Arg<long>()).Select(img => new RelationImageModel
                 {
-                    Id = id,
-                    FileName = x.FileName,
+                    Id = img.Id,
+                    FileName = img.FileName,
                 }).FirstOrDefault());
 
-            _relationImageRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback((long id) => images.RemoveAll(x => x.Id == id));
+            _relationImageRepository.DeleteByIdAsync(Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => images.RemoveAll(img => img.Id == info.Arg<long>()));
 
-            _fileService.Setup(x => x.RemoveRelationImageAsync(It.IsAny<string>()))
-                .Callback(() => fileRemoved = true);
+            _fileService.RemoveRelationImageAsync(Arg.Any<string>()).Returns(Task.CompletedTask);
 
             var res = await _handler.Handle(new DeleteRelationImageCommand { Id = IdToDelete }, default);
 
             Assert.True(res.Success);
-            Assert.True(fileRemoved);
+            Assert.Equal(1, _fileService.GetMethodCallsNumber(nameof(_fileService.RemoveRelationImageAsync)));
             Assert.DoesNotContain(images, x => x.Id == IdToDelete);
         }
 
@@ -71,8 +64,7 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "Err";
 
-            _relationImageRepository.Setup(x => x.GetByIdAsync(It.IsAny<long>()))
-                .Callback(() => throw new Exception(Error));
+            _relationImageRepository.GetByIdAsync(Arg.Any<long>()).ThrowsAsync(new Exception(Error));
 
             var res = await _handler.Handle(new DeleteRelationImageCommand(), default);
 

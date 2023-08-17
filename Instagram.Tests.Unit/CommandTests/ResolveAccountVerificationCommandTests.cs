@@ -2,35 +2,29 @@
 using Instagram.Application.Command;
 using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
-using Instagram.Models.Response;
 using Instagram.Models.User.Request;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class ResolveAccountVerificationCommandTests
     {
-        private readonly Mock<IFileService> _fileService;
-        private readonly Mock<IAccountVerificationRepository> _accountVerificationRepository;
-        private readonly Mock<IUserRepository> _userRepository;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IFileService _fileService;
+        private readonly IAccountVerificationRepository _accountVerificationRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IResponseFactory _responseFactory;
         private readonly ResolveAccountVerificationHandler _handler;
 
         public ResolveAccountVerificationCommandTests()
         {
-            _fileService = new Mock<IFileService>();
-            _accountVerificationRepository = new Mock<IAccountVerificationRepository>();
-            _userRepository = new Mock<IUserRepository>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _fileService = Substitute.For<IFileService>();
+            _accountVerificationRepository = Substitute.For<IAccountVerificationRepository>();
+            _userRepository = Substitute.For<IUserRepository>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(() => new ResponseModel { Success = true });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
-            _handler = new ResolveAccountVerificationHandler(_accountVerificationRepository.Object, _userRepository.Object,
-                _responseFactory.Object, _fileService.Object);
+            _handler = new ResolveAccountVerificationHandler(_accountVerificationRepository, _userRepository,
+                _responseFactory, _fileService);
         }
 
         [Fact]
@@ -40,17 +34,16 @@ namespace Instagram.Tests.Unit.CommandTests
             var userVerified = false;
             var verificationDeleted = false;
 
-            _accountVerificationRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(new AccountVerification { Id = 1 });
+            _accountVerificationRepository.GetEntityByIdAsync(Arg.Any<long>())
+                .Returns(new AccountVerification { Id = 1 });
 
-            _accountVerificationRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback(() => verificationDeleted = true);
+            _accountVerificationRepository.DeleteByIdAsync(Arg.Any<long>()).Returns(Task.CompletedTask);
 
-            _userRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateUserRequest>()))
-                .Callback((UpdateUserRequest request) => userVerified = request.Verified!.Value);
+            _userRepository.UpdateAsync(Arg.Any<UpdateUserRequest>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => userVerified = info.Arg<UpdateUserRequest>().Verified!.Value);
 
-            _fileService.Setup(x => x.RemoveVerificationDocumentAsync(It.IsAny<string>()))
-                .Callback(() => fileDeleted = true);
+            _fileService.RemoveVerificationDocumentAsync(Arg.Any<string>()).Returns(Task.CompletedTask);
 
             var command = new ResolveAccountVerificationCommand
             {
@@ -61,25 +54,20 @@ namespace Instagram.Tests.Unit.CommandTests
             var res = await _handler.Handle(command, default);
 
             Assert.True(res.Success);
-            Assert.True(fileDeleted);
-            Assert.True(verificationDeleted);
+            Assert.Equal(1, _fileService.GetMethodCallsNumber(nameof(_fileService.RemoveVerificationDocumentAsync)));
+            Assert.Equal(1, _accountVerificationRepository.GetMethodCallsNumber(nameof(_accountVerificationRepository.DeleteByIdAsync)));
             Assert.Equal(command.Accepted, userVerified);
         }
 
         [Fact]
         public async Task Handle_VerificationDenied_Success()
         {
-            var fileDeleted = false;
-            var verificationDeleted = false;
+            _accountVerificationRepository.GetEntityByIdAsync(Arg.Any<long>())
+                .Returns(new AccountVerification { Id = 1 });
 
-            _accountVerificationRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(new AccountVerification { Id = 1 });
+            _accountVerificationRepository.DeleteByIdAsync(Arg.Any<long>()).Returns(Task.CompletedTask);
 
-            _accountVerificationRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback(() => verificationDeleted = true);
-
-            _fileService.Setup(x => x.RemoveVerificationDocumentAsync(It.IsAny<string>()))
-                .Callback(() => fileDeleted = true);
+            _fileService.RemoveVerificationDocumentAsync(Arg.Any<string>()).Returns(Task.CompletedTask);
 
             var command = new ResolveAccountVerificationCommand
             {
@@ -90,8 +78,8 @@ namespace Instagram.Tests.Unit.CommandTests
             var res = await _handler.Handle(command, default);
 
             Assert.True(res.Success);
-            Assert.True(fileDeleted);
-            Assert.True(verificationDeleted);
+            Assert.Equal(1, _fileService.GetMethodCallsNumber(nameof(_fileService.RemoveVerificationDocumentAsync)));
+            Assert.Equal(1, _accountVerificationRepository.GetMethodCallsNumber(nameof(_accountVerificationRepository.DeleteByIdAsync)));
         }
 
         [Fact]
@@ -99,8 +87,7 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "err";
 
-            _accountVerificationRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ThrowsAsync(new Exception(Error));
+            _accountVerificationRepository.GetEntityByIdAsync(Arg.Any<long>()).ThrowsAsync(new Exception(Error));
 
             var res = await _handler.Handle(new ResolveAccountVerificationCommand(), default);
 
