@@ -4,24 +4,26 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.Response;
 using Instagram.Models.UserBan.Request;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using NSubstitute.Exceptions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class UserBanServiceTest
     {
-        private readonly Mock<IUserBanRepository> _userBanRepository;
-        private readonly Mock<IUserBanFactory> _userBanFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IUserBanRepository _userBanRepository;
+        private readonly IUserBanFactory _userBanFactory;
+        private readonly IResponseFactory _responseFactory;
         private readonly UserBanService _service;
 
         public UserBanServiceTest()
         {
-            _userBanRepository = new Mock<IUserBanRepository>();
-            _userBanFactory = new Mock<IUserBanFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _userBanRepository = Substitute.For<IUserBanRepository>();
+            _userBanFactory = Substitute.For<IUserBanFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _service = new UserBanService(_userBanRepository.Object, _userBanFactory.Object, _responseFactory.Object);
+            _service = new UserBanService(_userBanRepository, _userBanFactory, _responseFactory);
         }
 
         [Fact]
@@ -29,14 +31,16 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             var bans = new List<UserBan>();
 
-            _userBanRepository.Setup(x => x.InsertAsync(It.IsAny<UserBan>()))
-                .Callback((UserBan ban) => bans.Add(ban));
+            _userBanRepository.InsertAsync(Arg.Any<UserBan>())
+                .Returns(0)
+                .AndDoes(info => bans.Add(info.Arg<UserBan>()));
 
-            _userBanFactory.Setup(x => x.Create(It.IsAny<AddUserBanRequest>()))
-                .Returns((AddUserBanRequest request) => new UserBan { UserId = request.UserId, EndDate = request.EndDate });
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _userBanFactory.Create(Arg.Any<AddUserBanRequest>())
+                .Returns(info => new UserBan
+                {
+                    EndDate = info.Arg<AddUserBanRequest>().EndDate,
+                    UserId = info.Arg<AddUserBanRequest>().UserId
+                });
 
             var request = new AddUserBanRequest { EndDate = 1, UserId = 2 };
 
@@ -51,14 +55,8 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "Err";
 
-            _userBanRepository.Setup(x => x.InsertAsync(It.IsAny<UserBan>()))
-                .Callback((UserBan ban) => throw new Exception(Error));
-
-            _userBanFactory.Setup(x => x.Create(It.IsAny<AddUserBanRequest>()))
-                .Returns((AddUserBanRequest request) => new UserBan { UserId = request.UserId, EndDate = request.EndDate });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _userBanFactory.Create(Arg.Any<AddUserBanRequest>())
+                .Throws(new Exception(Error));
 
             var request = new AddUserBanRequest { EndDate = 1, UserId = 2 };
 
@@ -79,11 +77,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new UserBan { Id = 1, },
             };
 
-            _userBanRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback((long id) => bans.RemoveAll(x => x.Id == id));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _userBanRepository.DeleteByIdAsync(Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => bans.RemoveAll(b => b.Id == info.Arg<long>()));
 
             var res = await _service.DeleteAsync(Id);
 
@@ -96,11 +92,8 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "Err";
 
-            _userBanRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback((long id) => throw new Exception(Error));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _userBanRepository.DeleteByIdAsync(Arg.Any<long>())
+                .ThrowsAsync(new Exception(Error));
 
             var res = await _service.DeleteAsync(2137);
 

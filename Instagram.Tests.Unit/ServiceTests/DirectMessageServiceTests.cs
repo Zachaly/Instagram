@@ -4,33 +4,25 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.DirectMessage.Request;
 using Instagram.Models.Response;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class DirectMessageServiceTests
     {
-        private readonly Mock<IDirectMessageRepository> _directMessageRepository;
-        private readonly Mock<IDirectMessageFactory> _directMessageFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IDirectMessageRepository _directMessageRepository;
+        private readonly IDirectMessageFactory _directMessageFactory;
+        private readonly IResponseFactory _responseFactory;
         private readonly DirectMessageService _service;
 
         public DirectMessageServiceTests()
         {
-            _directMessageRepository = new Mock<IDirectMessageRepository>();
-            _directMessageFactory = new Mock<IDirectMessageFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _directMessageRepository = Substitute.For<IDirectMessageRepository>();
+            _directMessageFactory = Substitute.For<IDirectMessageFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
-
-            _responseFactory.Setup(x => x.CreateSuccess(It.IsAny<long>()))
-                .Returns((long id) => new ResponseModel { Success = true, NewEntityId = id });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
-            _service = new DirectMessageService(_directMessageRepository.Object, _directMessageFactory.Object, _responseFactory.Object);
+            _service = new DirectMessageService(_directMessageRepository, _directMessageFactory, _responseFactory);
         }
 
         [Fact]
@@ -39,12 +31,12 @@ namespace Instagram.Tests.Unit.ServiceTests
             var messages = new List<DirectMessage>();
 
             const long NewId = 1;
-            _directMessageRepository.Setup(x => x.InsertAsync(It.IsAny<DirectMessage>()))
-                .Callback((DirectMessage message) => messages.Add(message))
-                .ReturnsAsync(NewId);
+            _directMessageRepository.InsertAsync(Arg.Any<DirectMessage>())
+                .Returns(NewId)
+                .AndDoes(info => messages.Add(info.Arg<DirectMessage>()));
 
-            _directMessageFactory.Setup(x => x.Create(It.IsAny<AddDirectMessageRequest>()))
-                .Returns((AddDirectMessageRequest request) => new DirectMessage { Content = request.Content });
+            _directMessageFactory.Create(Arg.Any<AddDirectMessageRequest>())
+                .Returns(info => new DirectMessage { Content = info.Arg<AddDirectMessageRequest>().Content });
 
             var request = new AddDirectMessageRequest
             {
@@ -65,8 +57,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "Err";
 
-            _directMessageFactory.Setup(x => x.Create(It.IsAny<AddDirectMessageRequest>()))
-                .Throws(new Exception(Error));
+            _directMessageFactory.Create(Arg.Any<AddDirectMessageRequest>()).Throws(new Exception(Error));
 
             var res = await _service.AddAsync(new AddDirectMessageRequest());
 
@@ -82,11 +73,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 Read = false
             };
 
-            _directMessageRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateDirectMessageRequest>()))
-                .Callback((UpdateDirectMessageRequest request) =>
-                {
-                    message.Read = request.Read.Value;
-                });
+            _directMessageRepository.UpdateAsync(Arg.Any<UpdateDirectMessageRequest>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => message.Read = info.Arg<UpdateDirectMessageRequest>().Read.Value);
 
             var request = new UpdateDirectMessageRequest
             {
@@ -104,8 +93,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _directMessageRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateDirectMessageRequest>()))
-                .Throws(new Exception(Error));
+            _directMessageRepository.UpdateAsync(Arg.Any<UpdateDirectMessageRequest>()).Throws(new Exception(Error));
 
             var res = await _service.UpdateAsync(new UpdateDirectMessageRequest());
 
@@ -125,8 +113,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new DirectMessage { Id = 3, },
             };
 
-            _directMessageRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback((long id) => messages.RemoveAll(x => x.Id == id));
+            _directMessageRepository.DeleteByIdAsync(Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => messages.RemoveAll(m => m.Id == info.Arg<long>()));
 
             var res = await _service.DeleteByIdAsync(IdToDelete);
 
@@ -139,8 +128,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _directMessageRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Throws(new Exception(Error));
+            _directMessageRepository.DeleteByIdAsync(Arg.Any<long>()).ThrowsAsync(new Exception(Error));
 
             var res = await _service.DeleteByIdAsync(2137);
 

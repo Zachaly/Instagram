@@ -5,23 +5,25 @@ using Instagram.Domain.Entity;
 using Instagram.Models.Response;
 using Instagram.Models.UserFollow;
 using Instagram.Models.UserFollow.Request;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class UserFollowServiceTests
     {
-        private readonly Mock<IUserFollowRepository> _userFollowRepository;
-        private readonly Mock<IUserFollowFactory> _userFollowFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IUserFollowRepository _userFollowRepository;
+        private readonly IUserFollowFactory _userFollowFactory;
+        private readonly IResponseFactory _responseFactory;
         private readonly UserFollowService _service;
 
         public UserFollowServiceTests()
         {
-            _userFollowRepository = new Mock<IUserFollowRepository>();
-            _userFollowFactory = new Mock<IUserFollowFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _service = new UserFollowService(_userFollowRepository.Object, _userFollowFactory.Object, _responseFactory.Object);
+            _userFollowRepository = Substitute.For<IUserFollowRepository>();
+            _userFollowFactory = Substitute.For<IUserFollowFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
+
+            _service = new UserFollowService(_userFollowRepository, _userFollowFactory, _responseFactory);
         }
 
         [Fact]
@@ -34,8 +36,8 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new UserFollowModel(),
             };
 
-            _userFollowRepository.Setup(x => x.GetAsync(It.IsAny<GetUserFollowRequest>()))
-                .ReturnsAsync(models);
+            _userFollowRepository.GetAsync(Arg.Any<GetUserFollowRequest>())
+                .Returns(models);
 
             var res = await _service.GetAsync(new GetUserFollowRequest());
 
@@ -47,14 +49,12 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             var follows = new List<UserFollow>();
 
-            _userFollowFactory.Setup(x => x.Create(It.IsAny<AddUserFollowRequest>()))
-                .Returns((AddUserFollowRequest req) => new UserFollow { FollowedUserId = req.FollowedUserId });
+            _userFollowFactory.Create(Arg.Any<AddUserFollowRequest>())
+                .Returns(info => new UserFollow { FollowedUserId = info.Arg<AddUserFollowRequest>().FollowedUserId });
 
-            _userFollowRepository.Setup(x => x.InsertAsync(It.IsAny<UserFollow>()))
-                .Callback((UserFollow follow) => follows.Add(follow));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _userFollowRepository.InsertAsync(Arg.Any<UserFollow>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => follows.Add(info.Arg<UserFollow>()));
 
             var request = new AddUserFollowRequest { FollowedUserId = 1 };
             var res = await _service.AddAsync(request);
@@ -68,14 +68,8 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "Error";
 
-            _userFollowFactory.Setup(x => x.Create(It.IsAny<AddUserFollowRequest>()))
-                .Returns((AddUserFollowRequest req) => new UserFollow { FollowedUserId = req.FollowedUserId });
-
-            _userFollowRepository.Setup(x => x.InsertAsync(It.IsAny<UserFollow>()))
-                .Callback(() => throw new Exception(Error));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _userFollowFactory.Create(Arg.Any<AddUserFollowRequest>())
+                .Throws(new Exception(Error));
 
             var request = new AddUserFollowRequest { FollowedUserId = 1 };
             var res = await _service.AddAsync(request);
@@ -96,12 +90,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new UserFollow { FollowedUserId = FollowerIdToDelete, FollowingUserId = FollowedIdToDelete },
             };
 
-            _userFollowRepository.Setup(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<long>()))
-                .Callback((long followerId, long followedId)
-                    => follows.RemoveAll(f => f.FollowedUserId == followedId && f.FollowingUserId == followerId));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _userFollowRepository.DeleteAsync(Arg.Any<long>(), Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => follows.RemoveAll(f => f.FollowingUserId == info.ArgAt<long>(0) && f.FollowedUserId == info.ArgAt<long>(1)));
 
             var res = await _service.DeleteAsync(FollowerIdToDelete, FollowedIdToDelete);
 
@@ -114,11 +105,8 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "error";
 
-            _userFollowRepository.Setup(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<long>()))
-                .Callback(() => throw new Exception(Error));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _userFollowRepository.DeleteAsync(Arg.Any<long>(), Arg.Any<long>())
+                .ThrowsAsync(new Exception(Error));
 
             var res = await _service.DeleteAsync(1, 2);
 
@@ -131,8 +119,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const int Count = 10;
 
-            _userFollowRepository.Setup(x => x.GetCountAsync(It.IsAny<GetUserFollowRequest>()))
-                .ReturnsAsync(10);
+            _userFollowRepository.GetCountAsync(Arg.Any<GetUserFollowRequest>()).Returns(Count);
 
             var res = await _service.GetCountAsync(new GetUserFollowRequest());
 

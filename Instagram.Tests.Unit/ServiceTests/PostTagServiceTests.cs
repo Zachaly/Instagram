@@ -4,24 +4,25 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.PostTag.Request;
 using Instagram.Models.Response;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class PostTagServiceTests 
     {
-        private readonly Mock<IPostTagRepository> _postTagRepository;
-        private readonly Mock<IPostTagFactory> _postTagFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IPostTagRepository _postTagRepository;
+        private readonly IPostTagFactory _postTagFactory;
+        private readonly IResponseFactory _responseFactory;
         private readonly PostTagService _service;
 
         public PostTagServiceTests()
         {
-            _postTagRepository = new Mock<IPostTagRepository>();
-            _postTagFactory = new Mock<IPostTagFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _postTagRepository = Substitute.For<IPostTagRepository>();
+            _postTagFactory = Substitute.For<IPostTagFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _service = new PostTagService(_postTagRepository.Object, _postTagFactory.Object, _responseFactory.Object);
+            _service = new PostTagService(_postTagRepository, _postTagFactory, _responseFactory);
         }
 
         [Fact]
@@ -29,14 +30,16 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             var tags = new List<PostTag>();
 
-            _postTagRepository.Setup(x => x.InsertAsync(It.IsAny<PostTag>()))
-                .Callback((PostTag tag) => tags.Add(tag));
+            _postTagRepository.InsertAsync(Arg.Any<PostTag>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => tags.Add(info.Arg<PostTag>()));
 
-            _postTagFactory.Setup(x => x.CreateMany(It.IsAny<AddPostTagRequest>()))
-                .Returns((AddPostTagRequest request) => request.Tags.Select(x => new PostTag { PostId = request.PostId, Tag = x }));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _postTagFactory.CreateMany(Arg.Any<AddPostTagRequest>())
+                .Returns(info => info.Arg<AddPostTagRequest>().Tags.Select(n => new PostTag 
+                { 
+                    PostId = info.Arg<AddPostTagRequest>().PostId,
+                    Tag = n
+                }));
 
             var request = new AddPostTagRequest { PostId = 1, Tags = new string[] { "a", "b" } };
 
@@ -51,14 +54,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _postTagRepository.Setup(x => x.InsertAsync(It.IsAny<PostTag>()))
-                .Callback(() => throw new Exception(Error));
-
-            _postTagFactory.Setup(x => x.CreateMany(It.IsAny<AddPostTagRequest>()))
-                .Returns((AddPostTagRequest request) => request.Tags.Select(x => new PostTag { PostId = request.PostId, Tag = x }));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _postTagFactory.CreateMany(Arg.Any<AddPostTagRequest>()).Throws(new Exception(Error));
 
             var request = new AddPostTagRequest { PostId = 1, Tags = new string[] { "a", "b" } };
 
@@ -82,11 +78,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new PostTag { PostId = PostId, Tag = "d" },
             };
 
-            _postTagRepository.Setup(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<string>()))
-                .Callback((long postId, string tag) => tags.RemoveAll(x => x.PostId == postId && x.Tag == tag));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-               .Returns(new ResponseModel { Success = true });
+            _postTagRepository.DeleteAsync(Arg.Any<long>(), Arg.Any<string>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => tags.RemoveAll(t => t.PostId == info.Arg<long>() && t.Tag == info.Arg<string>()));
 
             var res = await _service.DeleteAsync(PostId, Tag);
 
@@ -100,11 +94,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "Err";
 
-            _postTagRepository.Setup(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<string>()))
-                .Callback(() => throw new Exception(Error));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _postTagRepository.DeleteAsync(Arg.Any<long>(), Arg.Any<string>()).ThrowsAsync(new Exception(Error));
 
             var res = await _service.DeleteAsync(1, "a");
 

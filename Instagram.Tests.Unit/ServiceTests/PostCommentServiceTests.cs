@@ -4,24 +4,25 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.PostComment.Request;
 using Instagram.Models.Response;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class PostCommentServiceTests
     {
-        private readonly Mock<IPostCommentRepository> _postCommentRepository;
-        private readonly Mock<IPostCommentFactory> _postCommentFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IPostCommentRepository _postCommentRepository;
+        private readonly IPostCommentFactory _postCommentFactory;
+        private readonly IResponseFactory _responseFactory;
         private readonly PostCommentService _service;
 
         public PostCommentServiceTests()
         {
-            _postCommentRepository = new Mock<IPostCommentRepository>();
-            _postCommentFactory = new Mock<IPostCommentFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _postCommentRepository = Substitute.For<IPostCommentRepository>();
+            _postCommentFactory = Substitute.For<IPostCommentFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _service = new PostCommentService(_postCommentRepository.Object, _postCommentFactory.Object, _responseFactory.Object);
+            _service = new PostCommentService(_postCommentRepository, _postCommentFactory, _responseFactory);
         }
 
         [Fact]
@@ -31,15 +32,12 @@ namespace Instagram.Tests.Unit.ServiceTests
 
             const long NewCommentId = 1;
 
-            _postCommentFactory.Setup(x => x.Create(It.IsAny<AddPostCommentRequest>()))
-                .Returns((AddPostCommentRequest req) => new PostComment { Content = req.Content });
+            _postCommentFactory.Create(Arg.Any<AddPostCommentRequest>())
+                .Returns(info => new PostComment { Content = info.Arg<AddPostCommentRequest>().Content });
 
-            _postCommentRepository.Setup(x => x.InsertAsync(It.IsAny<PostComment>()))
-                .Callback((PostComment comment) => comments.Add(comment))
-                .ReturnsAsync(NewCommentId);
-
-            _responseFactory.Setup(x => x.CreateSuccess(It.IsAny<long>()))
-                .Returns((long id) => new ResponseModel { Success = true, NewEntityId = id });
+            _postCommentRepository.InsertAsync(Arg.Any<PostComment>())
+                .Returns(NewCommentId)
+                .AndDoes(info => comments.Add(info.Arg<PostComment>()));
 
             var request = new AddPostCommentRequest { Content = "content" };
 
@@ -55,14 +53,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _postCommentFactory.Setup(x => x.Create(It.IsAny<AddPostCommentRequest>()))
-                .Returns((AddPostCommentRequest req) => new PostComment { Content = req.Content });
-
-            _postCommentRepository.Setup(x => x.InsertAsync(It.IsAny<PostComment>()))
-                .Callback(() => throw new Exception(Error));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
+            _postCommentFactory.Create(Arg.Any<AddPostCommentRequest>()).Throws(new Exception(Error));
 
             var request = new AddPostCommentRequest { Content = "content" };
 

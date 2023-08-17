@@ -2,35 +2,26 @@
 using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
-using Instagram.Models.Response;
 using Instagram.Models.UserBlock.Request;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class UserBlockServiceTests
     {
-        private readonly Mock<IUserBlockRepository> _userBlockRepository;
-        private readonly Mock<IUserBlockFactory> _userBlockFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IUserBlockRepository _userBlockRepository;
+        private readonly IUserBlockFactory _userBlockFactory;
+        private readonly IResponseFactory _responseFactory;
         private readonly UserBlockService _service;
 
         public UserBlockServiceTests()
         {
-            _userBlockRepository = new Mock<IUserBlockRepository>();
-            _userBlockFactory = new Mock<IUserBlockFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _userBlockRepository = Substitute.For<IUserBlockRepository>();
+            _userBlockFactory = Substitute.For<IUserBlockFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
-
-            _responseFactory.Setup(x => x.CreateSuccess(It.IsAny<long>()))
-                .Returns((long id) => new ResponseModel { Success = true, NewEntityId = id });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
-            _service = new UserBlockService(_userBlockRepository.Object, _userBlockFactory.Object, _responseFactory.Object);
+            _service = new UserBlockService(_userBlockRepository, _userBlockFactory, _responseFactory);
         }
 
         [Fact]
@@ -40,12 +31,12 @@ namespace Instagram.Tests.Unit.ServiceTests
 
             const long NewId = 2;
 
-            _userBlockRepository.Setup(x => x.InsertAsync(It.IsAny<UserBlock>()))
-                .Callback((UserBlock block) => blocks.Add(block))
-                .ReturnsAsync(NewId);
+            _userBlockRepository.InsertAsync(Arg.Any<UserBlock>())
+                .Returns(NewId)
+                .AndDoes(info => blocks.Add(info.Arg<UserBlock>()));
 
-            _userBlockFactory.Setup(x => x.Create(It.IsAny<AddUserBlockRequest>()))
-                .Returns((AddUserBlockRequest request) => new UserBlock { BlockedUserId = request.BlockedUserId });
+            _userBlockFactory.Create(Arg.Any<AddUserBlockRequest>())
+                .Returns(info => new UserBlock { BlockedUserId = info.Arg<AddUserBlockRequest>().BlockedUserId });
 
             var request = new AddUserBlockRequest
             {
@@ -64,8 +55,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _userBlockFactory.Setup(x => x.Create(It.IsAny<AddUserBlockRequest>()))
-                .Throws(new Exception(Error));
+            _userBlockFactory.Create(Arg.Any<AddUserBlockRequest>()).Throws(new Exception(Error));
 
             var res = await _service.AddAsync(new AddUserBlockRequest());
 
@@ -85,8 +75,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new UserBlock { Id = 3 }
             };
 
-            _userBlockRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback((long id) => blocks.RemoveAll(x => x.Id == id));
+            _userBlockRepository.DeleteByIdAsync(Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => blocks.RemoveAll(b => b.Id == info.Arg<long>()));
 
             var res = await _service.DeleteByIdAsync(IdToDelete);
 
@@ -99,8 +90,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _userBlockRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .ThrowsAsync(new Exception(Error));
+            _userBlockRepository.DeleteByIdAsync(Arg.Any<long>()).ThrowsAsync(new Exception(Error));
 
             var res = await _service.DeleteByIdAsync(2137);
 

@@ -4,24 +4,26 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.Response;
 using Instagram.Models.UserClaim.Request;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using NSubstitute.Exceptions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class UserClaimServiceTests 
     {
-        private readonly Mock<IUserClaimRepository> _userClaimRepository;
-        private readonly Mock<IUserClaimFactory> _userClaimFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IUserClaimRepository _userClaimRepository;
+        private readonly IUserClaimFactory _userClaimFactory;
+        private readonly IResponseFactory _responseFactory;
         private readonly UserClaimService _service;
 
         public UserClaimServiceTests()
         {
-            _userClaimRepository = new Mock<IUserClaimRepository>();
-            _userClaimFactory = new Mock<IUserClaimFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _userClaimRepository = Substitute.For<IUserClaimRepository>();
+            _userClaimFactory = Substitute.For<IUserClaimFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _service = new UserClaimService(_userClaimRepository.Object, _userClaimFactory.Object, _responseFactory.Object);
+            _service = new UserClaimService(_userClaimRepository, _userClaimFactory, _responseFactory);
         }
 
         [Fact]
@@ -29,14 +31,12 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             var claims = new List<UserClaim>();
 
-            _userClaimFactory.Setup(x => x.Create(It.IsAny<AddUserClaimRequest>()))
-                .Returns((AddUserClaimRequest request) => new UserClaim { Value = request.Value });
+            _userClaimFactory.Create(Arg.Any<AddUserClaimRequest>())
+                .Returns(info => new UserClaim { Value = info.Arg<AddUserClaimRequest>().Value });
 
-            _userClaimRepository.Setup(x => x.InsertAsync(It.IsAny<UserClaim>()))
-                .Callback((UserClaim claim) => claims.Add(claim));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _userClaimRepository.InsertAsync(Arg.Any<UserClaim>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => claims.Add(info.Arg<UserClaim>()));
 
             var request = new AddUserClaimRequest { Value = "val" };
 
@@ -49,16 +49,11 @@ namespace Instagram.Tests.Unit.ServiceTests
         [Fact]
         public async Task AddAsync_ExceptionThrown_Fail()
         {
-            _userClaimFactory.Setup(x => x.Create(It.IsAny<AddUserClaimRequest>()))
-                .Returns((AddUserClaimRequest request) => new UserClaim { Value = request.Value });
 
             const string Error = "Err";
 
-            _userClaimRepository.Setup(x => x.InsertAsync(It.IsAny<UserClaim>()))
-                .Callback(() => throw new Exception(Error));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
+            _userClaimFactory.Create(Arg.Any<AddUserClaimRequest>())
+                .Throws(new Exception(Error));
 
             var request = new AddUserClaimRequest { Value = "val" };
 
@@ -71,25 +66,21 @@ namespace Instagram.Tests.Unit.ServiceTests
         [Fact]
         public async Task DeleteAsync_Success()
         {
-            _userClaimRepository.Setup(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<string>()));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _userClaimRepository.DeleteAsync(Arg.Any<long>(), Arg.Any<string>()).Returns(Task.CompletedTask);
 
             var res = await _service.DeleteAsync(1, "val");
 
             Assert.True(res.Success);
+            Assert.Equal(1, _userClaimRepository.GetMethodCallsNumber(nameof(_userClaimRepository.DeleteAsync)));
         }
 
         [Fact]
         public async Task DeleteAsync_ExceptionThrown_Failure()
         {
             const string Error = "err";
-            _userClaimRepository.Setup(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<string>()))
-                .Callback(() => throw new Exception(Error));
 
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
+            _userClaimRepository.DeleteAsync(Arg.Any<long>(), Arg.Any<string>())
+                .ThrowsAsync(new Exception(Error));
 
             var res = await _service.DeleteAsync(1, "val");
 

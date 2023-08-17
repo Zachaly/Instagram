@@ -1,24 +1,24 @@
 ﻿using Instagram.Application;
 using Instagram.Domain.Entity;
 using Microsoft.Extensions.Configuration;
-using Moq;
+using NSubstitute;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class AuthServiceTests
     {
-        private readonly Mock<IConfiguration> _config;
+        private readonly IConfiguration _config;
         private readonly AuthService _service;
 
         public AuthServiceTests()
         {
-            _config = new Mock<IConfiguration>();
-            _config.SetupGet(x => x[It.Is<string>(s => s == "Auth:Audience")]).Returns("https://localhost");
-            _config.SetupGet(x => x[It.Is<string>(s => s == "Auth:Issuer")]).Returns("https://localhost");
-            _config.SetupGet(x => x[It.Is<string>(s => s == "Auth:SecretKey")]).Returns("supersecretkeyloooooooooooooooooooooooooooooooong");
-            _config.SetupGet(x => x[It.Is<string>(s => s == "EncryptionKey")]).Returns(new string('a', 24));
-            _service = new AuthService(_config.Object);
+            _config = Substitute.For<IConfiguration>();
+            _config[Arg.Is((string s) => s == "Auth:Audience")].Returns("https://localhost");
+            _config[Arg.Is((string s) => s == "Auth:Issuer")].Returns("https://localhost");
+            _config[Arg.Is((string s) => s == "Auth:SecretKey")].Returns("supersecretkeyloooooooooooooooooooooooooooooooong");
+            _config[Arg.Is((string s) => s == "EncryptionKey")].Returns(new string('a', 24));
+            _service = new AuthService(_config);
         }
 
         [Fact]
@@ -72,8 +72,8 @@ namespace Instagram.Tests.Unit.ServiceTests
 
             Assert.Contains(decodedToken.Claims, x => x.Value == user.Id.ToString());
             Assert.Contains(decodedToken.Claims, x => x.Value == user.Email);
-            Assert.Contains(decodedToken.Audiences, x => x == _config.Object["Auth:Audience"]);
-            Assert.Equal(decodedToken.Issuer, _config.Object["Auth:Issuer"]);
+            Assert.Contains(decodedToken.Audiences, x => x == _config["Auth:Audience"]);
+            Assert.Equal(decodedToken.Issuer, _config["Auth:Issuer"]);
             Assert.Contains(decodedToken.Claims, x => x.Value == claim.Value);
         }
     }

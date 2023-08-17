@@ -17,7 +17,7 @@ namespace Instagram.Tests.Unit
                     => new ResponseModel 
                     { 
                         Success = false,
-                        Error = info.ArgAt<string>(0)
+                        Error = info.Arg<string>()
                     });
 
             factory.CreateSuccess(Arg.Any<long>())
@@ -25,7 +25,7 @@ namespace Instagram.Tests.Unit
                 => new ResponseModel
                 {
                     Success = true,
-                    NewEntityId = info.ArgAt<long>(0)
+                    NewEntityId = info.Arg<long>()
                 });
 
             return factory;

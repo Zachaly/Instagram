@@ -2,19 +2,19 @@
 using Instagram.Database.Repository;
 using Instagram.Models.Post;
 using Instagram.Models.Post.Request;
-using Moq;
+using NSubstitute;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class PostServiceTests
     {
-        private readonly Mock<IPostRepository> _postRepository;
+        private readonly IPostRepository _postRepository;
         private readonly PostService _service;
 
         public PostServiceTests()
         {
-            _postRepository = new Mock<IPostRepository>();
-            _service = new PostService(_postRepository.Object);
+            _postRepository = Substitute.For<IPostRepository>();
+            _service = new PostService(_postRepository);
         }
 
         [Fact]
@@ -27,8 +27,7 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new PostModel { Id = 3, },
             };
 
-            _postRepository.Setup(x => x.GetAsync(It.IsAny<GetPostRequest>()))
-                .ReturnsAsync(posts);
+            _postRepository.GetAsync(Arg.Any<GetPostRequest>()).Returns(posts);
 
             var res = await _service.GetAsync(new GetPostRequest());
 
@@ -43,8 +42,7 @@ namespace Instagram.Tests.Unit.ServiceTests
                 Id = 1,
             };
 
-            _postRepository.Setup(x => x.GetByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(post);
+            _postRepository.GetByIdAsync(Arg.Any<long>()).Returns(post);
 
             var res = await _service.GetByIdAsync(1);
 
@@ -56,8 +54,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const int Count = 20;
 
-            _postRepository.Setup(x => x.GetCountAsync(It.IsAny<GetPostRequest>()))
-                .ReturnsAsync(Count);
+            _postRepository.GetCountAsync(Arg.Any<GetPostRequest>()).Returns(Count);
 
             var res = await _service.GetCountAsync(new GetPostRequest());
 
