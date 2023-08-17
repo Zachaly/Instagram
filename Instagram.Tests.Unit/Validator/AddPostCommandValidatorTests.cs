@@ -1,7 +1,7 @@
 ﻿using Instagram.Application.Command;
 using Instagram.Application.Validation;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using NSubstitute;
 
 namespace Instagram.Tests.Unit.Validator
 {
@@ -15,7 +15,7 @@ namespace Instagram.Tests.Unit.Validator
         }
 
         private IEnumerable<IFormFile> MockFiles()
-            => new List<IFormFile>() { new Mock<IFormFile>().Object } ;
+            => new List<IFormFile>() { Substitute.For<IFormFile>() } ;
 
         [Fact]
         public void ValidCommand_PassesValidation()
