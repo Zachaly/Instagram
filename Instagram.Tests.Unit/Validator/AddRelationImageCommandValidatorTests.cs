@@ -1,7 +1,7 @@
 ﻿using Instagram.Application.Command;
 using Instagram.Application.Validation;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using NSubstitute;
 
 namespace Instagram.Tests.Unit.Validator
 {
@@ -19,7 +19,7 @@ namespace Instagram.Tests.Unit.Validator
         {
             var command = new AddRelationImageCommand
             {
-                File = new Mock<IFormFile>().Object,
+                File = Substitute.For<IFormFile>(),
                 RelationId = 1
             };
 
@@ -47,7 +47,7 @@ namespace Instagram.Tests.Unit.Validator
         {
             var command = new AddRelationImageCommand
             {
-                File = new Mock<IFormFile>().Object,
+                File = Substitute.For<IFormFile>(),
                 RelationId = 0
             };
 

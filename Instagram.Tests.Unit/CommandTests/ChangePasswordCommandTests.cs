@@ -2,32 +2,27 @@
 using Instagram.Application.Command;
 using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
-using Instagram.Models.Response;
 using Instagram.Models.User.Request;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using NSubstitute.ReturnsExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class ChangePasswordCommandTests
     {
-        private readonly Mock<IAuthService> _authService;
-        private readonly Mock<IUserRepository> _userRepository;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IAuthService _authService;
+        private readonly IUserRepository _userRepository;
+        private readonly IResponseFactory _responseFactory;
         private readonly ChangePasswordHandler _handler;
 
         public ChangePasswordCommandTests()
         {
-            _authService = new Mock<IAuthService>();
-            _userRepository = new Mock<IUserRepository>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _authService = Substitute.For<IAuthService>();
+            _userRepository = Substitute.For<IUserRepository>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
-
-            _handler = new ChangePasswordHandler(_authService.Object, _userRepository.Object, _responseFactory.Object);
+            _handler = new ChangePasswordHandler(_authService, _userRepository, _responseFactory);
         }
 
         [Fact]
@@ -35,19 +30,17 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             var user = new User();
 
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(user);
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>()).Returns(user);
 
-            _userRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateUserRequest>()))
-                .Callback((UpdateUserRequest request) => user.PasswordHash = request.PasswordHash);
+            _userRepository.UpdateAsync(Arg.Any<UpdateUserRequest>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => user.PasswordHash = info.Arg<UpdateUserRequest>().PasswordHash);
 
-            _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(true);
+            _authService.VerifyPasswordAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
             const string Hash = "hash";
 
-            _authService.Setup(x => x.HashPasswordAsync(It.IsAny<string>()))
-                .ReturnsAsync(Hash);
+            _authService.HashPasswordAsync(Arg.Any<string>()).Returns(Hash);
 
             var command = new ChangePasswordCommand();
 
@@ -60,8 +53,7 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_UserNotFound_Failure()
         {
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(() => null);
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>()).ReturnsNull();
 
             var command = new ChangePasswordCommand();
 
@@ -74,11 +66,9 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_InvalidOldPassword_Failure()
         {
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(() => new User());
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>()).Returns(new User());
 
-            _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(false);
+            _authService.VerifyPasswordAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
             var command = new ChangePasswordCommand();
 
@@ -91,16 +81,9 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_ExceptionThrown_Failure()
         {
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(() => new User());
-
-            _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(true);
-
             const string Error = "err";
-            _authService.Setup(x => x.HashPasswordAsync(It.IsAny<string>()))
-                .Callback(() => throw new Exception(Error));
-
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>()).ThrowsAsync(new Exception(Error));
+            
             var command = new ChangePasswordCommand();
 
             var res = await _handler.Handle(command, default);

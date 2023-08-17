@@ -9,7 +9,7 @@ namespace Instagram.Tests.Integration.DatabaseTests
     {
         private readonly DirectMessageRepository _repository;
 
-        public DirectMessageRepositoryTests()
+        public DirectMessageRepositoryTests() : base()
         {
             _repository = new DirectMessageRepository(new SqlQueryBuilder(), _connectionFactory);
         }

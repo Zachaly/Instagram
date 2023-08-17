@@ -1,7 +1,7 @@
 ﻿using Instagram.Application.Command;
 using Instagram.Application.Validation;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using NSubstitute;
 
 namespace Instagram.Tests.Unit.Validator
 {
@@ -20,7 +20,7 @@ namespace Instagram.Tests.Unit.Validator
             var command = new AddAccountVerificationCommand
             {
                 DateOfBirth = "21.12.2023",
-                Document = new Mock<IFormFile>().Object,
+                Document = Substitute.For<IFormFile>(),
                 FirstName = "Fname",
                 LastName = "Lname",
                 UserId = 1
@@ -37,7 +37,7 @@ namespace Instagram.Tests.Unit.Validator
             var command = new AddAccountVerificationCommand
             {
                 DateOfBirth = "21.12.2023",
-                Document = new Mock<IFormFile>().Object,
+                Document = Substitute.For<IFormFile>(),
                 FirstName = "Fname",
                 LastName = "Lname",
                 UserId = 0
@@ -73,7 +73,7 @@ namespace Instagram.Tests.Unit.Validator
             var command = new AddAccountVerificationCommand
             {
                 DateOfBirth = new string('a', length),
-                Document = new Mock<IFormFile>().Object,
+                Document = Substitute.For<IFormFile>(),
                 FirstName = "Fname",
                 LastName = "Lname",
                 UserId = 1
@@ -92,7 +92,7 @@ namespace Instagram.Tests.Unit.Validator
             var command = new AddAccountVerificationCommand
             {
                 DateOfBirth = "21.12.2023",
-                Document = new Mock<IFormFile>().Object,
+                Document = Substitute.For<IFormFile>(),
                 FirstName = new string('a', length),
                 LastName = "Lname",
                 UserId = 1
@@ -111,7 +111,7 @@ namespace Instagram.Tests.Unit.Validator
             var command = new AddAccountVerificationCommand
             {
                 DateOfBirth = "21.12.2023",
-                Document = new Mock<IFormFile>().Object,
+                Document = Substitute.For<IFormFile>(),
                 FirstName = "FName",
                 LastName = new string('a', length),
                 UserId = 1

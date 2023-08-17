@@ -4,29 +4,30 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.PostImage;
 using Instagram.Models.PostImage.Request;
-using Instagram.Models.Response;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using NSubstitute.ReturnsExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class DeletePostCommandTests
     {
-        private readonly Mock<IPostRepository> _postRepository;
-        private readonly Mock<IResponseFactory> _responseFactory;
-        private readonly Mock<IFileService> _fileService;
-        private readonly Mock<IPostImageRepository> _postImageRepository;
-        private readonly Mock<IPostTagRepository> _postTagRepository;
+        private readonly IPostRepository _postRepository;
+        private readonly IResponseFactory _responseFactory;
+        private readonly IFileService _fileService;
+        private readonly IPostImageRepository _postImageRepository;
+        private readonly IPostTagRepository _postTagRepository;
         private readonly DeletePostHandler _handler;
 
         public DeletePostCommandTests()
         {
-            _postRepository = new Mock<IPostRepository>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _fileService = new Mock<IFileService>();
-            _postImageRepository = new Mock<IPostImageRepository>();
-            _postTagRepository = new Mock<IPostTagRepository>();
-            _handler = new DeletePostHandler(_postRepository.Object, _fileService.Object, _responseFactory.Object,
-                _postImageRepository.Object, _postTagRepository.Object);
+            _postRepository = Substitute.For<IPostRepository>();
+            _responseFactory = ResponseFactoryMock.Create();
+            _fileService = Substitute.For<IFileService>();
+            _postImageRepository = Substitute.For<IPostImageRepository>();
+            _postTagRepository = Substitute.For<IPostTagRepository>();
+            _handler = new DeletePostHandler(_postRepository, _fileService, _responseFactory,
+                _postImageRepository, _postTagRepository);
         }
 
         [Fact]
@@ -59,28 +60,26 @@ namespace Instagram.Tests.Unit.CommandTests
                 new PostTag { PostId = 5 },
             };
 
-            _postRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback((long id) => posts.Remove(posts.First(x => x.Id == id)));
+            _postRepository.DeleteByIdAsync(Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => posts.RemoveAll(p => p.Id == info.Arg<long>()));
 
-            _postRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync((long id) => posts.First(x => x.Id == id));
+            _postRepository.GetEntityByIdAsync(Arg.Any<long>()).Returns(info => posts.First(p => p.Id == info.Arg<long>()));
 
-            _postImageRepository.Setup(x => x.DeleteByPostIdAsync(It.IsAny<long>()))
-                .Callback((long postId) => images.RemoveAll(img => img.PostId == postId));
+            _postImageRepository.DeleteByPostIdAsync(Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => images.RemoveAll(p => p.PostId == info.Arg<long>()));
 
-            _postImageRepository.Setup(x => x.GetAsync(It.IsAny<GetPostImageRequest>()))
-                .ReturnsAsync((GetPostImageRequest request) 
-                    => images
-                        .Where(img => img.PostId == request.PostId)
-                        .Select(x => new PostImageModel { File = x.File }));
+            _postImageRepository.GetAsync(Arg.Any<GetPostImageRequest>())
+                .Returns(info =>
+                    images.Where(img => img.PostId == info.Arg<GetPostImageRequest>().PostId!)
+                    .Select(img => new PostImageModel { File = img.File }));
 
-            _fileService.Setup(x => x.RemovePostImageAsync(It.IsAny<string>()));
+            _fileService.RemovePostImageAsync(Arg.Any<string>()).Returns(Task.CompletedTask);
 
-            _postTagRepository.Setup(x => x.DeleteByPostIdAsync(It.IsAny<long>()))
-                .Callback((long postId) => tags.RemoveAll(x => x.PostId == postId));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _postTagRepository.DeleteByPostIdAsync(Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => tags.RemoveAll(t => t.PostId == info.Arg<long>()));
 
             var command = new DeletePostCommand { Id = IdToDelete };
 
@@ -90,16 +89,13 @@ namespace Instagram.Tests.Unit.CommandTests
             Assert.DoesNotContain(posts, x => x.Id == command.Id);
             Assert.DoesNotContain(images, x => x.PostId == command.Id);
             Assert.DoesNotContain(tags, x => x.PostId == command.Id);
+            Assert.Equal(2, _fileService.GetMethodCallsNumber(nameof(_fileService.RemovePostImageAsync)));
         }
 
         [Fact]
         public async Task Handle_PostNotFound_Fail()
         {
-            _postRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync((long id) => null);
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
+            _postRepository.GetEntityByIdAsync(Arg.Any<long>()).ReturnsNull();
 
             var command = new DeletePostCommand { Id = 2137 };
 
@@ -112,28 +108,11 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_ExceptionThrown_Fail()
         {
-            const int IdToDelete = 2;
-            var posts = new List<Post>
-            {
-                new Post { Id = 1, },
-                new Post { Id = IdToDelete, },
-                new Post { Id = 3 },
-                new Post { Id = 4 },
-            };
             const string Error = "Err";
 
-            _postRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback((long id) => throw new Exception(Error));
+            _postRepository.GetEntityByIdAsync(Arg.Any<long>()).ThrowsAsync(new Exception(Error));
 
-            _postImageRepository.Setup(x => x.GetAsync(It.IsAny<GetPostImageRequest>()));
-
-            _postRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync((long id) => posts.First(x => x.Id == id));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
-            var command = new DeletePostCommand { Id = IdToDelete };
+            var command = new DeletePostCommand { Id = 2137 };
 
             var res = await _handler.Handle(command, default);
 

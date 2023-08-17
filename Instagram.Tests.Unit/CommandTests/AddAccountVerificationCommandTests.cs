@@ -2,67 +2,63 @@
 using Instagram.Application.Command;
 using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
-using Instagram.Models.Response;
 using Instagram.Models.AccountVerification.Request;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class AddAccountVerificationCommandTests
     {
-        private readonly Mock<IAccountVerificationRepository> _accountVerificationRepository;
-        private readonly Mock<IAccountVerificationFactory> _accountVerificationFactory;
-        private readonly Mock<IFileService> _fileService;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IAccountVerificationRepository _accountVerificationRepository;
+        private readonly IAccountVerificationFactory _accountVerificationFactory;
+        private readonly IFileService _fileService;
+        private readonly IResponseFactory _responseFactory;
         private readonly AddAccountVerificationHandler _handler;
 
         public AddAccountVerificationCommandTests()
         {
-            _accountVerificationRepository = new Mock<IAccountVerificationRepository>();
-            _accountVerificationFactory = new Mock<IAccountVerificationFactory>();
-            _fileService = new Mock<IFileService>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _accountVerificationRepository = Substitute.For<IAccountVerificationRepository>();
+            _accountVerificationFactory = Substitute.For<IAccountVerificationFactory>();
+            _fileService = Substitute.For<IFileService>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _responseFactory.Setup(x => x.CreateSuccess(It.IsAny<long>()))
-                .Returns((long id) => new ResponseModel { Success = true, NewEntityId = id });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
-            _handler = new AddAccountVerificationHandler(_accountVerificationRepository.Object, _accountVerificationFactory.Object,
-                _responseFactory.Object, _fileService.Object);
+            _handler = new AddAccountVerificationHandler(_accountVerificationRepository, _accountVerificationFactory,
+                _responseFactory, _fileService);
         }
 
         [Fact]
         public async Task Handle_Success()
         {
-            _accountVerificationFactory.Setup(x => x.Create(It.IsAny<AddAccountVerificationRequest>(), It.IsAny<string>()))
-                .Returns((AddAccountVerificationRequest request, string fileName) => new AccountVerification
-                {
-                    UserId = request.UserId,
-                    DocumentFileName = fileName,
-                });
 
-            _fileService.Setup(x => x.SaveVerificationDocumentAsync(It.IsAny<IFormFile>()))
-                .ReturnsAsync((IFormFile file) => file.FileName);
+            _accountVerificationFactory.Create(Arg.Any<AddAccountVerificationRequest>(), Arg.Any<string>())
+                .Returns(info => new AccountVerification
+                    {
+                        UserId = info.Arg<AddAccountVerificationRequest>().UserId,
+                        DocumentFileName = info.Arg<string>()
+                    });
+
+            _fileService.SaveVerificationDocumentAsync(Arg.Any<IFormFile>())
+                .Returns(info => info.Arg<IFormFile>().FileName);
 
             var verifications = new List<AccountVerification>();
 
             const long NewId = 2;
 
-            _accountVerificationRepository.Setup(x => x.InsertAsync(It.IsAny<AccountVerification>()))
-                .Callback((AccountVerification accountVerification) => verifications.Add(accountVerification))
-                .ReturnsAsync(NewId);
+            _accountVerificationRepository.InsertAsync(Arg.Any<AccountVerification>())
+                .Returns(Task.FromResult(NewId))
+                .AndDoes(info => verifications.Add(info.Arg<AccountVerification>()));
+                
 
             const string FileName = "document";
-            var file = new Mock<IFormFile>();
-            file.Setup(x => x.FileName).Returns(FileName);
+            var file = Substitute.For<IFormFile>();
+            file.FileName.Returns(FileName);
 
             var command = new AddAccountVerificationCommand
             {
                 UserId = 1,
-                Document = file.Object,
+                Document = file,
             };
 
             var res = await _handler.Handle(command, default);
@@ -76,7 +72,7 @@ namespace Instagram.Tests.Unit.CommandTests
         public async Task Handle_ExceptionThrown_Failure()
         {
             const string Error = "err";
-            _fileService.Setup(x => x.SaveVerificationDocumentAsync(It.IsAny<IFormFile>()))
+            _fileService.SaveVerificationDocumentAsync(Arg.Any<IFormFile>())
                 .ThrowsAsync(new Exception(Error));
 
             var res = await _handler.Handle(new AddAccountVerificationCommand(), default);

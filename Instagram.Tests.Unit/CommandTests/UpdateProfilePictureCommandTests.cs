@@ -2,28 +2,29 @@
 using Instagram.Application.Command;
 using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
-using Instagram.Models.Response;
 using Instagram.Models.User.Request;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using NSubstitute.ReturnsExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class UpdateProfilePictureCommandTests
     {
-        private readonly Mock<IFileService> _fileService;
-        private readonly Mock<IUserRepository> _userRepository;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IFileService _fileService;
+        private readonly IUserRepository _userRepository;
+        private readonly IResponseFactory _responseFactory;
 
         private readonly UpdateProfilePictureHandler _handler;
 
         public UpdateProfilePictureCommandTests()
         {
-            _fileService = new Mock<IFileService>();
-            _userRepository = new Mock<IUserRepository>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _fileService = Substitute.For<IFileService>();
+            _userRepository = Substitute.For<IUserRepository>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _handler = new UpdateProfilePictureHandler(_fileService.Object, _userRepository.Object, _responseFactory.Object);
+            _handler = new UpdateProfilePictureHandler(_fileService, _userRepository, _responseFactory);
         }
 
         [Fact]
@@ -31,25 +32,20 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string NewFileName = "file";
 
-            _fileService.Setup(x => x.SaveProfilePictureAsync(It.IsAny<IFormFile>()))
-                .ReturnsAsync(NewFileName);
+            _fileService.SaveProfilePictureAsync(Arg.Any<IFormFile>()).Returns(NewFileName);
 
             var user = new User { ProfilePicture = null };
 
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(user);
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>())
+                .Returns(user);
 
-            _userRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateUserRequest>()))
-                .Callback((UpdateUserRequest request) =>
-                {
-                    user.ProfilePicture = request.ProfilePicture;
-                });
+            _userRepository.UpdateAsync(Arg.Any<UpdateUserRequest>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => user.ProfilePicture = info.Arg<UpdateUserRequest>().ProfilePicture);
 
-            _responseFactory.Setup(x => x.CreateSuccess()).Returns(new ResponseModel { Success = true });
+            var file = Substitute.For<IFormFile>();
 
-            var file = new Mock<IFormFile>();
-
-            var command = new UpdateProfilePictureCommand { UserId = 1, File = file.Object };
+            var command = new UpdateProfilePictureCommand { UserId = 1, File = file };
 
             var res = await _handler.Handle(command, default);
 
@@ -62,44 +58,37 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string NewFileName = "file";
 
-            _fileService.Setup(x => x.RemoveProfilePictureAsync(It.IsAny<string>()));
-            _fileService.Setup(x => x.SaveProfilePictureAsync(It.IsAny<IFormFile>())).ReturnsAsync(NewFileName);
+            _fileService.RemoveProfilePictureAsync(Arg.Any<string>()).Returns(Task.CompletedTask);
+            _fileService.SaveProfilePictureAsync(Arg.Any<IFormFile>()).Returns(NewFileName);
 
             var user = new User { ProfilePicture = "prof" };
 
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(user);
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>())
+                .Returns(user);
 
-            _userRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateUserRequest>()))
-                .Callback((UpdateUserRequest request) =>
-                {
-                    user.ProfilePicture = request.ProfilePicture;
-                });
+            _userRepository.UpdateAsync(Arg.Any<UpdateUserRequest>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => user.ProfilePicture = info.Arg<UpdateUserRequest>().ProfilePicture);
 
-            _responseFactory.Setup(x => x.CreateSuccess()).Returns(new ResponseModel { Success = true });
+            var file = Substitute.For<IFormFile>();
 
-            var file = new Mock<IFormFile>();
-
-            var command = new UpdateProfilePictureCommand { UserId = 1, File = file.Object };
+            var command = new UpdateProfilePictureCommand { UserId = 1, File = file };
 
             var res = await _handler.Handle(command, default);
 
             Assert.True(res.Success);
+            Assert.Equal(1, _fileService.GetMethodCallsNumber(nameof(_fileService.RemoveProfilePictureAsync)));
             Assert.Equal(NewFileName, user.ProfilePicture);
         }
 
         [Fact]
         public async Task Handle_UserNotFound_Fail()
         {
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(() => null);
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>()).ReturnsNull();
 
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns(new ResponseModel { Success = false });
+            var file = Substitute.For<IFormFile>();
 
-            var file = new Mock<IFormFile>();
-
-            var command = new UpdateProfilePictureCommand { UserId = 1, File = file.Object };
+            var command = new UpdateProfilePictureCommand { UserId = 1, File = file };
 
             var res = await _handler.Handle(command, default);
 
@@ -111,20 +100,11 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "error";
 
-            _fileService.Setup(x => x.RemoveProfilePictureAsync(It.IsAny<string>()))
-                .Callback(() => throw new Exception(Error));
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>()).ThrowsAsync(new Exception(Error));
 
-            var user = new User { ProfilePicture = "prof" };
+            var file = Substitute.For<IFormFile>();
 
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(user);
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
-            var file = new Mock<IFormFile>();
-
-            var command = new UpdateProfilePictureCommand { UserId = 1, File = file.Object };
+            var command = new UpdateProfilePictureCommand { UserId = 1, File = file };
 
             var res = await _handler.Handle(command, default);
 

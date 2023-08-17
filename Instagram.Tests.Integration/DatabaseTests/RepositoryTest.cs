@@ -1,5 +1,5 @@
 ﻿using Instagram.Database.Factory;
-using Moq;
+using NSubstitute;
 using System.Data.SqlClient;
 
 namespace Instagram.Tests.Integration.DatabaseTests
@@ -9,9 +9,11 @@ namespace Instagram.Tests.Integration.DatabaseTests
         protected readonly IConnectionFactory _connectionFactory;
         public RepositoryTest()
         {
-            var factoryMock =  new Mock<IConnectionFactory>();
-            factoryMock.Setup(x => x.CreateConnection()).Returns(new SqlConnection(Constants.ConnectionString));
-            _connectionFactory = factoryMock.Object;
+            var factoryMock = Substitute.For<IConnectionFactory>();
+
+            factoryMock.CreateConnection().Returns(new SqlConnection(Constants.ConnectionString));
+
+            _connectionFactory = factoryMock;
         }
     }
 }

@@ -6,25 +6,26 @@ using Instagram.Models.Response;
 using Instagram.Models.User;
 using Instagram.Models.User.Request;
 using Instagram.Models.UserClaim.Request;
-using Moq;
+using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class AuthCommandTests
     {
-        private readonly Mock<IAuthService> _authService;
-        private readonly Mock<IUserRepository> _userRepository;
-        private readonly Mock<IUserFactory> _userFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
-        private readonly Mock<IUserClaimRepository> _userClaimRepository;
+        private readonly IAuthService _authService;
+        private readonly IUserRepository _userRepository;
+        private readonly IUserFactory _userFactory;
+        private readonly IResponseFactory _responseFactory;
+        private readonly IUserClaimRepository _userClaimRepository;
 
         public AuthCommandTests()
         {
-            _authService = new Mock<IAuthService>();
-            _userRepository = new Mock<IUserRepository>();
-            _userFactory = new Mock<IUserFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _userClaimRepository = new Mock<IUserClaimRepository>();
+            _authService = Substitute.For<IAuthService>();
+            _userRepository = Substitute.For<IUserRepository>();
+            _userFactory = Substitute.For<IUserFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
+            _userClaimRepository = Substitute.For<IUserClaimRepository>();
         }
 
         [Fact]
@@ -33,31 +34,29 @@ namespace Instagram.Tests.Unit.CommandTests
             var user = new User { Id = 1, Email = "mail" };
             const string Token = "token";
 
-            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>()))
-                .ReturnsAsync(user);
+            _userRepository.GetEntityByEmailAsync(Arg.Any<string>()).Returns(user);
 
-            _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(true);
+            _authService.VerifyPasswordAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
-            _authService.Setup(x => x.GenerateTokenAsync(It.IsAny<User>(), It.IsAny<IEnumerable<UserClaim>>()))
-                .ReturnsAsync(Token);
+            _authService.GenerateTokenAsync(Arg.Any<User>(), Arg.Any<IEnumerable<UserClaim>>()).Returns(Token);
 
-            _userFactory.Setup(x => x.CreateLoginResponse(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<UserClaim>>()))
-                .Returns((long id, string token, string email, IEnumerable<UserClaim> _) => new LoginResponse
-                {
-                    AuthToken = token,
-                    Email = email,
-                    UserId = id
-                });
+            _userFactory.CreateLoginResponse(Arg.Any<long>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IEnumerable<UserClaim>>())
+                .Returns(info =>
+                    new LoginResponse
+                    {
+                        AuthToken = info.ArgAt<string>(1),
+                        Email = info.ArgAt<string>(2),
+                        UserId = info.Arg<long>(),
+                    });
 
-            _userClaimRepository.Setup(x => x.GetEntitiesAsync(It.IsAny<GetUserClaimRequest>()))
-                .ReturnsAsync(Enumerable.Empty<UserClaim>());
+            _userClaimRepository.GetEntitiesAsync(Arg.Any<GetUserClaimRequest>())
+                .Returns(Enumerable.Empty<UserClaim>());
 
-            _responseFactory.Setup(x => x.CreateSuccess(It.IsAny<LoginResponse>()))
-                .Returns((LoginResponse data) => new DataResponseModel<LoginResponse> { Data = data, Success = true });
+            _responseFactory.CreateSuccess(Arg.Any<LoginResponse>())
+                .Returns(info => new DataResponseModel<LoginResponse> { Data = info.Arg<LoginResponse>(), Success = true });
 
-            var res = await new LoginHandler(_userRepository.Object, _authService.Object,
-                _userFactory.Object, _responseFactory.Object, _userClaimRepository.Object)
+            var res = await new LoginHandler(_userRepository, _authService,
+                _userFactory, _responseFactory, _userClaimRepository)
                 .Handle(new LoginCommand(), default);
 
             Assert.True(res.Success);
@@ -71,17 +70,20 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             var user = new User { Id = 1, Email = "mail" };
 
-            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>()))
-                .ReturnsAsync(user);
+            _userRepository.GetEntityByEmailAsync(Arg.Any<string>()).Returns(user);
 
-            _authService.Setup(x => x.VerifyPasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(false);
+            _authService.VerifyPasswordAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
-            _responseFactory.Setup(x => x.CreateFailure<LoginResponse>(It.IsAny<string>()))
-                .Returns((string error) => new DataResponseModel<LoginResponse> { Error = error, Success = false, Data = null });
+            _responseFactory.CreateFailure<LoginResponse>(Arg.Any<string>())
+                .Returns(info => new DataResponseModel<LoginResponse>
+                {
+                    Error = info.Arg<string>(),
+                    Success = false,
+                    Data = null
+                });
 
-            var res = await new LoginHandler(_userRepository.Object, _authService.Object,
-                _userFactory.Object, _responseFactory.Object, _userClaimRepository.Object)
+            var res = await new LoginHandler(_userRepository, _authService,
+                _userFactory, _responseFactory, _userClaimRepository)
                 .Handle(new LoginCommand(), default);
 
             Assert.False(res.Success);
@@ -92,14 +94,18 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task LoginCommand_UserNotFound_Failure()
         {
-            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>()))
-                .ReturnsAsync(() => null);
+            _userRepository.GetEntityByEmailAsync(Arg.Any<string>()).ReturnsNull();
 
-            _responseFactory.Setup(x => x.CreateFailure<LoginResponse>(It.IsAny<string>()))
-                .Returns((string error) => new DataResponseModel<LoginResponse> { Error = error, Success = false, Data = null });
+            _responseFactory.CreateFailure<LoginResponse>(Arg.Any<string>())
+                .Returns(info => new DataResponseModel<LoginResponse>
+                {
+                    Error = info.Arg<string>(),
+                    Success = false,
+                    Data = null
+                });
 
-            var res = await new LoginHandler(_userRepository.Object, _authService.Object, _userFactory.Object,
-                _responseFactory.Object, _userClaimRepository.Object)
+            var res = await new LoginHandler(_userRepository, _authService, _userFactory,
+                _responseFactory, _userClaimRepository)
                 .Handle(new LoginCommand(), default);
 
             Assert.False(res.Success);
@@ -113,27 +119,25 @@ namespace Instagram.Tests.Unit.CommandTests
             var users = new List<User>();
             const long UserId = 1;
 
-            _userRepository.Setup(x => x.InsertAsync(It.IsAny<User>()))
-                .Callback((User user) => users.Add(user))
-                .ReturnsAsync(UserId);
-            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>()))
-                .ReturnsAsync((string email) => users.FirstOrDefault(x => x.Email == email));
+            _userRepository.InsertAsync(Arg.Any<User>())
+                .Returns(UserId)
+                .AndDoes(info => users.Add(info.Arg<User>()));
+
+            _userRepository.GetEntityByEmailAsync(Arg.Any<string>())
+                .ReturnsNull();
 
             const string Hash = "hash";
-            _authService.Setup(x => x.HashPasswordAsync(It.IsAny<string>())).ReturnsAsync(Hash);
+            _authService.HashPasswordAsync(Arg.Any<string>()).Returns(Hash);
 
-            _userFactory.Setup(x => x.Create(It.IsAny<RegisterRequest>(), It.IsAny<string>()))
-                .Returns((RegisterRequest request, string passwordHash) => new User
+            _userFactory.Create(Arg.Any<RegisterRequest>(), Arg.Any<string>())
+                .Returns(info => new User
                 {
-                    PasswordHash = passwordHash,
-                    Nickname = request.Nickname
+                    Nickname = info.Arg<RegisterRequest>().Nickname,
+                    PasswordHash = info.Arg<string>()
                 });
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
-
             var command = new RegisterCommand { Nickname = "nick", Email = "mail" };
-            var res = await new RegisterHandler(_userFactory.Object, _userRepository.Object, _authService.Object, _responseFactory.Object)
+            var res = await new RegisterHandler(_userFactory, _userRepository, _authService, _responseFactory)
                 .Handle(command, default);
 
             Assert.True(res.Success);
@@ -143,14 +147,10 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task RegisterCommand_UserExists_Fail()
         {
-            _userRepository.Setup(x => x.GetEntityByEmailAsync(It.IsAny<string>()))
-                .ReturnsAsync(new User());
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
+            _userRepository.GetEntityByEmailAsync(Arg.Any<string>()).Returns(new User());
 
             var command = new RegisterCommand { Nickname = "nick", Email = "mail" };
-            var res = await new RegisterHandler(_userFactory.Object, _userRepository.Object, _authService.Object, _responseFactory.Object)
+            var res = await new RegisterHandler(_userFactory, _userRepository, _authService, _responseFactory)
                 .Handle(command, default);
 
             Assert.False(res.Success);

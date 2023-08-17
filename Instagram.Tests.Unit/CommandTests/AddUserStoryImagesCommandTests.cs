@@ -4,33 +4,28 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.Response;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class AddUserStoryImagesCommandTests
     {
-        private readonly Mock<IUserStoryImageRepository> _userStoryRepository;
-        private readonly Mock<IUserStoryFactory> _userStoryFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
-        private readonly Mock<IFileService> _fileService;
+        private readonly IUserStoryImageRepository _userStoryRepository;
+        private readonly IUserStoryFactory _userStoryFactory;
+        private readonly IResponseFactory _responseFactory;
+        private readonly IFileService _fileService;
         private readonly AddUserStoryImagesHandler _handler;
 
         public AddUserStoryImagesCommandTests()
         {
-            _userStoryRepository = new Mock<IUserStoryImageRepository>();
-            _userStoryFactory = new Mock<IUserStoryFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _fileService = new Mock<IFileService>();
+            _userStoryRepository = Substitute.For<IUserStoryImageRepository>();
+            _userStoryFactory = Substitute.For<IUserStoryFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
+            _fileService = Substitute.For<IFileService>();
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
-
-            _handler = new AddUserStoryImagesHandler(_userStoryRepository.Object, _userStoryFactory.Object,
-                _responseFactory.Object, _fileService.Object);
+            _handler = new AddUserStoryImagesHandler(_userStoryRepository, _userStoryFactory,
+                _responseFactory, _fileService);
         }
 
         [Fact]
@@ -38,14 +33,19 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             var images = new List<UserStoryImage>();
 
-            _userStoryRepository.Setup(x => x.InsertAsync(It.IsAny<UserStoryImage>()))
-                .Callback((UserStoryImage image) => images.Add(image));
+            _userStoryRepository.InsertAsync(Arg.Any<UserStoryImage>())
+                .Returns(0)
+                .AndDoes(info => images.Add(info.Arg<UserStoryImage>()));
 
-            _userStoryFactory.Setup(x => x.Create(It.IsAny<long>(), It.IsAny<string>()))
-                .Returns((long id, string fileName) => new UserStoryImage { UserId = id, FileName = fileName });
+            _userStoryFactory.Create(Arg.Any<long>(), Arg.Any<string>())
+                .Returns(info => new UserStoryImage
+                    {
+                        UserId = info.Arg<long>(),
+                        FileName = info.Arg<string>(),
+                    });
 
-            _fileService.Setup(x => x.SaveStoryImagesAsync(It.IsAny<IEnumerable<IFormFile>>()))
-                .ReturnsAsync((IEnumerable<IFormFile> files) => files.Select(x => x.Name));
+            _fileService.SaveStoryImagesAsync(Arg.Any<IEnumerable<IFormFile>>())
+                .Returns(info => info.Arg<IEnumerable<IFormFile>>().Select(f => f.Name));
 
             var fileNames = new List<string>
             {
@@ -58,10 +58,10 @@ namespace Instagram.Tests.Unit.CommandTests
                 UserId = 1,
                 Images = fileNames.Select(name =>
                 {
-                    var mock = new Mock<IFormFile>();
-                    mock.Setup(x => x.Name).Returns(name);
+                    var mock = Substitute.For<IFormFile>();
+                    mock.Name.Returns(name);
 
-                    return mock.Object;
+                    return mock;
                 })
             };
 
@@ -80,7 +80,7 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "err";
 
-            _fileService.Setup(x => x.SaveStoryImagesAsync(It.IsAny<IEnumerable<IFormFile>>()))
+            _fileService.SaveStoryImagesAsync(Arg.Any<IEnumerable<IFormFile>>())
                 .ThrowsAsync(new Exception(Error));
 
             var res = await _handler.Handle(new AddUserStoryImagesCommand(), default);

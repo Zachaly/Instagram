@@ -5,23 +5,24 @@ using Instagram.Domain.Entity;
 using Instagram.Models.PostLike;
 using Instagram.Models.PostLike.Request;
 using Instagram.Models.Response;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class PostLikeServiceTests
     {
-        private readonly Mock<IPostLikeFactory> _postLikeFactory;
-        private readonly Mock<IPostLikeRepository> _postLikeRepository;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IPostLikeFactory _postLikeFactory;
+        private readonly IPostLikeRepository _postLikeRepository;
+        private readonly IResponseFactory _responseFactory;
         private readonly PostLikeService _service;
 
         public PostLikeServiceTests()
         {
-            _postLikeFactory = new Mock<IPostLikeFactory>();
-            _postLikeRepository = new Mock<IPostLikeRepository>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _service = new PostLikeService(_postLikeFactory.Object, _postLikeRepository.Object, _responseFactory.Object);
+            _postLikeFactory = Substitute.For<IPostLikeFactory>();
+            _postLikeRepository = Substitute.For<IPostLikeRepository>();
+            _responseFactory = ResponseFactoryMock.Create();
+            _service = new PostLikeService(_postLikeFactory, _postLikeRepository, _responseFactory);
         }
 
         [Fact]
@@ -36,8 +37,7 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new PostLikeModel { UserId = 5 },
             };
 
-            _postLikeRepository.Setup(x => x.GetAsync(It.IsAny<GetPostLikeRequest>()))
-                .ReturnsAsync(likes);
+            _postLikeRepository.GetAsync(Arg.Any<GetPostLikeRequest>()).Returns(likes);
 
             var res = await _service.GetAsync(new GetPostLikeRequest());
 
@@ -49,14 +49,16 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             var likes = new List<PostLike>();
 
-            _postLikeFactory.Setup(x => x.Create(It.IsAny<AddPostLikeRequest>()))
-                .Returns((AddPostLikeRequest req) => new PostLike { PostId = req.PostId, UserId = req.UserId });
+            _postLikeFactory.Create(Arg.Any<AddPostLikeRequest>())
+                .Returns(info => new PostLike
+                {
+                    PostId = info.Arg<AddPostLikeRequest>().PostId,
+                    UserId = info.Arg<AddPostLikeRequest>().UserId,
+                });
 
-            _postLikeRepository.Setup(x => x.InsertAsync(It.IsAny<PostLike>()))
-                .Callback((PostLike like) => likes.Add(like));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _postLikeRepository.InsertAsync(Arg.Any<PostLike>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => likes.Add(info.Arg<PostLike>()));
 
             var request = new AddPostLikeRequest { PostId = 1, UserId = 2 };
             var res = await _service.AddAsync(request);
@@ -70,14 +72,8 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _postLikeFactory.Setup(x => x.Create(It.IsAny<AddPostLikeRequest>()))
-                .Returns((AddPostLikeRequest req) => new PostLike { PostId = req.PostId, UserId = req.UserId });
-
-            _postLikeRepository.Setup(x => x.InsertAsync(It.IsAny<PostLike>()))
-                .Callback((PostLike like) => throw new Exception(Error));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _postLikeFactory.Create(Arg.Any<AddPostLikeRequest>())
+                .Throws(new Exception(Error));
 
             var request = new AddPostLikeRequest { PostId = 1, UserId = 2 };
             var res = await _service.AddAsync(request);
@@ -91,8 +87,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const int Count = 10;
 
-            _postLikeRepository.Setup(x => x.GetCountAsync(It.IsAny<GetPostLikeRequest>()))
-                .ReturnsAsync(Count);
+            _postLikeRepository.GetCountAsync(Arg.Any<GetPostLikeRequest>()).Returns(Count);
 
             var res = await _service.GetCountAsync(new GetPostLikeRequest());
 
@@ -113,11 +108,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new PostLike { PostId = 4, UserId = 4 },
             };
 
-            _postLikeRepository.Setup(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<long>()))
-                .Callback((long postId, long userId) => likes.RemoveAll(x => x.PostId == postId && x.UserId == userId));
-
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
+            _postLikeRepository.DeleteAsync(Arg.Any<long>(), Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => likes.RemoveAll(x => x.PostId == info.ArgAt<long>(0) && x.UserId == info.ArgAt<long>(1)));
 
             var res = await _service.DeleteAsync(PostIdToDelete, UserIdToDelete);
 
@@ -130,11 +123,8 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "error";
 
-            _postLikeRepository.Setup(x => x.DeleteAsync(It.IsAny<long>(), It.IsAny<long>()))
-                .Callback((long postId, long userId) => throw new Exception(Error));
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _postLikeRepository.DeleteAsync(Arg.Any<long>(), Arg.Any<long>())
+                .ThrowsAsync(new Exception(Error));
 
             var res = await _service.DeleteAsync(1, 2);
 

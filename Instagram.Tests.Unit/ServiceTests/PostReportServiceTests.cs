@@ -4,24 +4,25 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.PostReport.Request;
 using Instagram.Models.Response;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class PostReportServiceTests
     {
-        private readonly Mock<IPostReportRepository> _postReportRepository;
-        private readonly Mock<IPostReportFactory> _postReportFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly IPostReportRepository _postReportRepository;
+        private readonly IPostReportFactory _postReportFactory;
+        private readonly IResponseFactory _responseFactory;
         private readonly PostReportService _service;
 
         public PostReportServiceTests()
         {
-            _postReportRepository = new Mock<IPostReportRepository>();
-            _postReportFactory = new Mock<IPostReportFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _postReportRepository = Substitute.For<IPostReportRepository>();
+            _postReportFactory = Substitute.For<IPostReportFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _service = new PostReportService(_postReportRepository.Object, _postReportFactory.Object, _responseFactory.Object);
+            _service = new PostReportService(_postReportRepository, _postReportFactory, _responseFactory);
         }
 
         [Fact]
@@ -30,15 +31,12 @@ namespace Instagram.Tests.Unit.ServiceTests
             var reports = new List<PostReport>();
             const long NewId = 1;
 
-            _postReportRepository.Setup(x => x.InsertAsync(It.IsAny<PostReport>()))
-                .Callback((PostReport postReport) => reports.Add(postReport))
-                .ReturnsAsync(NewId);
+            _postReportRepository.InsertAsync(Arg.Any<PostReport>())
+                .Returns(NewId)
+                .AndDoes(info => reports.Add(info.Arg<PostReport>()));
 
-            _postReportFactory.Setup(x => x.Create(It.IsAny<AddPostReportRequest>()))
-                .Returns((AddPostReportRequest request) => new PostReport { PostId = request.PostId });
-
-            _responseFactory.Setup(x => x.CreateSuccess(It.IsAny<long>()))
-                .Returns((long id) => new ResponseModel { Success = true, NewEntityId = id });
+            _postReportFactory.Create(Arg.Any<AddPostReportRequest>())
+                .Returns(info => new PostReport { PostId = info.Arg<AddPostReportRequest>().PostId });
 
             var request = new AddPostReportRequest { PostId = 2 };
 
@@ -54,14 +52,8 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _postReportRepository.Setup(x => x.InsertAsync(It.IsAny<PostReport>()))
-                .Callback(() => throw new Exception(Error));
-
-            _postReportFactory.Setup(x => x.Create(It.IsAny<AddPostReportRequest>()))
-                .Returns((AddPostReportRequest request) => new PostReport { PostId = request.PostId });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Success = false, Error = err });
+            _postReportFactory.Create(Arg.Any<AddPostReportRequest>())
+                .Throws(new Exception(Error));
 
             var request = new AddPostReportRequest { PostId = 2 };
 

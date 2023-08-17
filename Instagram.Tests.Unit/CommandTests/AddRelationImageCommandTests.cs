@@ -4,33 +4,28 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.Response;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class AddRelationImageCommandTests
     {
-        private readonly Mock<IRelationImageRepository> _relationImageRepository;
-        private readonly Mock<IResponseFactory> _responseFactory;
-        private readonly Mock<IFileService> _fileService;
-        private readonly Mock<IRelationFactory> _relationFactory;
+        private readonly IRelationImageRepository _relationImageRepository;
+        private readonly IResponseFactory _responseFactory;
+        private readonly IFileService _fileService;
+        private readonly IRelationFactory _relationFactory;
         private readonly AddRelationImageHandler _handler;
 
         public AddRelationImageCommandTests()
         {
-            _relationImageRepository = new Mock<IRelationImageRepository>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _fileService = new Mock<IFileService>();
-            _relationFactory = new Mock<IRelationFactory>();
+            _relationImageRepository = Substitute.For<IRelationImageRepository>();
+            _responseFactory = ResponseFactoryMock.Create();
+            _fileService = Substitute.For<IFileService>();
+            _relationFactory = Substitute.For<IRelationFactory>();
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(() => new ResponseModel { Success = true });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Error = err, Success = false });
-
-            _handler = new AddRelationImageHandler(_relationImageRepository.Object, _fileService.Object,
-                _relationFactory.Object, _responseFactory.Object);
+            _handler = new AddRelationImageHandler(_relationImageRepository, _fileService,
+                _relationFactory, _responseFactory);
         }
 
         [Fact]
@@ -38,23 +33,27 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             var images = new List<RelationImage>();
 
-            _relationImageRepository.Setup(x => x.InsertAsync(It.IsAny<RelationImage>()))
-                .Callback((RelationImage image) => images.Add(image));
+            _relationImageRepository.InsertAsync(Arg.Any<RelationImage>())
+                .Returns(0)
+                .AndDoes(info => images.Add(info.Arg<RelationImage>()));
 
-            _fileService.Setup(x => x.SaveRelationImageAsync(It.IsAny<IFormFile>()))
-                .ReturnsAsync((IFormFile file) => file.Name);
+            _fileService.SaveRelationImageAsync(Arg.Any<IFormFile>())
+                .Returns(info => info.Arg<IFormFile>().Name);
 
-            _relationFactory.Setup(x => x.CreateImage(It.IsAny<long>(), It.IsAny<string>()))
-                .Returns((long id, string name) => new RelationImage { FileName = name, RelationId = id });
+            _relationFactory.CreateImage(Arg.Any<long>(), Arg.Any<string>())
+                .Returns(info => new RelationImage
+                    {
+                        FileName = info.Arg<string>(),
+                        RelationId = info.Arg<long>(),
+                    });
 
             const string FileName = "file";
-            var file = new Mock<IFormFile>();
-            file.Setup(x => x.Name)
-                .Returns(FileName);
+            var file = Substitute.For<IFormFile>();
+            file.Name.Returns(FileName);
 
             var command = new AddRelationImageCommand
             {
-                File = file.Object,
+                File = file,
                 RelationId = 1
             };
 
@@ -69,8 +68,7 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "err";
 
-            _fileService.Setup(x => x.SaveRelationImageAsync(It.IsAny<IFormFile>()))
-                .Callback(() => throw new Exception(Error));
+            _fileService.SaveRelationImageAsync(Arg.Any<IFormFile>()).ThrowsAsync(new Exception(Error));
 
             var res = await _handler.Handle(new AddRelationImageCommand(), default);
 

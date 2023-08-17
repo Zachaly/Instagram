@@ -2,20 +2,20 @@
 using Instagram.Database.Repository;
 using Instagram.Models.UserStory;
 using Instagram.Models.UserStory.Request;
-using Moq;
+using NSubstitute;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class UserStoryServiceTests
     {
-        private readonly Mock<IUserStoryImageRepository> _userStoryRepository;
+        private readonly IUserStoryImageRepository _userStoryRepository;
         private readonly UserStoryService _service;
 
         public UserStoryServiceTests()
         {
-            _userStoryRepository = new Mock<IUserStoryImageRepository>();
+            _userStoryRepository = Substitute.For<IUserStoryImageRepository>();
 
-            _service = new UserStoryService(_userStoryRepository.Object);
+            _service = new UserStoryService(_userStoryRepository);
         }
 
         [Fact]
@@ -29,8 +29,7 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new UserStoryModel { UserId = 4, },
             };
 
-            _userStoryRepository.Setup(x => x.GetStoriesAsync(It.IsAny<GetUserStoryRequest>()))
-                .ReturnsAsync(stories);
+            _userStoryRepository.GetStoriesAsync(Arg.Any<GetUserStoryRequest>()).Returns(stories);
 
             var res = await _service.GetAsync(new GetUserStoryRequest());
 

@@ -6,37 +6,44 @@ using Instagram.Domain.Entity;
 using Instagram.Models.Response;
 using Instagram.Models.User;
 using Instagram.Models.UserClaim.Request;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using NSubstitute.ReturnsExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class GetCurrentUserQueryTests
     {
-        private readonly Mock<IAuthService> _authService;
-        private readonly Mock<IUserRepository> _userRepository;
-        private readonly Mock<IUserClaimRepository> _userClaimRepository;
-        private readonly Mock<IResponseFactory> _responseFactory;
-        private readonly Mock<IUserDataService> _userDataService;
-        private readonly Mock<IUserFactory> _userFactory;
+        private readonly IAuthService _authService;
+        private readonly IUserRepository _userRepository;
+        private readonly IUserClaimRepository _userClaimRepository;
+        private readonly IResponseFactory _responseFactory;
+        private readonly IUserDataService _userDataService;
+        private readonly IUserFactory _userFactory;
         private readonly GetCurrentUserHandler _handler;
 
         public GetCurrentUserQueryTests()
         {
-            _authService = new Mock<IAuthService>();
-            _userRepository = new Mock<IUserRepository>();
-            _userClaimRepository = new Mock<IUserClaimRepository>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _userDataService = new Mock<IUserDataService>();
-            _userFactory = new Mock<IUserFactory>();
+            _authService = Substitute.For<IAuthService>();
+            _userRepository = Substitute.For<IUserRepository>();
+            _userClaimRepository = Substitute.For<IUserClaimRepository>();
+            _responseFactory = ResponseFactoryMock.Create();
+            _userDataService = Substitute.For<IUserDataService>();
+            _userFactory = Substitute.For<IUserFactory>();
 
-            _responseFactory.Setup(x => x.CreateSuccess<LoginResponse>(It.IsAny<LoginResponse>()))
-                .Returns((LoginResponse response) => new DataResponseModel<LoginResponse> { Success = true, Data = response });
+            _responseFactory.CreateFailure<LoginResponse>(Arg.Any<string>())
+                .Returns(info => new DataResponseModel<LoginResponse>
+                {
+                    Error = info.Arg<string>(),
+                    Success = false,
+                    Data = null
+                });
 
-            _responseFactory.Setup(x => x.CreateFailure<LoginResponse>(It.IsAny<string>()))
-                .Returns((string err) => new DataResponseModel<LoginResponse> { Data = null, Error = err, Success = false });
+            _responseFactory.CreateSuccess(Arg.Any<LoginResponse>())
+                .Returns(info => new DataResponseModel<LoginResponse> { Data = info.Arg<LoginResponse>(), Success = true });
 
-            _handler = new GetCurrentUserHandler(_authService.Object, _userRepository.Object, _userClaimRepository.Object, _userDataService.Object,
-                _responseFactory.Object, _userFactory.Object);
+            _handler = new GetCurrentUserHandler(_authService, _userRepository, _userClaimRepository, _userDataService,
+                _responseFactory, _userFactory);
         }
 
         [Fact]
@@ -44,26 +51,21 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             var user = new User { Id = 1 };
 
-            _userDataService.Setup(x => x.GetCurrentUserId())
-                .ReturnsAsync(user.Id);
+            _userDataService.GetCurrentUserId().Returns(user.Id);
 
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(user);
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>()).Returns(user);
 
-            _userClaimRepository.Setup(x => x.GetEntitiesAsync(It.IsAny<GetUserClaimRequest>()))
-                .ReturnsAsync(Enumerable.Empty<UserClaim>());
+            _userClaimRepository.GetEntitiesAsync(Arg.Any<GetUserClaimRequest>()).Returns(Enumerable.Empty<UserClaim>());
 
             const string Token = "token";
 
-            _authService.Setup(x => x.GenerateTokenAsync(It.IsAny<User>(), It.IsAny<IEnumerable<UserClaim>>()))
-                .ReturnsAsync(Token);
+            _authService.GenerateTokenAsync(Arg.Any<User>(), Arg.Any<IEnumerable<UserClaim>>()).Returns(Token);
 
-            _userFactory.Setup(x => x.CreateLoginResponse(It.IsAny<long>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<IEnumerable<UserClaim>>()))
-                .Returns((long id, string token, string _, IEnumerable<UserClaim> __) => new LoginResponse
+            _userFactory.CreateLoginResponse(Arg.Any<long>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IEnumerable<UserClaim>>())
+                .Returns(info => new LoginResponse
                 {
-                    AuthToken = token,
-                    UserId = id,
+                    AuthToken = info.ArgAt<string>(1),
+                    UserId = info.Arg<long>()
                 });
 
             var res = await _handler.Handle(new GetCurrentUserQuery(), default);
@@ -76,8 +78,7 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_UserIdNull_Failure()
         {
-            _userDataService.Setup(x => x.GetCurrentUserId())
-                .ReturnsAsync(() => null);
+            _userDataService.GetCurrentUserId().ReturnsNull();
 
             var res = await _handler.Handle(new GetCurrentUserQuery(), default);
 
@@ -88,11 +89,9 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_UserNotFound_Failure()
         {
-            _userDataService.Setup(x => x.GetCurrentUserId())
-                .ReturnsAsync(2137);
+            _userDataService.GetCurrentUserId().Returns(2137);
 
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(() => null);
+            _userRepository.GetEntityByIdAsync(Arg.Any<long>()).ReturnsNull();
 
             var res = await _handler.Handle(new GetCurrentUserQuery(), default);
 
@@ -103,16 +102,8 @@ namespace Instagram.Tests.Unit.CommandTests
         [Fact]
         public async Task Handle_ExceptionThrown_Failure()
         {
-            _userDataService.Setup(x => x.GetCurrentUserId())
-                .ReturnsAsync(2137);
-
-            _userRepository.Setup(x => x.GetEntityByIdAsync(It.IsAny<long>()))
-                .ReturnsAsync(() => new User());
-
             const string Error = "err";
-
-            _userClaimRepository.Setup(x => x.GetEntitiesAsync(It.IsAny<GetUserClaimRequest>()))
-                .Callback(() => throw new Exception(Error));
+            _userDataService.GetCurrentUserId().ThrowsAsync(new Exception(Error));
 
             var res = await _handler.Handle(new GetCurrentUserQuery(), default);
 

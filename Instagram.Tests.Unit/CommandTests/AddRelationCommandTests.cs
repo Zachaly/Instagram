@@ -4,37 +4,32 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.Relation.Request;
 using Instagram.Models.Response;
-using Instagram.Models.User;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.CommandTests
 {
     public class AddRelationCommandTests
     {
-        private readonly Mock<IRelationRepository> _relationRepository;
-        private readonly Mock<IRelationFactory> _relationFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
-        private readonly Mock<IFileService> _fileService;
-        private readonly Mock<IRelationImageRepository> _relationImageRepository;
+        private readonly IRelationRepository _relationRepository;
+        private readonly IRelationFactory _relationFactory;
+        private readonly IResponseFactory _responseFactory;
+        private readonly IFileService _fileService;
+        private readonly IRelationImageRepository _relationImageRepository;
         private readonly AddRelationHandler _handler;
 
         public AddRelationCommandTests()
         {
-            _relationRepository = new Mock<IRelationRepository>();
-            _relationFactory = new Mock<IRelationFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
-            _fileService = new Mock<IFileService>();
-            _relationImageRepository = new Mock<IRelationImageRepository>();
+            _relationRepository = Substitute.For<IRelationRepository>();
+            _relationFactory = Substitute.For<IRelationFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
+            _fileService = Substitute.For<IFileService>();
+            _relationImageRepository = Substitute.For<IRelationImageRepository>();
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(() => new ResponseModel { Success = true });
 
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string err) => new ResponseModel { Error = err, Success = false });
-
-            _handler = new AddRelationHandler(_relationRepository.Object, _relationFactory.Object, _relationImageRepository.Object,
-                _fileService.Object, _responseFactory.Object);
+            _handler = new AddRelationHandler(_relationRepository, _relationFactory, _relationImageRepository,
+                _fileService, _responseFactory);
         }
 
         [Fact]
@@ -43,32 +38,41 @@ namespace Instagram.Tests.Unit.CommandTests
             var relations = new List<Relation>();
             var images = new List<RelationImage>();
 
-            _fileService.Setup(x => x.SaveRelationImagesAsync(It.IsAny<IEnumerable<IFormFile>>()))
-                .ReturnsAsync((IEnumerable<IFormFile> files) => files.Select(x => x.Name));
+            _fileService.SaveRelationImagesAsync(Arg.Any<IEnumerable<IFormFile>>())
+                .Returns(info => info.Arg<IEnumerable<IFormFile>>().Select(f => f.Name));
 
-            _relationFactory.Setup(x => x.Create(It.IsAny<AddRelationRequest>()))
-                .Returns((AddRelationRequest request) => new Relation { Name = request.Name, UserId = request.UserId });
+            _relationFactory.Create(Arg.Any<AddRelationRequest>())
+                .Returns(info => new Relation
+                    { 
+                        Name = info.Arg<AddRelationRequest>().Name,
+                        UserId = info.Arg<AddRelationRequest>().UserId
+                    });
 
-            _relationFactory.Setup(x => x.CreateImage(It.IsAny<long>(), It.IsAny<string>()))
-                .Returns((long id, string name) => new RelationImage { FileName = name, RelationId = id });
+            _relationFactory.CreateImage(Arg.Any<long>(), Arg.Any<string>())
+                .Returns(info => new RelationImage
+                    {
+                        FileName = info.Arg<string>(),
+                        RelationId = info.Arg<long>(),
+                    });
 
             const long NewId = 2;
 
-            _relationRepository.Setup(x => x.InsertAsync(It.IsAny<Relation>()))
-                .Callback((Relation relation) => relations.Add(relation))
-                .ReturnsAsync(NewId);
+            _relationRepository.InsertAsync(Arg.Any<Relation>())
+                .Returns(NewId)
+                .AndDoes(info => relations.Add(info.Arg<Relation>()));
 
-            _relationImageRepository.Setup(x => x.InsertAsync(It.IsAny<RelationImage>()))
-                .Callback((RelationImage image) => images.Add(image));
+            _relationImageRepository.InsertAsync(Arg.Any<RelationImage>())
+                .Returns(0)
+                .AndDoes(info => images.Add(info.Arg<RelationImage>()));
 
             var fileNames = new string[] { "file1", "file2" };
 
             var files = fileNames.Select(name =>
             {
-                var mock = new Mock<IFormFile>();
-                mock.Setup(x => x.Name).Returns(name);
+                var mock = Substitute.For<IFormFile>();
+                mock.Name.Returns(name);
 
-                return mock.Object;
+                return mock;
             });
 
             var command = new AddRelationCommand { Files = files, Name = "name", UserId = 1 };
@@ -89,8 +93,8 @@ namespace Instagram.Tests.Unit.CommandTests
         {
             const string Error = "Err";
 
-            _relationFactory.Setup(x => x.Create(It.IsAny<AddRelationRequest>()))
-                .Callback(() => throw new Exception(Error));
+            _relationFactory.Create(Arg.Any<AddRelationRequest>())
+                .Throws(new Exception(Error));
 
             var res = await _handler.Handle(new AddRelationCommand(), default);
 

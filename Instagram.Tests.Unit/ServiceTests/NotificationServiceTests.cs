@@ -4,38 +4,25 @@ using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
 using Instagram.Models.Notification.Request;
 using Instagram.Models.Response;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
     public class NotificationServiceTests
     {
-        private readonly Mock<INotificationRepository> _notificationRepository;
-        private readonly Mock<INotificationFactory> _notificationFactory;
-        private readonly Mock<IResponseFactory> _responseFactory;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly INotificationFactory _notificationFactory;
+        private readonly IResponseFactory _responseFactory;
         private readonly NotificationService _service;
 
         public NotificationServiceTests()
         {
-            _notificationRepository = new Mock<INotificationRepository>();
-            _notificationFactory = new Mock<INotificationFactory>();
-            _responseFactory = new Mock<IResponseFactory>();
+            _notificationRepository = Substitute.For<INotificationRepository>();
+            _notificationFactory = Substitute.For<INotificationFactory>();
+            _responseFactory = ResponseFactoryMock.Create();
 
-            _responseFactory.Setup(x => x.CreateSuccess())
-                .Returns(new ResponseModel { Success = true });
-
-            _responseFactory.Setup(x => x.CreateSuccess(It.IsAny<long>()))
-                .Returns((long id) => new ResponseModel { Success = true, NewEntityId = id });
-
-            _responseFactory.Setup(x => x.CreateFailure(It.IsAny<string>()))
-                .Returns((string error) => new ResponseModel { Success = false, Error = error });
-
-            _service = new NotificationService(_notificationRepository.Object, _notificationFactory.Object, _responseFactory.Object);
+            _service = new NotificationService(_notificationRepository, _notificationFactory, _responseFactory);
         }
 
         [Fact]
@@ -43,18 +30,18 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             var notifications = new List<Notification>();
 
-            _notificationFactory.Setup(x => x.Create(It.IsAny<AddNotificationRequest>()))
-                .Returns((AddNotificationRequest request) => new Notification
+            _notificationFactory.Create(Arg.Any<AddNotificationRequest>())
+                .Returns(info => new Notification
                 {
-                    UserId = request.UserId,
-                    Message = request.Message,
+                    UserId = info.Arg<AddNotificationRequest>().UserId,
+                    Message = info.Arg<AddNotificationRequest>().Message,
                 });
 
             const long NewId = 1;
 
-            _notificationRepository.Setup(x => x.InsertAsync(It.IsAny<Notification>()))
-                .Callback((Notification notification) => notifications.Add(notification))
-                .ReturnsAsync(NewId);
+            _notificationRepository.InsertAsync(Arg.Any<Notification>())
+                .Returns(NewId)
+                .AndDoes(info => notifications.Add(info.Arg<Notification>()));
 
             var request = new AddNotificationRequest
             {
@@ -74,7 +61,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _notificationFactory.Setup(x => x.Create(It.IsAny<AddNotificationRequest>()))
+            _notificationFactory.Create(Arg.Any<AddNotificationRequest>())
                 .Throws(new Exception(Error));
 
             var res = await _service.AddAsync(new AddNotificationRequest());
@@ -95,8 +82,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 new Notification { Id = 3}
             };
 
-            _notificationRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
-                .Callback((long id) => notifications.RemoveAll(x => x.Id == id));
+            _notificationRepository.DeleteByIdAsync(Arg.Any<long>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => notifications.RemoveAll(n => n.Id == info.Arg<long>()));
 
             var res = await _service.DeleteByIdAsync(IdToDelete);
 
@@ -108,8 +96,8 @@ namespace Instagram.Tests.Unit.ServiceTests
         public async Task DeleteAsync_ExceptionThrown_Failure()
         {
             const string Error = "err";
-
-            _notificationRepository.Setup(x => x.DeleteByIdAsync(It.IsAny<long>()))
+            
+            _notificationRepository.DeleteByIdAsync(Arg.Any<long>())
                 .ThrowsAsync(new Exception(Error));
 
             var res = await _service.DeleteByIdAsync(2137);
@@ -127,8 +115,9 @@ namespace Instagram.Tests.Unit.ServiceTests
                 IsRead = false
             };
 
-            _notificationRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateNotificationRequest>()))
-                .Callback((UpdateNotificationRequest request) => notification.IsRead = request.IsRead.Value);
+            _notificationRepository.UpdateAsync(Arg.Any<UpdateNotificationRequest>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(info => notification.IsRead = info.Arg<UpdateNotificationRequest>().IsRead.Value);
 
             var request = new UpdateNotificationRequest
             {
@@ -147,7 +136,7 @@ namespace Instagram.Tests.Unit.ServiceTests
         {
             const string Error = "err";
 
-            _notificationRepository.Setup(x => x.UpdateAsync(It.IsAny<UpdateNotificationRequest>()))
+            _notificationRepository.UpdateAsync(Arg.Any<UpdateNotificationRequest>())
                 .ThrowsAsync(new Exception(Error));
 
             var res = await _service.UpdateAsync(new UpdateNotificationRequest());
