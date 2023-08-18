@@ -1,7 +1,7 @@
 ﻿using Instagram.Application.Auth.Abstraction;
 using System.Security.Claims;
 
-namespace Instagram.Api.Infrastructure
+namespace Instagram.Api.Infrastructure.Service
 {
     public class UserDataService : IUserDataService
     {

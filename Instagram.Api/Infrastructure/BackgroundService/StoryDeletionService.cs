@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Instagram.Api.Infrastructure
 {
-    public class StoryDeletionService :  BackgroundService
+    public class StoryDeletionService : BackgroundService
     {
         const int Delay = 1000 * 60 * 60 * 24; // 24h
         private readonly IServiceProvider _serviceProvider;
@@ -33,7 +33,7 @@ namespace Instagram.Api.Infrastructure
                             SkipPagination = true,
                         });
 
-                        foreach(var image in images)
+                        foreach (var image in images)
                         {
                             await mediator.Send(new DeleteUserStoryImageCommand { Id = image.Id });
                         }

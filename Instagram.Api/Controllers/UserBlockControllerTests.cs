@@ -44,7 +44,7 @@ namespace Instagram.Api.Controllers
         {
             var res = await _userBlockServiceProxy.GetByIdAsync(id);
 
-            return ResponseModelExtentions.ReturnOkOrNotFound(res);
+            return ResponseModelExtensions.ReturnOkOrNotFound(res);
         }
 
         /// <summary>
