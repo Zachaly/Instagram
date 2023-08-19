@@ -1,4 +1,5 @@
-﻿using Instagram.Application.Command;
+﻿using Instagram.Api.Infrastructure.ServiceProxy.Abstraction;
+using Instagram.Application.Command;
 using Instagram.Models.Response;
 using Instagram.Models.User;
 using MediatR;

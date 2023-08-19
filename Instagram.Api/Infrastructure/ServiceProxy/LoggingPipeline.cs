@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Instagram.Api.Infrastructure.ServiceProxy.Abstraction;
+using MediatR;
 
 namespace Instagram.Api.Infrastructure.ServiceProxy
 {

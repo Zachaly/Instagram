@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Instagram.Api.Infrastructure.ServiceProxy.Abstraction;
 using Instagram.Application.Abstraction;
 using Instagram.Models.Notification;
 using Instagram.Models.Notification.Request;
@@ -8,33 +9,19 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 {
     public interface INotificationServiceProxy : INotificationService { }
 
-    public class NotificationServiceProxy : HttpLoggingServiceProxyBase<NotificationModel, GetNotificationRequest, INotificationService>, INotificationServiceProxy
+    public class NotificationServiceProxy 
+        : HttpLoggingServiceProxyBase<NotificationModel, GetNotificationRequest, AddNotificationRequest, INotificationService>,
+        INotificationServiceProxy
     {
-        private readonly IValidator<AddNotificationRequest> _addValidator;
         private readonly IValidator<UpdateNotificationRequest> _updateValidator;
-        private readonly IResponseFactory _responseFactory;
 
         public NotificationServiceProxy(ILogger<INotificationService> logger, IHttpContextAccessor httpContextAccessor,
             INotificationService service, IValidator<AddNotificationRequest> addValidator,
-            IValidator<UpdateNotificationRequest> updateValidator, IResponseFactory responseFactory) : base(logger, httpContextAccessor, service)
+            IValidator<UpdateNotificationRequest> updateValidator, IResponseFactory responseFactory) 
+            : base(logger, httpContextAccessor, service, responseFactory, addValidator)
         {
-            _addValidator = addValidator;
             _updateValidator = updateValidator;
-            _responseFactory = responseFactory;
             ServiceName = "Notification";
-        }
-
-        public async Task<ResponseModel> AddAsync(AddNotificationRequest request)
-        {
-            LogInformation("Add");
-
-            var validation = _addValidator.Validate(request);
-
-            var response = validation.IsValid ? await _service.AddAsync(request) : _responseFactory.CreateValidationError(validation);
-
-            LogResponse(response, "Add");
-
-            return response;
         }
 
         public async Task<ResponseModel> DeleteByIdAsync(long id)

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Instagram.Api.Infrastructure.ServiceProxy.Abstraction;
 using Instagram.Application.Abstraction;
 using Instagram.Models.Response;
 using Instagram.Models.User;
