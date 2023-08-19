@@ -3,8 +3,7 @@ using Instagram.Models.UserFollow.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IUserFollowFactory
+    public interface IUserFollowFactory : IEntityFactory<UserFollow, AddUserFollowRequest>
     {
-        UserFollow Create(AddUserFollowRequest request);
     }
 }

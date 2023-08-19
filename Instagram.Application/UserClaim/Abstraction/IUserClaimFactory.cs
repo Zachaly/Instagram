@@ -3,8 +3,7 @@ using Instagram.Models.UserClaim.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IUserClaimFactory
+    public interface IUserClaimFactory : IEntityFactory<UserClaim, AddUserClaimRequest>
     {
-        UserClaim Create(AddUserClaimRequest request);
     }
 }

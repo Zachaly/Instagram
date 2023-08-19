@@ -2,11 +2,9 @@
 using Instagram.Application.Abstraction;
 using Instagram.Database.Repository;
 using Instagram.Domain.Entity;
-using Instagram.Models.Response;
 using Instagram.Models.UserBan.Request;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-using NSubstitute.Exceptions;
 
 namespace Instagram.Tests.Unit.ServiceTests
 {
@@ -30,9 +28,10 @@ namespace Instagram.Tests.Unit.ServiceTests
         public async Task AddAsync_Success()
         {
             var bans = new List<UserBan>();
+            const long NewId = 1;
 
             _userBanRepository.InsertAsync(Arg.Any<UserBan>())
-                .Returns(0)
+                .Returns(NewId)
                 .AndDoes(info => bans.Add(info.Arg<UserBan>()));
 
             _userBanFactory.Create(Arg.Any<AddUserBanRequest>())
@@ -47,6 +46,7 @@ namespace Instagram.Tests.Unit.ServiceTests
             var res = await _service.AddAsync(request);
 
             Assert.True(res.Success);
+            Assert.Equal(NewId, res.NewEntityId);
             Assert.Contains(bans, x => x.UserId == request.UserId && x.EndDate == request.EndDate);
         }
 

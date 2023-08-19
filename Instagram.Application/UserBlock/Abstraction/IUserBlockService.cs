@@ -4,9 +4,8 @@ using Instagram.Models.UserBlock.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IUserBlockService : IServiceBase<UserBlockModel, GetUserBlockRequest>
+    public interface IUserBlockService : IServiceBase<UserBlockModel, GetUserBlockRequest, AddUserBlockRequest>
     {
-        Task<ResponseModel> AddAsync(AddUserBlockRequest request);
         Task<ResponseModel> DeleteByIdAsync(long id);
     }
 }

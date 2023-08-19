@@ -3,8 +3,8 @@ using Instagram.Models.UserBlock.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IUserBlockFactory
+    public interface IUserBlockFactory : IEntityFactory<UserBlock, AddUserBlockRequest>
     {
-        UserBlock Create(AddUserBlockRequest request);
+
     }
 }

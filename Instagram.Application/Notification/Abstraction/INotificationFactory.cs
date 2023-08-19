@@ -3,8 +3,8 @@ using Instagram.Models.Notification.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface INotificationFactory
+    public interface INotificationFactory : IEntityFactory<Notification, AddNotificationRequest>
     {
-        Notification Create(AddNotificationRequest request);
+
     }
 }

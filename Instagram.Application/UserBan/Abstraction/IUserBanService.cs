@@ -4,9 +4,8 @@ using Instagram.Models.UserBan.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IUserBanService : IServiceBase<UserBanModel, GetUserBanRequest>
+    public interface IUserBanService : IServiceBase<UserBanModel, GetUserBanRequest, AddUserBanRequest>
     {
-        Task<ResponseModel> AddAsync(AddUserBanRequest request);
         Task<ResponseModel> DeleteAsync(long id);
     }
 }

@@ -7,32 +7,12 @@ using Instagram.Models.Response;
 
 namespace Instagram.Application
 {
-    public class PostLikeService : KeylessServiceBase<PostLike, PostLikeModel, GetPostLikeRequest, IPostLikeRepository>, IPostLikeService
+    public class PostLikeService : KeylessServiceBase<PostLike, PostLikeModel, GetPostLikeRequest, AddPostLikeRequest, IPostLikeRepository>,
+        IPostLikeService
     {
-        private readonly IPostLikeFactory _postLikeFactory;
-        private readonly IResponseFactory _responseFactory;
-
         public PostLikeService(IPostLikeFactory postLikeFactory, IPostLikeRepository postLikeRepository,
-            IResponseFactory responseFactory) : base(postLikeRepository)
+            IResponseFactory responseFactory) : base(postLikeRepository, postLikeFactory, responseFactory)
         {
-            _postLikeFactory = postLikeFactory;
-            _responseFactory = responseFactory;
-        }
-
-        public async Task<ResponseModel> AddAsync(AddPostLikeRequest request)
-        {
-            try
-            {
-                var like = _postLikeFactory.Create(request);
-
-                await _repository.InsertAsync(like);
-
-                return _responseFactory.CreateSuccess();
-            }
-            catch(Exception ex)
-            {
-                return _responseFactory.CreateFailure(ex.Message);
-            }
         }
 
         public async Task<ResponseModel> DeleteAsync(long postId, long userId)

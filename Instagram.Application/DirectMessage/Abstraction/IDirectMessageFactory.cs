@@ -3,8 +3,7 @@ using Instagram.Models.DirectMessage.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IDirectMessageFactory
+    public interface IDirectMessageFactory : IEntityFactory<DirectMessage, AddDirectMessageRequest>
     {
-        DirectMessage Create(AddDirectMessageRequest request);
     }
 }

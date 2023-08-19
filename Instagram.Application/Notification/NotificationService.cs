@@ -7,33 +7,12 @@ using Instagram.Models.Response;
 
 namespace Instagram.Application
 {
-    public class NotificationService : ServiceBase<Notification, NotificationModel, GetNotificationRequest, INotificationRepository>,
+    public class NotificationService : ServiceBase<Notification, NotificationModel, GetNotificationRequest, AddNotificationRequest, INotificationRepository>,
         INotificationService
     {
-        private readonly INotificationFactory _notificationFactory;
-        private readonly IResponseFactory _responseFactory;
-
         public NotificationService(INotificationRepository repository, INotificationFactory notificationFactory,
-            IResponseFactory responseFactory) : base(repository)
+            IResponseFactory responseFactory) : base(repository, notificationFactory, responseFactory)
         {
-            _notificationFactory = notificationFactory;
-            _responseFactory = responseFactory;
-        }
-
-        public async Task<ResponseModel> AddAsync(AddNotificationRequest request)
-        {
-            try
-            {
-                var notification = _notificationFactory.Create(request);
-
-                var id = await _repository.InsertAsync(notification);
-
-                return _responseFactory.CreateSuccess(id);
-            }
-            catch (Exception ex)
-            {
-                return _responseFactory.CreateFailure(ex.Message);
-            }
         }
 
         public async Task<ResponseModel> DeleteByIdAsync(long id)

@@ -3,8 +3,8 @@ using Instagram.Models.PostComment.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IPostCommentFactory
+    public interface IPostCommentFactory : IEntityFactory<PostComment, AddPostCommentRequest>
     {
-        PostComment Create(AddPostCommentRequest request);
+
     }
 }

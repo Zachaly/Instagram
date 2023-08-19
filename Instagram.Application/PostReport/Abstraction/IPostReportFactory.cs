@@ -3,8 +3,8 @@ using Instagram.Models.PostReport.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IPostReportFactory
+    public interface IPostReportFactory : IEntityFactory<PostReport, AddPostReportRequest>
     {
-        PostReport Create(AddPostReportRequest request);
+
     }
 }

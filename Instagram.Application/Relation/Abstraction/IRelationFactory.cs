@@ -3,9 +3,8 @@ using Instagram.Models.Relation.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IRelationFactory
+    public interface IRelationFactory : IEntityFactory<Relation, AddRelationRequest>
     {
-        Relation Create(AddRelationRequest request);
         RelationImage CreateImage(long relationId, string fileName);
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Instagram.Models.PostReport;
 using Instagram.Models.PostReport.Request;
-using Instagram.Models.Response;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IPostReportService : IServiceBase<PostReportModel, GetPostReportRequest>
+    public interface IPostReportService : IServiceBase<PostReportModel, GetPostReportRequest, AddPostReportRequest>
     {
-        Task<ResponseModel> AddAsync(AddPostReportRequest request);
+
     }
 }

@@ -4,9 +4,8 @@ using Instagram.Models.UserClaim.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IUserClaimService : IKeylessServiceBase<UserClaimModel, GetUserClaimRequest>
+    public interface IUserClaimService : IKeylessServiceBase<UserClaimModel, GetUserClaimRequest, AddUserClaimRequest>
     {
         Task<ResponseModel> DeleteAsync(long userId, string value);
-        Task<ResponseModel> AddAsync(AddUserClaimRequest request);
     }
 }
