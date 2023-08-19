@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Instagram.Api.Infrastructure.NotificationCommands;
+using Instagram.Api.Infrastructure.ServiceProxy.Abstraction;
 using Instagram.Application.Abstraction;
 using Instagram.Models.Response;
 using Instagram.Models.UserFollow;
@@ -10,32 +11,24 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 {
     public interface IUserFollowServiceProxy : IUserFollowService { }
 
-    public class UserFollowServiceProxy : HttpLoggingKeylessServiceProxyBase<UserFollowModel, GetUserFollowRequest, IUserFollowService>, IUserFollowServiceProxy
+    public class UserFollowServiceProxy 
+        : HttpLoggingKeylessServiceProxyBase<UserFollowModel, GetUserFollowRequest, AddUserFollowRequest, IUserFollowService>,
+        IUserFollowServiceProxy
     {
-        private readonly IResponseFactory _responseFactory;
-        private readonly IValidator<AddUserFollowRequest> _addValidator;
         private readonly IMediator _mediator;
 
         public UserFollowServiceProxy(ILogger<IUserFollowService> logger, IHttpContextAccessor httpContextAccessor,
             IUserFollowService userFollowService, IResponseFactory responseFactory, IValidator<AddUserFollowRequest> addValidator,
             IMediator mediator)
-            : base(logger, httpContextAccessor, userFollowService)
+            : base(logger, httpContextAccessor, userFollowService, responseFactory, addValidator)
         {
-            _responseFactory = responseFactory;
-            _addValidator = addValidator;
             _mediator = mediator;
             ServiceName = "UserFollow";
         }
 
-        public async Task<ResponseModel> AddAsync(AddUserFollowRequest request)
+        public override async Task<ResponseModel> AddAsync(AddUserFollowRequest request)
         {
-            LogInformation("Add");
-
-            var validation = _addValidator.Validate(request);
-
-            var response = validation.IsValid ? await _service.AddAsync(request) : _responseFactory.CreateValidationError(validation);
-
-            LogResponse(response, "Add");
+            var response = await base.AddAsync(request);
 
             if (response.Success)
             {

@@ -1,4 +1,5 @@
-﻿using Instagram.Application.Abstraction;
+﻿using Instagram.Api.Infrastructure.ServiceProxy.Abstraction;
+using Instagram.Application.Abstraction;
 using Instagram.Models.AccountVerification;
 using Instagram.Models.AccountVerification.Request;
 

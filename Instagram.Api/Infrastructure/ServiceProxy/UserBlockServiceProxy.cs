@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Instagram.Api.Infrastructure.ServiceProxy.Abstraction;
 using Instagram.Application.Abstraction;
 using Instagram.Models.Response;
 using Instagram.Models.UserBlock;
@@ -11,30 +12,15 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 
     }
 
-    public class UserBlockServiceProxy : HttpLoggingServiceProxyBase<UserBlockModel, GetUserBlockRequest, IUserBlockService>, IUserBlockServiceProxy
+    public class UserBlockServiceProxy 
+        : HttpLoggingServiceProxyBase<UserBlockModel, GetUserBlockRequest, AddUserBlockRequest, IUserBlockService>,
+        IUserBlockServiceProxy
     {
-        private readonly IValidator<AddUserBlockRequest> _addValidator;
-        private readonly IResponseFactory _responseFactory;
-
         public UserBlockServiceProxy(ILogger<IUserBlockService> logger, IHttpContextAccessor httpContextAccessor, IUserBlockService service,
-            IValidator<AddUserBlockRequest> addValidator, IResponseFactory responseFactory) : base(logger, httpContextAccessor, service)
+            IValidator<AddUserBlockRequest> addValidator, IResponseFactory responseFactory) 
+            : base(logger, httpContextAccessor, service, responseFactory, addValidator)
         {
-            _addValidator = addValidator;
-            _responseFactory = responseFactory;
             ServiceName = "UserBlock";
-        }
-
-        public async Task<ResponseModel> AddAsync(AddUserBlockRequest request)
-        {
-            LogInformation("Add");
-
-            var validation = _addValidator.Validate(request);
-
-            var response = validation.IsValid ? await _service.AddAsync(request) : _responseFactory.CreateValidationError(validation);
-
-            LogResponse(response, "Add");
-
-            return response;
         }
 
         public async Task<ResponseModel> DeleteByIdAsync(long id)

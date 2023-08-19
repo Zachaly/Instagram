@@ -3,8 +3,8 @@ using Instagram.Models.PostLike.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IPostLikeFactory
+    public interface IPostLikeFactory : IEntityFactory<PostLike, AddPostLikeRequest>
     {
-        PostLike Create(AddPostLikeRequest request);
+
     }
 }

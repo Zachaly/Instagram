@@ -10,6 +10,6 @@ namespace Instagram.Application
             => request.Tags.Select(name => new PostTag { Tag = name.ToLower(), PostId = request.PostId });
 
         public IEnumerable<PostTag> CreateMany(long postId, IEnumerable<string> tags)
-        => tags.Select(name => new PostTag { PostId = postId, Tag = name.ToLower() });
+            => tags.Select(name => new PostTag { PostId = postId, Tag = name.ToLower() });
     }
 }

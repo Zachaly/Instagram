@@ -4,9 +4,8 @@ using Instagram.Models.Response;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IPostLikeService : IKeylessServiceBase<PostLikeModel, GetPostLikeRequest>
+    public interface IPostLikeService : IKeylessServiceBase<PostLikeModel, GetPostLikeRequest, AddPostLikeRequest>
     {
-        Task<ResponseModel> AddAsync(AddPostLikeRequest request);
         Task<ResponseModel> DeleteAsync(long postId, long userId);
     }
 }

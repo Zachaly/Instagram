@@ -3,8 +3,8 @@ using Instagram.Models.UserBan.Request;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IUserBanFactory
+    public interface IUserBanFactory : IEntityFactory<UserBan, AddUserBanRequest>
     {
-        UserBan Create(AddUserBanRequest request);
+
     }
 }

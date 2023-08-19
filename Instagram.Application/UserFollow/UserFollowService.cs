@@ -7,33 +7,12 @@ using Instagram.Models.UserFollow.Request;
 
 namespace Instagram.Application
 {
-    public class UserFollowService : KeylessServiceBase<UserFollow, UserFollowModel, GetUserFollowRequest, IUserFollowRepository>, IUserFollowService
+    public class UserFollowService : KeylessServiceBase<UserFollow, UserFollowModel, GetUserFollowRequest, AddUserFollowRequest, IUserFollowRepository>,
+        IUserFollowService
     {
-        private readonly IUserFollowFactory _userFollowFactory;
-        private readonly IResponseFactory _responseFactory;
-
         public UserFollowService(IUserFollowRepository userFollowRepository, IUserFollowFactory userFollowFactory, 
-            IResponseFactory responseFactory) : base(userFollowRepository)
-        {
-            _userFollowFactory = userFollowFactory;
-            _responseFactory = responseFactory;
-        }
-
-        public async Task<ResponseModel> AddAsync(AddUserFollowRequest request)
-        {
-            try
-            {
-                var follow = _userFollowFactory.Create(request);
-
-                await _repository.InsertAsync(follow);
-
-                return _responseFactory.CreateSuccess();
-            }
-            catch (Exception ex)
-            {
-                return _responseFactory.CreateFailure(ex.Message);
-            }
-        }
+            IResponseFactory responseFactory) : base(userFollowRepository, userFollowFactory, responseFactory)
+        { }
 
         public async Task<ResponseModel> DeleteAsync(long followerId, long followedId)
         {

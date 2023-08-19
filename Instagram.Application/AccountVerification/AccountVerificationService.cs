@@ -6,7 +6,8 @@ using Instagram.Models.AccountVerification.Request;
 
 namespace Instagram.Application
 {
-    public class AccountVerificationService : ServiceBase<AccountVerification, AccountVerificationModel, GetAccountVerificationRequest, IAccountVerificationRepository>, IAccountVerificationService
+    public class AccountVerificationService : ServiceBase<AccountVerification, AccountVerificationModel, GetAccountVerificationRequest, IAccountVerificationRepository>,
+        IAccountVerificationService
     {
         public AccountVerificationService(IAccountVerificationRepository repository) : base(repository)
         {

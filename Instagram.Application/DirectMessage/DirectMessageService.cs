@@ -7,32 +7,12 @@ using Instagram.Models.Response;
 
 namespace Instagram.Application
 {
-    public class DirectMessageService : ServiceBase<DirectMessage, DirectMessageModel, GetDirectMessageRequest, IDirectMessageRepository>, IDirectMessageService
+    public class DirectMessageService : ServiceBase<DirectMessage, DirectMessageModel, GetDirectMessageRequest, AddDirectMessageRequest, IDirectMessageRepository>,
+        IDirectMessageService
     {
-        private readonly IDirectMessageFactory _directMessageFactory;
-        private readonly IResponseFactory _responseFactory;
-
         public DirectMessageService(IDirectMessageRepository repository, IDirectMessageFactory directMessageFactory,
-            IResponseFactory responseFactory) : base(repository)
+            IResponseFactory responseFactory) : base(repository, directMessageFactory, responseFactory)
         {
-            _directMessageFactory = directMessageFactory;
-            _responseFactory = responseFactory;
-        }
-
-        public async Task<ResponseModel> AddAsync(AddDirectMessageRequest request)
-        {
-            try
-            {
-                var message = _directMessageFactory.Create(request);
-
-                var id = await _repository.InsertAsync(message);
-
-                return _responseFactory.CreateSuccess(id);
-            }
-            catch(Exception ex)
-            {
-                return _responseFactory.CreateFailure(ex.Message);
-            }
         }
 
         public async Task<ResponseModel> DeleteByIdAsync(long id)

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Instagram.Api.Infrastructure.NotificationCommands;
+using Instagram.Api.Infrastructure.ServiceProxy.Abstraction;
 using Instagram.Application.Abstraction;
 using Instagram.Models.DirectMessage;
 using Instagram.Models.DirectMessage.Request;
@@ -10,34 +11,26 @@ namespace Instagram.Api.Infrastructure.ServiceProxy
 {
     public interface IDirectMessageServiceProxy : IDirectMessageService { }
 
-    public class DirectMessageServiceProxy : HttpLoggingServiceProxyBase<DirectMessageModel, GetDirectMessageRequest, IDirectMessageService>, IDirectMessageServiceProxy
+    public class DirectMessageServiceProxy : 
+        HttpLoggingServiceProxyBase<DirectMessageModel, GetDirectMessageRequest, AddDirectMessageRequest, IDirectMessageService>,
+        IDirectMessageServiceProxy
     {
-        private readonly IValidator<AddDirectMessageRequest> _addValidator;
         private readonly IValidator<UpdateDirectMessageRequest> _updateValidator;
-        private readonly IResponseFactory _responseFactory;
         private readonly IMediator _mediator;
 
         public DirectMessageServiceProxy(ILogger<IDirectMessageService> logger, IHttpContextAccessor httpContextAccessor,
             IDirectMessageService service, IResponseFactory responseFactory,
             IValidator<AddDirectMessageRequest> addValidator, IValidator<UpdateDirectMessageRequest> updateValidator, IMediator mediator) 
-            : base(logger, httpContextAccessor, service)
+            : base(logger, httpContextAccessor, service, responseFactory, addValidator)
         {
-            _addValidator = addValidator;
             _updateValidator = updateValidator;
-            _responseFactory = responseFactory;
             _mediator = mediator;
             ServiceName = "AccountVerification";
         }
 
-        public async Task<ResponseModel> AddAsync(AddDirectMessageRequest request)
+        public override async Task<ResponseModel> AddAsync(AddDirectMessageRequest request)
         {
-            LogInformation("Add");
-
-            var validation = _addValidator.Validate(request);
-
-            var response = validation.IsValid ? await _service.AddAsync(request) : _responseFactory.CreateValidationError(validation);
-
-            LogResponse(response, "Add");
+            var response = await base.AddAsync(request);
 
             if (response.Success)
             {

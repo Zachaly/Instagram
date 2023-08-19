@@ -1,9 +1,10 @@
-﻿using Instagram.Application.Abstraction;
+﻿using Instagram.Api.Infrastructure.ServiceProxy.Abstraction;
+using Instagram.Application.Abstraction;
 using Instagram.Models.UserStory;
 using Instagram.Models.UserStory.Request;
 
 namespace Instagram.Api.Infrastructure.ServiceProxy
-{ 
+{
     public interface IUserStoryServiceProxy : IUserStoryService { }
 
     public class UserStoryServiceProxy : HttpLoggingProxyBase<IUserStoryService>, IUserStoryServiceProxy

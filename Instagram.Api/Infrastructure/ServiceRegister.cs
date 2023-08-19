@@ -2,6 +2,7 @@
 using FluentValidation;
 using Instagram.Api.Authorization;
 using Instagram.Api.Infrastructure.NotificationCommands;
+using Instagram.Api.Infrastructure.Service;
 using Instagram.Api.Infrastructure.ServiceProxy;
 using Instagram.Application;
 using Instagram.Application.Abstraction;

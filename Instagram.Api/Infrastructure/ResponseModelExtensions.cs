@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Instagram.Api.Infrastructure
 {
-    public static class ResponseModelExtentions
+    public static class ResponseModelExtensions
     {
         public static ActionResult<DataResponseModel<T>> ReturnOkOrBadRequest<T>(this DataResponseModel<T> response)
         {

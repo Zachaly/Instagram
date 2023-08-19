@@ -4,9 +4,8 @@ using Instagram.Models.Response;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IDirectMessageService : IServiceBase<DirectMessageModel, GetDirectMessageRequest>
+    public interface IDirectMessageService : IServiceBase<DirectMessageModel, GetDirectMessageRequest, AddDirectMessageRequest>
     {
-        Task<ResponseModel> AddAsync(AddDirectMessageRequest request);
         Task<ResponseModel> UpdateAsync(UpdateDirectMessageRequest request);
         Task<ResponseModel> DeleteByIdAsync(long id);
     }

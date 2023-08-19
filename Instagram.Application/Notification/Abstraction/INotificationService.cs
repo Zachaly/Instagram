@@ -4,9 +4,8 @@ using Instagram.Models.Response;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface INotificationService : IServiceBase<NotificationModel, GetNotificationRequest>
+    public interface INotificationService : IServiceBase<NotificationModel, GetNotificationRequest, AddNotificationRequest>
     {
-        Task<ResponseModel> AddAsync(AddNotificationRequest request);
         Task<ResponseModel> DeleteByIdAsync(long id);
         Task<ResponseModel> UpdateAsync(UpdateNotificationRequest request);
     }

@@ -4,9 +4,8 @@ using Instagram.Models.Response;
 
 namespace Instagram.Application.Abstraction
 {
-    public interface IPostTagService : IKeylessServiceBase<PostTagModel, GetPostTagRequest>
+    public interface IPostTagService : IKeylessServiceBase<PostTagModel, GetPostTagRequest, AddPostTagRequest>
     {
-        Task<ResponseModel> AddAsync(AddPostTagRequest request);
         Task<ResponseModel> DeleteAsync(long postId, string tag);
     }
 }

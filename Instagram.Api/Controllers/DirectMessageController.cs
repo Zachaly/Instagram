@@ -45,7 +45,7 @@ namespace Instagram.Api.Controllers
         {
             var res = await _directMessageServiceProxy.GetByIdAsync(id);
 
-            return ResponseModelExtentions.ReturnOkOrNotFound(res);
+            return ResponseModelExtensions.ReturnOkOrNotFound(res);
         }
 
         /// <summary>
