@@ -1,6 +1,4 @@
-﻿using Instagram.Mobile.View;
-using Instagram.Mobile.ViewModel;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace Instagram.Mobile
 {
@@ -17,10 +15,7 @@ namespace Instagram.Mobile
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            builder.Services.AddTransient<LoginPage>();
-            builder.Services.AddTransient<RegisterPage>();
-            builder.Services.AddTransient<LoginPageViewModel>();
-            builder.Services.AddTransient<RegisterPageViewModel>();
+            builder.AddServices();
 
 #if DEBUG
 		builder.Logging.AddDebug();

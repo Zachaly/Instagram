@@ -6,17 +6,22 @@
              Title="Login"
              x:DataType="viewModel:LoginPageViewModel"
              BindingContext="view">
-    <VerticalStackLayout>
+    <VerticalStackLayout Margin="5">
         <VerticalStackLayout>
             <Label Text="Email"/>
-            <Entry/>
+            <Entry
+                Placeholder="Enter your email"
+                TextChanged="EmailEntryTextChanged"/>
         </VerticalStackLayout>
         <VerticalStackLayout>
             <Label Text="Password"/>
-            <Entry IsPassword="True"/>
+            <Entry
+                Placeholder="Enter your password"
+                IsPassword="True"
+                TextChanged="PasswordEntryTextChanged"/>
         </VerticalStackLayout>
         <HorizontalStackLayout>
-            <Button Text="Login"/>
+            <Button Text="Login" Command="{Binding LoginCommand}"/>
             <Button Text="Register" Command="{Binding GoToRegisterPageCommand}"/>
         </HorizontalStackLayout>
     </VerticalStackLayout>

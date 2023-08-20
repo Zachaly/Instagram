@@ -1,10 +1,23 @@
-﻿namespace Instagram.Mobile.View
+﻿using Instagram.Mobile.ViewModel;
+
+namespace Instagram.Mobile.View
 {
     public partial class MainPage : ContentPage
     {
-        public MainPage()
+        public MainPage(MainPageViewModel viewModel)
         {
             InitializeComponent();
+            BindingContext = viewModel;
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            var viewModel = BindingContext as MainPageViewModel;
+            if(!viewModel.IsAuthorized)
+            {
+                viewModel.GoToLoginPageCommand.Execute(null);
+            }
         }
     }
 }

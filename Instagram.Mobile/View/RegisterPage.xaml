@@ -5,7 +5,7 @@
              xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
              x:DataType="viewModel:RegisterPageViewModel"
              Title="Register">
-    <VerticalStackLayout>
+    <VerticalStackLayout Margin="5">
         <VerticalStackLayout>
             <Label Text="Email"/>
             <Entry/>

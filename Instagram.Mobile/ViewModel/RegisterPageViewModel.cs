@@ -12,6 +12,6 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToLoginPage()
-            => await Shell.Current.GoToAsync("//" + nameof(LoginPage));
+            => await Shell.Current.GoToAsync("..");
     }
 }
