@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Instagram.Mobile.View.RegisterPage"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             x:DataType="viewModel:RegisterPageViewModel"
+             Title="Register">
+    <VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Email"/>
+            <Entry/>
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Name"/>
+            <Entry/>
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Nickname"/>
+            <Entry/>
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Password"/>
+            <Entry IsPassword="True"/>
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Verify password"/>
+            <Entry IsPassword="True"/>
+        </VerticalStackLayout>
+        <HorizontalStackLayout>
+            <Button Text="Register"/>
+            <Button Text="Login" Command="{Binding GoToLoginPageCommand}"/>
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>
