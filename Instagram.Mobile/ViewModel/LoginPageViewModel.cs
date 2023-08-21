@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
@@ -11,7 +12,11 @@ namespace Instagram.Mobile.ViewModel
         private readonly IAuthorizationService _authorizationService;
 
         [ObservableProperty]
-        private LoginRequest _loginRequest = new LoginRequest();
+        private LoginRequest _loginRequest = new LoginRequest
+        {
+            Password = "",
+            Email = ""
+        };
 
         public LoginPageViewModel(IAuthorizationService authorizationService)
         {
@@ -25,7 +30,14 @@ namespace Instagram.Mobile.ViewModel
         [RelayCommand]
         private async Task LoginAsync()
         {
-            await _authorizationService.AuthorizeAsync(LoginRequest);
+            try
+            {
+                await _authorizationService.AuthorizeAsync(LoginRequest);
+            }
+            catch(InvalidRequestException ex)
+            {
+                await Toast.Make(ex.Response.Error).Show();
+            }
 
             if(_authorizationService.IsAuthorized)
             {

@@ -4,6 +4,7 @@ using Instagram.Mobile.Service;
 using Instagram.Models.User.Request;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using System.Diagnostics;
 
 namespace Instagram.Mobile.ViewModel
 {
@@ -11,10 +12,19 @@ namespace Instagram.Mobile.ViewModel
     {
         private readonly IUserService _userService;
         [ObservableProperty]
-        private RegisterRequest _registerRequest = new RegisterRequest();
+        private RegisterRequest _registerRequest = new RegisterRequest
+        {
+            Name = "",
+            Email = "",
+            Nickname = "",
+            Password = ""
+        };
 
         [ObservableProperty]
         private string _passwordVerification = "";
+
+        [ObservableProperty]
+        private IDictionary<string, string[]> _validationErrors;
 
         public RegisterPageViewModel(IUserService userService)
         {
@@ -30,18 +40,20 @@ namespace Instagram.Mobile.ViewModel
         {
             if(PasswordVerification != RegisterRequest.Password)
             {
-                var toast = Toast.Make("Passwords empty or dot not match!", ToastDuration.Short, 16);
-                await toast.Show();
+                await Toast.Make("Passwords empty or dot not match!", ToastDuration.Short, 16).Show();
                 return;
             }
 
-            var isCreated = await _userService.RegisterAsync(RegisterRequest);
-
-            if(isCreated)
+            try
             {
-                var toast = Toast.Make("Account created", ToastDuration.Short, 16);
-                await toast.Show();
+                await _userService.RegisterAsync(RegisterRequest);
+
+                await Toast.Make("Account created", ToastDuration.Short, 16).Show();
                 await GoToLoginPage();
+            }
+            catch(InvalidRequestException ex)
+            {
+                ValidationErrors = ex.Response.ValidationErrors;
             }
         }
     }

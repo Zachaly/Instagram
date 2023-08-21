@@ -1,7 +1,9 @@
 ﻿using Instagram.Models.User;
 using Instagram.Models.User.Request;
-using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Json;
+using Newtonsoft.Json;
+using Instagram.Models.Response;
 
 namespace Instagram.Mobile.Service
 {
@@ -29,23 +31,23 @@ namespace Instagram.Mobile.Service
 
         public async Task AuthorizeAsync(LoginRequest request)
         {
-            try
+            var client = _httpClientFactory.Create();
+
+            var response = await client.PostAsJsonAsync("user/login", request);
+
+            if (response.IsSuccessStatusCode)
             {
-                var client = _httpClientFactory.Create();
+                var userData = await response.Content.ReadFromJsonAsync<LoginResponse>();
 
-                var response = await client.PostAsJsonAsync("user/login", request);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var userData = await response.Content.ReadFromJsonAsync<LoginResponse>();
-
-                    _userData = userData;
-                    _httpClientFactory.AddAuthToken(userData.AuthToken);
-                }
-            }
-            catch (Exception ex)
+                _userData = userData;
+                _httpClientFactory.AddAuthToken(userData.AuthToken);
+            } 
+            else if(response.StatusCode == HttpStatusCode.BadRequest)
             {
-                Debug.WriteLine(ex);
+                var content = await response.Content.ReadAsStringAsync();
+                var responseModel = JsonConvert.DeserializeObject<DataResponseModel<LoginResponse>>(content);
+
+                throw new InvalidRequestException(responseModel);
             }
         }
 
