@@ -11,7 +11,7 @@ namespace Instagram.Mobile.ViewModel
         private readonly IAuthorizationService _authorizationService;
 
         [ObservableProperty]
-        private LoginRequest loginRequest = new LoginRequest();
+        private LoginRequest _loginRequest = new LoginRequest();
 
         public LoginPageViewModel(IAuthorizationService authorizationService)
         {

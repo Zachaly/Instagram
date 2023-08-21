@@ -4,21 +4,23 @@
              x:Class="Instagram.Mobile.View.LoginPage"
              xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
              Title="Login"
-             x:DataType="viewModel:LoginPageViewModel"
-             BindingContext="view">
+             x:DataType="viewModel:LoginPageViewModel">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsEnabled="False" IsVisible="False"/>
+    </Shell.BackButtonBehavior>
     <VerticalStackLayout Margin="5">
         <VerticalStackLayout>
             <Label Text="Email"/>
             <Entry
                 Placeholder="Enter your email"
-                TextChanged="EmailEntryTextChanged"/>
+                Text="{Binding LoginRequest.Email, Mode=TwoWay}"/>
         </VerticalStackLayout>
         <VerticalStackLayout>
             <Label Text="Password"/>
             <Entry
                 Placeholder="Enter your password"
                 IsPassword="True"
-                TextChanged="PasswordEntryTextChanged"/>
+                Text="{Binding LoginRequest.Password, Mode=TwoWay}"/>
         </VerticalStackLayout>
         <HorizontalStackLayout>
             <Button Text="Login" Command="{Binding LoginCommand}"/>

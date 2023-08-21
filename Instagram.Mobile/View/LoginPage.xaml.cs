@@ -9,14 +9,4 @@ public partial class LoginPage : ContentPage
 		InitializeComponent();
 		BindingContext = viewModel;
 	}
-
-    private void EmailEntryTextChanged(object sender, TextChangedEventArgs e)
-    {
-        (BindingContext as LoginPageViewModel).LoginRequest.Email = e.NewTextValue;
-    }
-
-    private void PasswordEntryTextChanged(object sender, TextChangedEventArgs e)
-    {
-        (BindingContext as LoginPageViewModel).LoginRequest.Password = e.NewTextValue;
-    }
 }

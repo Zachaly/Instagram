@@ -5,29 +5,32 @@
              xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
              x:DataType="viewModel:RegisterPageViewModel"
              Title="Register">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsEnabled="False" IsVisible="False"/>
+    </Shell.BackButtonBehavior>
     <VerticalStackLayout Margin="5">
         <VerticalStackLayout>
             <Label Text="Email"/>
-            <Entry/>
+            <Entry Text="{Binding RegisterRequest.Email, Mode=TwoWay}"/>
         </VerticalStackLayout>
         <VerticalStackLayout>
             <Label Text="Name"/>
-            <Entry/>
+            <Entry Text="{Binding RegisterRequest.Name, Mode=TwoWay}"/>
         </VerticalStackLayout>
         <VerticalStackLayout>
             <Label Text="Nickname"/>
-            <Entry/>
+            <Entry Text="{Binding RegisterRequest.Nickname, Mode=TwoWay}"/>
         </VerticalStackLayout>
         <VerticalStackLayout>
             <Label Text="Password"/>
-            <Entry IsPassword="True"/>
+            <Entry IsPassword="True" Text="{Binding RegisterRequest.Password, Mode=TwoWay}"/>
         </VerticalStackLayout>
         <VerticalStackLayout>
             <Label Text="Verify password"/>
-            <Entry IsPassword="True"/>
+            <Entry IsPassword="True" Text="{Binding PasswordVerification, Mode=TwoWay}"/>
         </VerticalStackLayout>
         <HorizontalStackLayout>
-            <Button Text="Register"/>
+            <Button Text="Register" Command="{Binding RegisterCommand}"/>
             <Button Text="Login" Command="{Binding GoToLoginPageCommand}"/>
         </HorizontalStackLayout>
     </VerticalStackLayout>

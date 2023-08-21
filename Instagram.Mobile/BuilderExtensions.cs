@@ -17,6 +17,8 @@ namespace Instagram.Mobile
 
             builder.Services.AddSingleton<IAuthorizationService, AuthorizationService>();
             builder.Services.AddSingleton<IHttpClientFactory, HttpClientFactory>();
+
+            builder.Services.AddSingleton<IUserService, UserService>();
         }
     }
 }
