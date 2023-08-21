@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Instagram.Mobile.View.RegisterPage"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             x:DataType="viewModel:RegisterPageViewModel"
+             Title="Register">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsEnabled="False" IsVisible="False"/>
+    </Shell.BackButtonBehavior>
+    <VerticalStackLayout Margin="5">
+        <VerticalStackLayout>
+            <Label Text="Email"/>
+            <Entry Text="{Binding RegisterRequest.Email, Mode=TwoWay}"/>
+            <CollectionView
+                ItemsSource="{Binding ValidationErrors[Email]}"
+                SelectionMode="None">
+            </CollectionView>
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Name"/>
+            <Entry Text="{Binding RegisterRequest.Name, Mode=TwoWay}"/>
+            <CollectionView
+                ItemsSource="{Binding ValidationErrors[Name]}"
+                SelectionMode="None">
+            </CollectionView>
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Nickname"/>
+            <Entry Text="{Binding RegisterRequest.Nickname, Mode=TwoWay}"/>
+            <CollectionView
+                ItemsSource="{Binding ValidationErrors[Nickname]}"
+                SelectionMode="None">   
+            </CollectionView>
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Password"/>
+            <Entry IsPassword="True" Text="{Binding RegisterRequest.Password, Mode=TwoWay}"/>
+            <CollectionView
+                ItemsSource="{Binding ValidationErrors[Password]}"
+                SelectionMode="None">
+            </CollectionView>
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Verify password"/>
+            <Entry IsPassword="True" Text="{Binding PasswordVerification, Mode=TwoWay}"/>
+        </VerticalStackLayout>
+        <HorizontalStackLayout>
+            <Button Text="Register" Command="{Binding RegisterCommand}"/>
+            <Button Text="Login" Command="{Binding GoToLoginPageCommand}"/>
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Instagram.Mobile.View.LoginPage"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             Title="Login"
+             x:DataType="viewModel:LoginPageViewModel">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsEnabled="False" IsVisible="False"/>
+    </Shell.BackButtonBehavior>
+    <VerticalStackLayout Margin="5">
+        <VerticalStackLayout>
+            <Label Text="Email"/>
+            <Entry
+                Placeholder="Enter your email"
+                Text="{Binding LoginRequest.Email, Mode=TwoWay}"/>
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <Label Text="Password"/>
+            <Entry
+                Placeholder="Enter your password"
+                IsPassword="True"
+                Text="{Binding LoginRequest.Password, Mode=TwoWay}"/>
+        </VerticalStackLayout>
+        <HorizontalStackLayout>
+            <Button Text="Login" Command="{Binding LoginCommand}"/>
+            <Button Text="Register" Command="{Binding GoToRegisterPageCommand}"/>
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>
