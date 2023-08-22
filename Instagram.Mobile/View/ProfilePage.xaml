@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             x:Class="Instagram.Mobile.View.ProfilePage"
+             Title="Profile"
+             x:DataType="viewModel:ProfilePageViewModel">
+    <VerticalStackLayout>
+        <Frame>
+            <StackLayout Orientation="Horizontal">
+                <Image Source="{Binding ImageUrl}"
+                       MaximumHeightRequest="100"
+                       MaximumWidthRequest="100"/>
+                <StackLayout Orientation="Vertical" HorizontalOptions="StartAndExpand">
+                    <Label Text="{Binding UserModel.Nickname}" FontSize="20"/>
+                    <Label Text="{Binding UserModel.Name}"/>
+                    <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3"/>
+                    <Label Text="{Binding UserModel.Bio}"/>
+                    <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3"/>
+                    <Grid ColumnDefinitions="*, *, *">
+                        <StackLayout Orientation="Horizontal" Grid.Column="0">
+                            <Label Text="Posts: "/>
+                            <Label Text="{Binding PostCount}" />
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" Grid.Column="1">
+                            <Label Text="Followers: "/>
+                            <Label Text="{Binding FollowersCount}" />
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" Grid.Column="2">
+                            <Label Text="Following: "/>
+                            <Label Text="{Binding FollowingCount}" />
+                        </StackLayout>
+                    </Grid>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+    </VerticalStackLayout>
+</ContentPage>

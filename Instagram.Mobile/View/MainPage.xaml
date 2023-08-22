@@ -9,6 +9,7 @@
         <VerticalStackLayout>
             <Label Text="You logged in"/>
             <Button Text="Logout" Command="{Binding LogoutCommand}"/>
+            <Button Text="Profile" Command="{Binding GoToProfilePageCommand}"/>
         </VerticalStackLayout>
     </ScrollView>
 

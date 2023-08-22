@@ -17,14 +17,22 @@ namespace Instagram.Mobile.ViewModel
         }
 
         [RelayCommand]
-        public async Task GoToLoginPageAsync()
+        private async Task GoToLoginPageAsync()
             => await Shell.Current.GoToAsync(nameof(LoginPage));
 
         [RelayCommand]
-        public async Task LogoutAsync()
+        private async Task LogoutAsync()
         {
             await _authorizationService.LogoutAsync();
             await GoToLoginPageAsync();
         }
+
+        [RelayCommand]
+        private async Task GoToProfilePageAsync()
+            => await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
+            {
+                { "UserId", _authorizationService.UserData.UserId }
+            });
+        
     }
 }
