@@ -1,5 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Instagram.Mobile.Service;
+using Instagram.Models.Post.Request;
 using Instagram.Models.User;
+using Instagram.Models.UserFollow.Request;
+using System.Runtime.InteropServices;
 
 namespace Instagram.Mobile.ViewModel
 {
@@ -28,6 +34,36 @@ namespace Instagram.Mobile.ViewModel
         [ObservableProperty]
         private int _postCount = 3;
 
+        private readonly IUserService _userService;
+        private readonly IUserFollowService _userFollowService;
+        private readonly IPostService _postService;
+
         public string ImageUrl => $"{Configuration.ApiUrl}image/profile/{UserModel.Id}";
+
+        public ProfilePageViewModel(IUserService userService, IUserFollowService userFollowService, IPostService postService)
+        {
+            _userService = userService;
+            _userFollowService = userFollowService;
+            _postService = postService;
+        }
+
+        [RelayCommand]
+        private async Task LoadUser()
+        {
+            try
+            {
+                UserModel = await _userService.GetByIdAsync(UserId);
+            }
+            catch(NotFoundException ex)
+            {
+                await Toast.Make(ex.Message).Show();
+                await Shell.Current.GoToAsync("..");
+                return;
+            }
+            
+            PostCount = await _postService.GetCountAsync(new GetPostRequest { CreatorId = UserId });
+            FollowersCount = await _userFollowService.GetCountAsync(new GetUserFollowRequest { FollowedUserId = UserId });
+            FollowingCount = await _userFollowService.GetCountAsync(new GetUserFollowRequest { FollowingUserId = UserId });
+        }
     }
 }

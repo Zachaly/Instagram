@@ -21,6 +21,8 @@ namespace Instagram.Mobile
             builder.Services.AddSingleton<IHttpClientFactory, HttpClientFactory>();
 
             builder.Services.AddSingleton<IUserService, UserService>();
+            builder.Services.AddSingleton<IUserFollowService, UserFollowService>();
+            builder.Services.AddSingleton<IPostService, PostService>();
         }
     }
 }

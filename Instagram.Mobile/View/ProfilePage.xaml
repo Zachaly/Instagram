@@ -14,9 +14,11 @@
                 <StackLayout Orientation="Vertical" HorizontalOptions="StartAndExpand">
                     <Label Text="{Binding UserModel.Nickname}" FontSize="20"/>
                     <Label Text="{Binding UserModel.Name}"/>
-                    <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3"/>
+                    <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3"
+                             Margin="3, 0"/>
                     <Label Text="{Binding UserModel.Bio}"/>
-                    <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3"/>
+                    <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3"
+                             Margin="3, 0"/>
                     <Grid ColumnDefinitions="*, *, *">
                         <StackLayout Orientation="Horizontal" Grid.Column="0">
                             <Label Text="Posts: "/>

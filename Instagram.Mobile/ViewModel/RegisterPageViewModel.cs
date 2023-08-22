@@ -4,7 +4,6 @@ using Instagram.Mobile.Service;
 using Instagram.Models.User.Request;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
-using System.Diagnostics;
 
 namespace Instagram.Mobile.ViewModel
 {
