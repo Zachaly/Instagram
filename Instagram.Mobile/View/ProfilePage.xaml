@@ -6,7 +6,8 @@
              Title="Profile"
              x:DataType="viewModel:ProfilePageViewModel">
     <VerticalStackLayout>
-        <Frame>
+        <Frame
+            IsVisible="{Binding IsNotLoading}">
             <StackLayout Orientation="Horizontal">
                 <Image Source="{Binding ImageUrl}"
                        MaximumHeightRequest="100"
@@ -19,7 +20,8 @@
                     <Label Text="{Binding UserModel.Bio}"/>
                     <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3"
                              Margin="3, 0"/>
-                    <Grid ColumnDefinitions="*, *, *">
+                    <Grid ColumnDefinitions="Auto, Auto, Auto"
+                          ColumnSpacing="5">
                         <StackLayout Orientation="Horizontal" Grid.Column="0">
                             <Label Text="Posts: "/>
                             <Label Text="{Binding PostCount}" />
@@ -35,6 +37,13 @@
                     </Grid>
                 </StackLayout>
             </StackLayout>
+
+            
         </Frame>
+        
+        <ActivityIndicator IsVisible="{Binding IsLoading}"
+                           IsRunning="{Binding IsLoading}"
+                           HorizontalOptions="FillAndExpand"
+                           VerticalOptions="FillAndExpand"/>
     </VerticalStackLayout>
 </ContentPage>
