@@ -4,12 +4,15 @@ using System.Net;
 using System.Net.Http.Json;
 using Newtonsoft.Json;
 using Instagram.Models.Response;
+using Instagram.Models.UserFollow.Request;
+using Instagram.Models.UserFollow;
 
 namespace Instagram.Mobile.Service
 {
     public interface IAuthorizationService
     {
         LoginResponse UserData { get; }
+        List<long> FollowedUserIds { get; }
         bool IsAuthorized { get; }
         Task AuthorizeAsync(LoginRequest request);
         Task LogoutAsync();
@@ -18,9 +21,12 @@ namespace Instagram.Mobile.Service
     public class AuthorizationService : IAuthorizationService
     {
         private LoginResponse _userData = null;
+        private readonly List<long> _followedUserIds = new List<long>();
         private readonly IHttpClientFactory _httpClientFactory;
 
         public LoginResponse UserData => _userData;
+
+        public List<long> FollowedUserIds => _followedUserIds;
 
         public bool IsAuthorized => _userData is not null;
 
@@ -41,6 +47,18 @@ namespace Instagram.Mobile.Service
 
                 _userData = userData;
                 _httpClientFactory.AddAuthToken(userData.AuthToken);
+
+                var getFollowRequest = new GetUserFollowRequest
+                {
+                    SkipPagination = true,
+                    FollowingUserId = _userData.UserId,
+                };
+
+                var followResponse = await client.GetAsync(getFollowRequest.BuildQuery("user-follow"));
+
+                var follows = await followResponse.Content.ReadFromJsonAsync<IEnumerable<UserFollowModel>>();
+
+                _followedUserIds.AddRange(follows.Select(f => f.FollowedUserId));
             } 
             else if(response.StatusCode == HttpStatusCode.BadRequest)
             {

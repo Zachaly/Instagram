@@ -6,11 +6,22 @@
              x:DataType="viewModel:MainPageViewModel">
 
     <ScrollView>
-        <VerticalStackLayout>
-            <Label Text="You logged in"/>
-            <Button Text="Logout" Command="{Binding LogoutCommand}"/>
-            <Button Text="Profile" Command="{Binding GoToProfilePageCommand}"/>
-        </VerticalStackLayout>
+        <CollectionView
+            ItemsSource="{Binding Posts}"
+            SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate
+                    x:DataType="viewModel:PostViewModel">
+                    <Frame>
+                        <VerticalStackLayout>
+                            <Image Source="{Binding ImageUrl}"
+                                   MaximumHeightRequest="300"
+                                   MaximumWidthRequest="300"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </ScrollView>
 
 </ContentPage>

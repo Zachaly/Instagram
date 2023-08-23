@@ -17,7 +17,10 @@ namespace Instagram.Mobile.View
             if(!viewModel.IsAuthorized)
             {
                 viewModel.GoToLoginPageCommand.Execute(null);
+                return;
             }
+
+            viewModel.LoadPostsCommand.Execute(null);
         }
     }
 }

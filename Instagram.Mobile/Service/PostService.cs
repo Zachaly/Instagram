@@ -1,4 +1,5 @@
-﻿using Instagram.Models.Post.Request;
+﻿using Instagram.Models.Post;
+using Instagram.Models.Post.Request;
 using System.Net.Http.Json;
 
 namespace Instagram.Mobile.Service
@@ -6,6 +7,7 @@ namespace Instagram.Mobile.Service
     public interface IPostService
     {
         Task<int> GetCountAsync(GetPostRequest request);
+        Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request);
     }
 
     public class PostService : IPostService
@@ -23,6 +25,14 @@ namespace Instagram.Mobile.Service
             var response = await _httpClient.GetAsync(request.BuildQuery($"{Endpoint}/count"));
 
             return await response.Content.ReadFromJsonAsync<int>();
+        }
+
+        public async Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request)
+        {
+            var q = request.BuildQuery(Endpoint);
+            var response = await _httpClient.GetAsync(q);
+
+            return await response.Content.ReadFromJsonAsync<IEnumerable<PostModel>>();
         }
     }
 }
