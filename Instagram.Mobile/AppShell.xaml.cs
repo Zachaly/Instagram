@@ -1,10 +1,11 @@
 ﻿using Instagram.Mobile.View;
+using Instagram.Mobile.ViewModel;
 
 namespace Instagram.Mobile
 {
     public partial class AppShell : Shell
     {
-        public AppShell()
+        public AppShell(ShellViewModel viewModel)
         {
             InitializeComponent();
 
@@ -12,6 +13,7 @@ namespace Instagram.Mobile
             Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
             Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
             Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
+            BindingContext = viewModel;
         }
     }
 }

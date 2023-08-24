@@ -16,6 +16,8 @@ namespace Instagram.Mobile.ViewModel
 
         public ObservableCollection<PostViewModel> Posts { get; set; } = new ObservableCollection<PostViewModel>();
 
+        private int _pageIndex = 0;
+
         public MainPageViewModel(IAuthorizationService authorizationService, IPostService postService)
         {
             _authorizationService = authorizationService;
@@ -25,13 +27,6 @@ namespace Instagram.Mobile.ViewModel
         [RelayCommand]
         private async Task GoToLoginPageAsync()
             => await Shell.Current.GoToAsync(nameof(LoginPage));
-
-        [RelayCommand]
-        private async Task LogoutAsync()
-        {
-            await _authorizationService.LogoutAsync();
-            await GoToLoginPageAsync();
-        }
 
         [RelayCommand]
         private async Task GoToProfilePageAsync()
@@ -46,15 +41,23 @@ namespace Instagram.Mobile.ViewModel
             var request = new GetPostRequest
             {
                 CreatorIds = _authorizationService.FollowedUserIds,
-                SkipCreators = new long[] { _authorizationService.UserData.UserId }
+                SkipCreators = new long[] { _authorizationService.UserData.UserId },
+                PageIndex = _pageIndex
             };
 
             var posts = await _postService.GetAsync(request);
+
+            if (!posts.Any())
+            {
+                return;
+            }
 
             foreach(var post in posts.Select(p => new PostViewModel(p)))
             {
                 Posts.Add(post);
             }
+
+            _pageIndex++;
         }
 
     }

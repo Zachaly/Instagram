@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
+using Instagram.Mobile.View;
 using Instagram.Models.Post.Request;
 using Instagram.Models.User;
 using Instagram.Models.UserFollow.Request;
@@ -35,19 +36,27 @@ namespace Instagram.Mobile.ViewModel
         private readonly IUserService _userService;
         private readonly IUserFollowService _userFollowService;
         private readonly IPostService _postService;
+        private readonly IAuthorizationService _authorizationService;
 
         public string ImageUrl => $"{Configuration.ApiUrl}image/profile/{UserId}";
 
-        public ProfilePageViewModel(IUserService userService, IUserFollowService userFollowService, IPostService postService)
+        public ProfilePageViewModel(IUserService userService, IUserFollowService userFollowService, IPostService postService,
+            IAuthorizationService authorizationService)
         {
             _userService = userService;
             _userFollowService = userFollowService;
             _postService = postService;
+            _authorizationService = authorizationService;
         }
 
         [RelayCommand]
         private async Task LoadUser()
         {
+            if(UserId == default)
+            {
+                UserId = _authorizationService.UserData.UserId;
+            }
+
             IsLoading = true;
             try
             {
@@ -56,7 +65,7 @@ namespace Instagram.Mobile.ViewModel
             catch(NotFoundException ex)
             {
                 await Toast.Make(ex.Message).Show();
-                await Shell.Current.GoToAsync("..");
+                await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
                 return;
             }
             
