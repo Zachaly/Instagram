@@ -37,9 +37,25 @@
                     </Grid>
                 </StackLayout>
             </StackLayout>
-
-            
         </Frame>
+
+        <CollectionView SelectionMode="None"
+                        ItemsSource="{Binding Posts}"
+                        IsVisible="{Binding IsNotLoading}">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="3"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModel:PostViewModel">
+                    <Frame>
+                        <Image Source="{Binding ImageUrl}"
+                           MaximumHeightRequest="50"
+                           MaximumWidthRequest="50"/>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
         
         <ActivityIndicator IsVisible="{Binding IsLoading}"
                            IsRunning="{Binding IsLoading}"

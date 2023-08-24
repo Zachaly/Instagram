@@ -6,6 +6,7 @@ using Instagram.Mobile.View;
 using Instagram.Models.Post.Request;
 using Instagram.Models.User;
 using Instagram.Models.UserFollow.Request;
+using System.Collections.ObjectModel;
 
 namespace Instagram.Mobile.ViewModel
 {
@@ -30,6 +31,8 @@ namespace Instagram.Mobile.ViewModel
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsNotLoading))]
         private bool _isLoading = true;
+
+        public ObservableCollection<PostViewModel> Posts { get; } = new ObservableCollection<PostViewModel>();
 
         public bool IsNotLoading => !IsLoading;
 
@@ -72,6 +75,14 @@ namespace Instagram.Mobile.ViewModel
             PostCount = await _postService.GetCountAsync(new GetPostRequest { CreatorId = UserId });
             FollowersCount = await _userFollowService.GetCountAsync(new GetUserFollowRequest { FollowedUserId = UserId });
             FollowingCount = await _userFollowService.GetCountAsync(new GetUserFollowRequest { FollowingUserId = UserId });
+            
+            var posts = await _postService.GetAsync(new GetPostRequest { CreatorId = UserId });
+            Posts.Clear();
+            foreach(var post in posts)
+            {
+                Posts.Add(new PostViewModel(post));
+            }
+
             IsLoading = false;
         }
     }
