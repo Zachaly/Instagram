@@ -10,6 +10,7 @@
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" IsEnabled="False"/>
     </Shell.BackButtonBehavior>
+
     <TabBar>
         <ShellContent Title="Home" Route="MainPage" ContentTemplate="{DataTemplate view:MainPage}"/>
         <ShellContent Title="Profile" Route="ProfilePage" ContentTemplate="{DataTemplate view:ProfilePage}"/>
@@ -18,6 +19,4 @@
               Command="{Binding LogoutCommand}"
               IsEnabled="False"
               />
-
-
 </Shell>

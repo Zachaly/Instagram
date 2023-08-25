@@ -64,6 +64,5 @@ namespace Instagram.Mobile.ViewModel
 
             _pageIndex++;
         }
-
     }
 }

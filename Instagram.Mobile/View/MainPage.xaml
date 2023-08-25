@@ -17,12 +17,31 @@
                         <VerticalStackLayout>
                             <Image Source="{Binding ImageUrl}"
                                    MaximumHeightRequest="300"
-                                   MaximumWidthRequest="300"/>
-                            <Label Text="{Binding Created}"/>
-                            <Label Text="{Binding Post.CreatorName}"/>
+                                   MaximumWidthRequest="300">
+                                <Image.GestureRecognizers>
+                                    <SwipeGestureRecognizer Direction="Left" Command="{Binding ChangeImageCommand}">
+                                        <SwipeGestureRecognizer.CommandParameter>
+                                            <x:Int32>1</x:Int32>
+                                        </SwipeGestureRecognizer.CommandParameter>
+                                    </SwipeGestureRecognizer>
+                                    <SwipeGestureRecognizer Direction="Right" Command="{Binding ChangeImageCommand}">
+                                        <SwipeGestureRecognizer.CommandParameter>
+                                            <x:Int32>-1</x:Int32>
+                                        </SwipeGestureRecognizer.CommandParameter>
+                                    </SwipeGestureRecognizer>
+                                </Image.GestureRecognizers>
+                            </Image>
+                            <Label Text="{Binding CurrentImage}" HorizontalTextAlignment="Center"/>
+                            <Label FontSize="12" Text="{Binding Created}"/>
                             <CollectionView ItemsLayout="HorizontalList" 
                                             ItemsSource="{Binding Tags}"/>
+                            <Label TextColor="Purple" FontSize="16" Text="{Binding Post.CreatorName}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding GoToCreatorProfileCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
                             <Label Text="{Binding Post.Content}"/>
+                            <BoxView BackgroundColor="Gray" HeightRequest="2"/>
                             <Grid ColumnDefinitions="*, *">
                                 <HorizontalStackLayout Grid.Column="0">
                                     <Label Text="Likes "/>
