@@ -8,7 +8,8 @@
     <ScrollView>
         <CollectionView
             ItemsSource="{Binding Posts}"
-            SelectionMode="None">
+            SelectionMode="None"
+            Scrolled="PostListScroll">
             <CollectionView.ItemTemplate>
                 <DataTemplate
                     x:DataType="viewModel:PostViewModel">
@@ -17,6 +18,22 @@
                             <Image Source="{Binding ImageUrl}"
                                    MaximumHeightRequest="300"
                                    MaximumWidthRequest="300"/>
+                            <Label Text="{Binding Created}"/>
+                            <Label Text="{Binding Post.CreatorName}"/>
+                            <CollectionView ItemsLayout="HorizontalList" 
+                                            ItemsSource="{Binding Tags}"/>
+                            <Label Text="{Binding Post.Content}"/>
+                            <Grid ColumnDefinitions="*, *">
+                                <HorizontalStackLayout Grid.Column="0">
+                                    <Label Text="Likes "/>
+                                    <Label Text="{Binding Post.LikeCount}"/>
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Grid.Column="1"
+                                                       HorizontalOptions="End">
+                                    <Label Text="Comments "/>
+                                    <Label Text="{Binding Post.CommentCount}"/>
+                                </HorizontalStackLayout>
+                            </Grid>
                         </VerticalStackLayout>
                     </Frame>
                 </DataTemplate>

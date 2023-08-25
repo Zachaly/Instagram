@@ -9,8 +9,11 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class MainPageViewModel : ObservableObject
     {
-        private IAuthorizationService _authorizationService;
+        private readonly IAuthorizationService _authorizationService;
         private readonly IPostService _postService;
+        private const int PageSize = 3;
+
+        public bool BlockLoading { get; set; } = false;
 
         public bool IsAuthorized => _authorizationService.IsAuthorized;
 
@@ -42,13 +45,15 @@ namespace Instagram.Mobile.ViewModel
             {
                 CreatorIds = _authorizationService.FollowedUserIds,
                 SkipCreators = new long[] { _authorizationService.UserData.UserId },
-                PageIndex = _pageIndex
+                PageIndex = _pageIndex,
+                PageSize = PageSize
             };
 
             var posts = await _postService.GetAsync(request);
 
             if (!posts.Any())
             {
+                BlockLoading = true;
                 return;
             }
 

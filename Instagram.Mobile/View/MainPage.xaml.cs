@@ -22,5 +22,20 @@ namespace Instagram.Mobile.View
 
             viewModel.LoadPostsCommand.Execute(null);
         }
+
+        private void PostListScroll(object sender, ItemsViewScrolledEventArgs e)
+        {
+            var viewModel = (MainPageViewModel)BindingContext;
+
+            if(viewModel.BlockLoading)
+            {
+                return;
+            }
+
+            if(e.LastVisibleItemIndex == viewModel.Posts.Count - 1) 
+            {
+                viewModel.LoadPostsCommand.Execute(null);
+            }
+        }
     }
 }
