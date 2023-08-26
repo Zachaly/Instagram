@@ -16,12 +16,19 @@ namespace Instagram.Mobile
 
             foreach(var prop in props) 
             {
-
-                if (prop.PropertyType.GetInterfaces().Contains(typeof(IEnumerable<>)))
+                if (typeof(IEnumerable<string>).IsAssignableFrom(prop.PropertyType))
                 {
-                    var value = prop.GetValue(request) as IEnumerable<object>;
-                    var names = value.Select(x => $"{Uri.EscapeDataString(prop.Name)}={Uri.EscapeDataString(x.ToString())}&");
+                    var value = prop.GetValue(request) as IEnumerable<string>;
+                    var names = value.Select(x => $"{Uri.EscapeDataString(prop.Name)}={Uri.EscapeDataString(x)}&");
                     builder.Append(string.Join("", names));
+                    continue;
+                }
+                else if (typeof(IEnumerable<long>).IsAssignableFrom(prop.PropertyType))
+                {
+                    var value = prop.GetValue(request) as IEnumerable<long>;
+                    var names = value.Select(x => $"{Uri.EscapeDataString(prop.Name)}={x}&");
+                    builder.Append(string.Join("", names));
+                    continue;
                 }
 
                 builder.Append($"{Uri.EscapeDataString(prop.Name)}={Uri.EscapeDataString(prop.GetValue(request).ToString())}&");

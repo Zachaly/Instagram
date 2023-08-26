@@ -16,6 +16,11 @@ namespace Instagram.Mobile
             builder.Services.AddTransient<MainPageViewModel>();
             builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<ProfilePageViewModel>();
+            builder.Services.AddTransient<AppShell>();
+            builder.Services.AddTransient<ShellViewModel>();
+            builder.Services.AddTransient<PostPage>();
+            builder.Services.AddTransient<PostPageViewModel>();
+            builder.Services.AddTransient<App>();
 
             builder.Services.AddSingleton<IAuthorizationService, AuthorizationService>();
             builder.Services.AddSingleton<IHttpClientFactory, HttpClientFactory>();
@@ -23,6 +28,7 @@ namespace Instagram.Mobile
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddSingleton<IUserFollowService, UserFollowService>();
             builder.Services.AddSingleton<IPostService, PostService>();
+            builder.Services.AddSingleton<IPostCommentService, PostCommentService>();
         }
     }
 }

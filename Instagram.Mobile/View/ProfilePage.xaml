@@ -4,7 +4,8 @@
              xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
              x:Class="Instagram.Mobile.View.ProfilePage"
              Title="Profile"
-             x:DataType="viewModel:ProfilePageViewModel">
+             x:DataType="viewModel:ProfilePageViewModel"
+             x:Name="page">
     <VerticalStackLayout>
         <Frame
             IsVisible="{Binding IsNotLoading}">
@@ -37,9 +38,29 @@
                     </Grid>
                 </StackLayout>
             </StackLayout>
-
-            
         </Frame>
+
+        <CollectionView SelectionMode="None"
+                        ItemsSource="{Binding Posts}"
+                        IsVisible="{Binding IsNotLoading}">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="4"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModel:PostViewModel">
+                    <Image Source="{Binding ImageUrl}"
+                           HeightRequest="100"
+                           WidthRequest="100">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={x:Reference page},
+                                Path=BindingContext.GoToPostPageCommand}"
+                                CommandParameter="{Binding .}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
         
         <ActivityIndicator IsVisible="{Binding IsLoading}"
                            IsRunning="{Binding IsLoading}"
