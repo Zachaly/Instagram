@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Instagram.Mobile.View.MainPage"
              xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
-             x:DataType="viewModel:MainPageViewModel">
-
+             x:DataType="viewModel:MainPageViewModel"
+             x:Name="page">
     <ScrollView>
         <CollectionView
             ItemsSource="{Binding Posts}"
@@ -40,7 +40,13 @@
                                     <TapGestureRecognizer Command="{Binding GoToCreatorProfileCommand}"/>
                                 </Label.GestureRecognizers>
                             </Label>
-                            <Label Text="{Binding Post.Content}"/>
+                            <Label Text="{Binding Post.Content}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={x:Reference page}, 
+                                        Path=BindingContext.GoToPostPageCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
                             <BoxView BackgroundColor="Gray" HeightRequest="2"/>
                             <Grid ColumnDefinitions="*, *">
                                 <HorizontalStackLayout Grid.Column="0">

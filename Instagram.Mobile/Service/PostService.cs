@@ -1,5 +1,6 @@
 ﻿using Instagram.Models.Post;
 using Instagram.Models.Post.Request;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace Instagram.Mobile.Service
@@ -8,6 +9,7 @@ namespace Instagram.Mobile.Service
     {
         Task<int> GetCountAsync(GetPostRequest request);
         Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request);
+        Task<PostModel> GetByIdAsync(long id);
     }
 
     public class PostService : IPostService
@@ -29,10 +31,21 @@ namespace Instagram.Mobile.Service
 
         public async Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request)
         {
-            var q = request.BuildQuery(Endpoint);
-            var response = await _httpClient.GetAsync(q);
+            var response = await _httpClient.GetAsync(request.BuildQuery(Endpoint));
 
             return await response.Content.ReadFromJsonAsync<IEnumerable<PostModel>>();
+        }
+
+        public async Task<PostModel> GetByIdAsync(long id)
+        {
+            var response = await _httpClient.GetAsync($"{Endpoint}/{id}");
+
+            if(response.StatusCode == HttpStatusCode.NotFound)
+            {
+                throw new NotFoundException("Post");
+            }
+
+            return await response.Content.ReadFromJsonAsync<PostModel>();
         }
     }
 }

@@ -64,5 +64,14 @@ namespace Instagram.Mobile.ViewModel
 
             _pageIndex++;
         }
+
+        [RelayCommand]
+        private async Task GoToPostPageAsync(PostViewModel post)
+        {
+            await Shell.Current.GoToAsync(nameof(PostPage), new Dictionary<string, object>
+            {
+                { "PostId", post.Post.Id }
+            });
+        }
     }
 }

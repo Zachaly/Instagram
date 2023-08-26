@@ -9,6 +9,7 @@ namespace Instagram.Mobile.ViewModel
     {
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ImageUrl))]
+        [NotifyPropertyChangedFor(nameof(CurrentImage))]
         private PostModel _post;
 
         [ObservableProperty]
@@ -16,14 +17,14 @@ namespace Instagram.Mobile.ViewModel
         [NotifyPropertyChangedFor(nameof(CurrentImage))]
         private int _currentImageIndex = 0;
 
-        public string ImageUrl => $"{Configuration.ImageUrl}post/{Post.ImageIds.ElementAt(CurrentImageIndex)}";
+        public string ImageUrl => $"{Configuration.ImageUrl}post/{Post?.ImageIds.ElementAt(CurrentImageIndex)}";
 
-        public string CurrentImage => $"{CurrentImageIndex + 1}/{_post.ImageIds.Count()}";
+        public string CurrentImage => $"{CurrentImageIndex + 1}/{Post?.ImageIds.Count()}";
 
         public string Created 
-            => DateTimeOffset.FromUnixTimeMilliseconds(Post.Created).DateTime.ToString("dd.MM.yyyy HH:mm");
+            => DateTimeOffset.FromUnixTimeMilliseconds(Post?.Created ?? 0).DateTime.ToString("dd.MM.yyyy HH:mm");
 
-        public IEnumerable<string> Tags => Post.Tags.Select(t => $"#{t}");
+        public IEnumerable<string> Tags => Post?.Tags.Select(t => $"#{t}");
 
         public PostViewModel(PostModel post)
         {
