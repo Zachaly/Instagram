@@ -11,6 +11,7 @@ namespace Instagram.Mobile.Service
     {
         Task RegisterAsync(RegisterRequest registerRequest);
         Task<UserModel> GetByIdAsync(long id);
+        Task<IEnumerable<UserModel>> GetAsync(GetUserRequest request);
     }
 
     public class UserService : IUserService
@@ -48,6 +49,13 @@ namespace Instagram.Mobile.Service
             }
 
             return await response.Content.ReadFromJsonAsync<UserModel>();
+        }
+
+        public async Task<IEnumerable<UserModel>> GetAsync(GetUserRequest request)
+        {
+            var response = await _httpClient.GetAsync(request.BuildQuery(Endpoint));
+
+            return await response.Content.ReadFromJsonAsync<IEnumerable<UserModel>>();
         }
     }
 }

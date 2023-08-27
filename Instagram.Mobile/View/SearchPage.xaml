@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Instagram.Mobile.View.SearchPage"
+             Title="SearchPage"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             x:DataType="viewModel:SearchPageViewModel"
+             x:Name="page">
+    <VerticalStackLayout>
+        <Entry Placeholder="Enter user's nickname" Text="{Binding UserName, Mode=TwoWay}"
+               TextChanged="TextChanged"/>
+        <CollectionView ItemsSource="{Binding Users}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModel:UserViewModel">
+                    <HorizontalStackLayout>
+                        <Image Source="{Binding ImageUrl}"
+                               HeightRequest="50"
+                               WidthRequest="50"/>
+                        <Label Text="{Binding User.Nickname}"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={x:Reference page}, Path=BindingContext.GoToProfilePageCommand}"
+                                                      CommandParameter="{Binding User.Id}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>

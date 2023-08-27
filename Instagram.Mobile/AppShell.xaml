@@ -13,6 +13,7 @@
 
     <TabBar>
         <ShellContent Title="Home" Route="MainPage" ContentTemplate="{DataTemplate view:MainPage}"/>
+        <ShellContent Title="Search" Route="SearchPage" ContentTemplate="{DataTemplate view:SearchPage}"/>
         <ShellContent Title="Profile" Route="ProfilePage" ContentTemplate="{DataTemplate view:ProfilePage}"/>
     </TabBar>
     <MenuItem Text="Logout"
