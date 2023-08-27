@@ -17,5 +17,20 @@ namespace Instagram.Mobile
             Routing.RegisterRoute(nameof(SearchPage), typeof(SearchPage));
             BindingContext = viewModel;
         }
+
+        protected override void OnNavigating(ShellNavigatingEventArgs args)
+        {
+            base.OnNavigating(args);
+
+            if (args.Source == ShellNavigationSource.ShellSectionChanged)
+            {
+                var navigation = Current.Navigation;
+                var pages = navigation.NavigationStack;
+                for (var i = pages.Count - 1; i >= 1; i--)
+                {
+                    navigation.RemovePage(pages[i]);
+                }
+            }
+        }
     }
 }
