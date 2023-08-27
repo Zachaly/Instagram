@@ -14,6 +14,7 @@ namespace Instagram.Mobile
             Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
             Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
             Routing.RegisterRoute(nameof(PostPage), typeof(PostPage));
+            Routing.RegisterRoute(nameof(SearchPage), typeof(SearchPage));
             BindingContext = viewModel;
         }
     }
