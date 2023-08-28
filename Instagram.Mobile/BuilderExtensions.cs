@@ -1,6 +1,8 @@
 ﻿using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
 using Instagram.Mobile.ViewModel;
+using Mopups.Interfaces;
+using Mopups.Services;
 
 namespace Instagram.Mobile
 {
