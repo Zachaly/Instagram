@@ -29,6 +29,10 @@
                                             <x:Int32>-1</x:Int32>
                                         </SwipeGestureRecognizer.CommandParameter>
                                     </SwipeGestureRecognizer>
+                                    <TapGestureRecognizer NumberOfTapsRequired="2" 
+                                                          Command="{Binding Source={x:Reference page},
+                                                          Path=BindingContext.LikePostCommand}"
+                                                          CommandParameter="{Binding .}"/>
                                 </Image.GestureRecognizers>
                             </Image>
                             <Label Text="{Binding CurrentImage}" HorizontalTextAlignment="Center"/>

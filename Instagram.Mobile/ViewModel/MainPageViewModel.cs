@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
 using Instagram.Models.Post.Request;
+using Instagram.Models.PostLike.Request;
 using System.Collections.ObjectModel;
 
 namespace Instagram.Mobile.ViewModel
@@ -11,6 +12,7 @@ namespace Instagram.Mobile.ViewModel
     {
         private readonly IAuthorizationService _authorizationService;
         private readonly IPostService _postService;
+        private readonly IPostLikeService _postLikeService;
         private const int PageSize = 3;
 
         public bool BlockLoading { get; set; } = false;
@@ -21,10 +23,12 @@ namespace Instagram.Mobile.ViewModel
 
         private int _pageIndex = 0;
 
-        public MainPageViewModel(IAuthorizationService authorizationService, IPostService postService)
+        public MainPageViewModel(IAuthorizationService authorizationService, IPostService postService,
+            IPostLikeService postLikeService)
         {
             _authorizationService = authorizationService;
             _postService = postService;
+            _postLikeService = postLikeService;
         }
 
         [RelayCommand]
@@ -71,6 +75,30 @@ namespace Instagram.Mobile.ViewModel
             await Shell.Current.GoToAsync(nameof(PostPage), new Dictionary<string, object>
             {
                 { "PostId", post.Post.Id }
+            });
+        }
+
+        [RelayCommand]
+        private async Task LikePostAsync(PostViewModel post)
+        {
+            var getRequest = new GetPostLikeRequest
+            {
+                PostId = post.Post.Id,
+                UserId = _authorizationService.UserData.UserId
+            };
+
+            var count = await _postLikeService.GetCountAsync(getRequest);
+
+            if(count > 0)
+            {
+                await _postLikeService.DeleteAsync(_authorizationService.UserData.UserId, post.Post.Id);
+                return;
+            }
+
+            await _postLikeService.AddAsync(new AddPostLikeRequest 
+            { 
+                PostId = post.Post.Id,
+                UserId =  _authorizationService.UserData.UserId
             });
         }
     }
