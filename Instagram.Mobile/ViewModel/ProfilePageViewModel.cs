@@ -6,6 +6,7 @@ using Instagram.Mobile.View;
 using Instagram.Models.Post.Request;
 using Instagram.Models.User;
 using Instagram.Models.UserFollow.Request;
+using Mopups.Services;
 using System.Collections.ObjectModel;
 
 namespace Instagram.Mobile.ViewModel
@@ -126,7 +127,42 @@ namespace Instagram.Mobile.ViewModel
         {
             await _userFollowService.DeleteFollowAsync(_authorizationService.UserData.UserId, UserId);
 
+            _authorizationService.FollowedUserIds.Remove(UserId);
+
             CanFollow = true;
+        }
+
+        [RelayCommand]
+        private async Task ShowFollowersAsync()
+        {
+            var users = (await _userFollowService.GetAsync(new GetUserFollowRequest
+            {
+                FollowedUserId = UserId,
+                JoinFollower = true
+            })).Select(follow => new UserListPopupViewModel.UserListItem 
+            {
+                Id = follow.FollowingUserId,
+                UserName = follow.UserName
+            });
+
+            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(users)));
+        }
+
+
+        [RelayCommand]
+        private async Task ShowFollowedAsync()
+        {
+            var users = (await _userFollowService.GetAsync(new GetUserFollowRequest
+            {
+                FollowingUserId = UserId,
+                JoinFollowed = true
+            })).Select(follow => new UserListPopupViewModel.UserListItem
+            {
+                Id = follow.FollowedUserId,
+                UserName = follow.UserName
+            });
+
+            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(users)));
         }
     }
 }

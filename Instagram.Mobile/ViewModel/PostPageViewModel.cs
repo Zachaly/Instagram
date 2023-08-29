@@ -81,9 +81,14 @@ namespace Instagram.Mobile.ViewModel
                 return;
             }
 
-            var likes = await _postLikeService.GetAsync(new GetPostLikeRequest { PostId = Post.Id });
+            var users = (await _postLikeService.GetAsync(new GetPostLikeRequest { PostId = Post.Id }))
+                .Select(like => new UserListPopupViewModel.UserListItem 
+                { 
+                    Id = like.UserId,
+                    UserName = like.UserName,
+                });
 
-            await MopupService.Instance.PushAsync(new PostLikesPopup(new PostLikesPopupViewModel(likes)));
+            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(users)));
         }
     }
 }
