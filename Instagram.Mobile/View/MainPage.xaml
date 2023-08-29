@@ -29,6 +29,10 @@
                                             <x:Int32>-1</x:Int32>
                                         </SwipeGestureRecognizer.CommandParameter>
                                     </SwipeGestureRecognizer>
+                                    <TapGestureRecognizer NumberOfTapsRequired="2" 
+                                                          Command="{Binding Source={x:Reference page},
+                                                          Path=BindingContext.LikePostCommand}"
+                                                          CommandParameter="{Binding .}"/>
                                 </Image.GestureRecognizers>
                             </Image>
                             <Label Text="{Binding CurrentImage}" HorizontalTextAlignment="Center"/>
@@ -52,6 +56,12 @@
                                 <HorizontalStackLayout Grid.Column="0">
                                     <Label Text="Likes "/>
                                     <Label Text="{Binding Post.LikeCount}"/>
+                                    <HorizontalStackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer 
+                                            Command="{Binding Source={x:Reference page},
+                                            Path=BindingContext.ShowPostLikesCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    </HorizontalStackLayout.GestureRecognizers>
                                 </HorizontalStackLayout>
                                 <HorizontalStackLayout Grid.Column="1"
                                                        HorizontalOptions="End">

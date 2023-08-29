@@ -1,6 +1,8 @@
 ﻿using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
 using Instagram.Mobile.ViewModel;
+using Mopups.Interfaces;
+using Mopups.Services;
 
 namespace Instagram.Mobile
 {
@@ -31,6 +33,7 @@ namespace Instagram.Mobile
             builder.Services.AddSingleton<IUserFollowService, UserFollowService>();
             builder.Services.AddSingleton<IPostService, PostService>();
             builder.Services.AddSingleton<IPostCommentService, PostCommentService>();
+            builder.Services.AddSingleton<IPostLikeService, PostLikeService>();
         }
     }
 }
