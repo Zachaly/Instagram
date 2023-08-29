@@ -3,22 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
              xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
-             x:Class="Instagram.Mobile.View.PostLikesPopup"
-             x:DataType="viewModel:PostLikesPopupViewModel"
-             BackgroundColor="LightGray">
+             x:Class="Instagram.Mobile.View.UserListPopup"
+             x:DataType="viewModel:UserListPopupViewModel"
+             BackgroundColor="LightGray"
+             x:Name="popup">
     <VerticalStackLayout Margin="50"
                          BackgroundColor="WhiteSmoke">
-        <CollectionView ItemsSource="{Binding Likes}"
+        <CollectionView ItemsSource="{Binding Users}"
                         SelectionMode="None">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModel:PostLikeViewModel">
+                <DataTemplate x:DataType="{x:Type viewModel:UserListPopupViewModel+UserListItem}">
                     <HorizontalStackLayout>
-                        <Image Source="{Binding UserImageUrl}"
+                        <Image Source="{Binding ImageUrl}"
                            HeightRequest="50"
                            WidthRequest="50"/>
-                        <Label Text="{Binding Like.UserName}" VerticalTextAlignment="Center">
+                        <Label Text="{Binding UserName}" VerticalTextAlignment="Center">
                             <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding GoToProfileCommand}"/>
+                                <TapGestureRecognizer Command="{Binding Source={x:Reference popup},
+                                    Path=BindingContext.GoToProfileCommand}"
+                                    CommandParameter="{Binding .}"/>
                             </Label.GestureRecognizers>
                         </Label>
                     </HorizontalStackLayout>

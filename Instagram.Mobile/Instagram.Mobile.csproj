@@ -58,10 +58,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="View\UserListPopup.xaml.cs">
+	    <DependentUpon>UserListPopup.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <MauiXaml Update="View\LoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="View\PostLikesPopup.xaml">
+	  <MauiXaml Update="View\UserListPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="View\PostPage.xaml">

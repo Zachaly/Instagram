@@ -4,7 +4,6 @@ using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
 using Instagram.Models.Post.Request;
 using Instagram.Models.PostLike.Request;
-using Mopups.Interfaces;
 using Mopups.Services;
 using System.Collections.ObjectModel;
 
@@ -112,9 +111,14 @@ namespace Instagram.Mobile.ViewModel
                 return;
             }
 
-            var likes = await _postLikeService.GetAsync(new GetPostLikeRequest { PostId = post.Post.Id });
+            var likes = (await _postLikeService.GetAsync(new GetPostLikeRequest { PostId = post.Post.Id }))
+                .Select(like => new UserListPopupViewModel.UserListItem 
+                {
+                    Id = like.UserId,
+                    UserName = like.UserName,
+                });
 
-            await MopupService.Instance.PushAsync(new PostLikesPopup(new PostLikesPopupViewModel(likes)));
+            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(likes)));
         }
     }
 }

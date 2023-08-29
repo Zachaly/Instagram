@@ -3,9 +3,9 @@ using Mopups.Pages;
 
 namespace Instagram.Mobile.View;
 
-public partial class PostLikesPopup : PopupPage
+public partial class UserListPopup : PopupPage
 {
-	public PostLikesPopup(PostLikesPopupViewModel viewModel)
+	public UserListPopup(UserListPopupViewModel viewModel)
 	{
 		InitializeComponent();
 		BindingContext = viewModel;

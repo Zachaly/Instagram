@@ -14,7 +14,14 @@
                        MaximumHeightRequest="100"
                        MaximumWidthRequest="100"/>
                 <StackLayout Orientation="Vertical" HorizontalOptions="StartAndExpand">
-                    <Label Text="{Binding UserModel.Nickname}" FontSize="20"/>
+                    <HorizontalStackLayout>
+                        <Label Text="{Binding UserModel.Nickname}" FontSize="20"/>
+                        <Button Text="Follow" BackgroundColor="ForestGreen" IsVisible="{Binding CanFollow}"
+                                Command="{Binding FollowCommand}"/>
+                        <Button Text="Unfollow" BackgroundColor="IndianRed" IsVisible="{Binding CanUnfollow}"
+                                Command="{Binding DeleteFollowCommand}"/>
+                    </HorizontalStackLayout>
+                    
                     <Label Text="{Binding UserModel.Name}"/>
                     <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3"
                              Margin="3, 0"/>
@@ -30,10 +37,16 @@
                         <StackLayout Orientation="Horizontal" Grid.Column="1">
                             <Label Text="Followers: "/>
                             <Label Text="{Binding FollowersCount}" />
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ShowFollowersCommand}"/>
+                            </StackLayout.GestureRecognizers>
                         </StackLayout>
                         <StackLayout Orientation="Horizontal" Grid.Column="2">
                             <Label Text="Following: "/>
                             <Label Text="{Binding FollowingCount}" />
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ShowFollowedCommand}"/>
+                            </StackLayout.GestureRecognizers>
                         </StackLayout>
                     </Grid>
                 </StackLayout>
