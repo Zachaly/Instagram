@@ -14,6 +14,8 @@ namespace Instagram.Mobile.ViewModel
     public partial class ProfilePageViewModel : ObservableObject
     {
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CanUnfollow))]
+        [NotifyPropertyChangedFor(nameof(IsNotCurrentUser))]
         private long _userId;
 
         [ObservableProperty]
@@ -32,16 +34,21 @@ namespace Instagram.Mobile.ViewModel
         [NotifyPropertyChangedFor(nameof(IsNotLoading))]
         private bool _isLoading = true;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CanUnfollow))]
+        private bool _canFollow;
+
         public ObservableCollection<PostViewModel> Posts { get; } = new ObservableCollection<PostViewModel>();
 
+        public bool IsNotCurrentUser => _authorizationService.UserData.UserId != UserId;
+        public bool CanUnfollow => IsNotCurrentUser && !CanFollow;
         public bool IsNotLoading => !IsLoading;
+        public string ImageUrl => $"{Configuration.ApiUrl}image/profile/{UserId}";
 
         private readonly IUserService _userService;
         private readonly IUserFollowService _userFollowService;
         private readonly IPostService _postService;
         private readonly IAuthorizationService _authorizationService;
-
-        public string ImageUrl => $"{Configuration.ApiUrl}image/profile/{UserId}";
 
         public ProfilePageViewModel(IUserService userService, IUserFollowService userFollowService, IPostService postService,
             IAuthorizationService authorizationService)
@@ -83,6 +90,9 @@ namespace Instagram.Mobile.ViewModel
                 Posts.Add(new PostViewModel(post));
             }
 
+            CanFollow = !_authorizationService.FollowedUserIds.Contains(UserId)
+                && IsNotCurrentUser;
+
             IsLoading = false;
         }
 
@@ -93,6 +103,30 @@ namespace Instagram.Mobile.ViewModel
             {
                 { "PostId", post.Post.Id },
             });
+        }
+
+        [RelayCommand]
+        private async Task FollowAsync()
+        {
+            var request = new AddUserFollowRequest
+            {
+                FollowedUserId = UserId,
+                FollowingUserId = _authorizationService.UserData.UserId
+            };
+
+            await _userFollowService.AddFollowAsync(request);
+
+            _authorizationService.FollowedUserIds.Add(request.FollowedUserId);
+
+            CanFollow = false;
+        }
+
+        [RelayCommand]
+        private async Task DeleteFollowAsync()
+        {
+            await _userFollowService.DeleteFollowAsync(_authorizationService.UserData.UserId, UserId);
+
+            CanFollow = true;
         }
     }
 }
