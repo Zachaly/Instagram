@@ -60,6 +60,19 @@
                 </Grid>
             </VerticalStackLayout>
         </Frame>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Entry Text="{Binding NewCommentContent}"
+                   Placeholder="New comment"
+                   HorizontalOptions="FillAndExpand"
+                   Grid.Column="0"/>
+            <Button Text="Add comment"
+                    Command="{Binding AddCommentCommand}"
+                    Grid.Column="1"/>
+        </Grid>
         <CollectionView ItemsSource="{Binding Comments}"
                         SelectionMode="None">
             <CollectionView.ItemTemplate>
