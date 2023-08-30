@@ -6,89 +6,99 @@
              xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
              xmlns:model="clr-namespace:Instagram.Models.PostComment;assembly=Instagram.Models"
              x:DataType="viewModel:PostPageViewModel">
-    <VerticalStackLayout>
-        <Frame>
-            <VerticalStackLayout>
-                <Image Source="{Binding ImageUrl}"
+    <ScrollView>
+        <VerticalStackLayout>
+            <Frame>
+                <VerticalStackLayout>
+                    <Image Source="{Binding ImageUrl}"
                    MaximumHeightRequest="300"
                    MaximumWidthRequest="300">
-                    <Image.GestureRecognizers>
-                        <SwipeGestureRecognizer Direction="Left" Command="{Binding ChangeImageCommand}">
-                            <SwipeGestureRecognizer.CommandParameter>
-                                <x:Int32>1</x:Int32>
-                            </SwipeGestureRecognizer.CommandParameter>
-                        </SwipeGestureRecognizer>
-                        <SwipeGestureRecognizer Direction="Right" Command="{Binding ChangeImageCommand}">
-                            <SwipeGestureRecognizer.CommandParameter>
-                                <x:Int32>-1</x:Int32>
-                            </SwipeGestureRecognizer.CommandParameter>
-                        </SwipeGestureRecognizer>
-                        <TapGestureRecognizer NumberOfTapsRequired="2" 
+                        <Image.GestureRecognizers>
+                            <SwipeGestureRecognizer Direction="Left" Command="{Binding ChangeImageCommand}">
+                                <SwipeGestureRecognizer.CommandParameter>
+                                    <x:Int32>1</x:Int32>
+                                </SwipeGestureRecognizer.CommandParameter>
+                            </SwipeGestureRecognizer>
+                            <SwipeGestureRecognizer Direction="Right" Command="{Binding ChangeImageCommand}">
+                                <SwipeGestureRecognizer.CommandParameter>
+                                    <x:Int32>-1</x:Int32>
+                                </SwipeGestureRecognizer.CommandParameter>
+                            </SwipeGestureRecognizer>
+                            <TapGestureRecognizer NumberOfTapsRequired="2" 
                                               Command="{Binding Source={x:Reference page},
                                               Path=BindingContext.LikePostCommand}"
                                               CommandParameter="{Binding .}"/>
-                    </Image.GestureRecognizers>
-                </Image>
-                <Label Text="{Binding CurrentImage}" HorizontalTextAlignment="Center"/>
-                <Label FontSize="12" Text="{Binding Created}"/>
-                <CollectionView ItemsLayout="HorizontalList" 
+                        </Image.GestureRecognizers>
+                    </Image>
+                    <Label Text="{Binding CurrentImage}" HorizontalTextAlignment="Center"/>
+                    <Label FontSize="12" Text="{Binding Created}"/>
+                    <CollectionView ItemsLayout="HorizontalList" 
                         ItemsSource="{Binding Tags}"/>
-                <Label TextColor="Purple" FontSize="16" Text="{Binding Post.CreatorName}">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToCreatorProfileCommand}"/>
-                    </Label.GestureRecognizers>
-                </Label>
-                <Label Text="{Binding Post.Content}"/>
-                <BoxView BackgroundColor="Gray" HeightRequest="2"/>
-                <Grid ColumnDefinitions="*, *">
-                    <HorizontalStackLayout Grid.Column="0">
-                        <Label Text="Likes "/>
-                        <Label Text="{Binding Post.LikeCount}"/>
-                        <HorizontalStackLayout.GestureRecognizers>
-                            <TapGestureRecognizer 
+                    <Label TextColor="Purple" FontSize="16" Text="{Binding Post.CreatorName}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToCreatorProfileCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label Text="{Binding Post.Content}"/>
+                    <BoxView BackgroundColor="Gray" HeightRequest="2"/>
+                    <Grid ColumnDefinitions="*, *">
+                        <HorizontalStackLayout Grid.Column="0">
+                            <Label Text="Likes "/>
+                            <Label Text="{Binding Post.LikeCount}"/>
+                            <HorizontalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer 
                                 Command="{Binding ShowPostLikesCommand}"/>
-                        </HorizontalStackLayout.GestureRecognizers>
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="1"
+                            </HorizontalStackLayout.GestureRecognizers>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Grid.Column="1"
                                    HorizontalOptions="End">
-                        <HorizontalStackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding LoadCommentsCommand}"/>
-                        </HorizontalStackLayout.GestureRecognizers>
-                        <Label Text="Comments "/>
-                        <Label Text="{Binding Post.CommentCount}"/>
-                    </HorizontalStackLayout>
-                </Grid>
-            </VerticalStackLayout>
-        </Frame>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Entry Text="{Binding NewCommentContent}"
+                            <HorizontalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding LoadCommentsCommand}"/>
+                            </HorizontalStackLayout.GestureRecognizers>
+                            <Label Text="Comments "/>
+                            <Label Text="{Binding Post.CommentCount}"/>
+                        </HorizontalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <VerticalStackLayout Grid.Column="0">
+                    <Entry Text="{Binding NewCommentContent}"
                    Placeholder="New comment"
                    HorizontalOptions="FillAndExpand"
-                   Grid.Column="0"/>
-            <Button Text="Add comment"
+                   />
+                    <CollectionView
+                    ItemsSource="{Binding CommentValidationErrors[Content]}"
+                    SelectionMode="None"/>
+                </VerticalStackLayout>
+
+                <Button Text="Add comment"
                     Command="{Binding AddCommentCommand}"
                     Grid.Column="1"/>
-        </Grid>
-        <CollectionView ItemsSource="{Binding Comments}"
+            </Grid>
+
+            <CollectionView ItemsSource="{Binding Comments}"
                         SelectionMode="None">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModel:PostCommentViewModel">
-                    <Frame>
-                        <VerticalStackLayout>
-                            <Label TextColor="Purple" FontSize="16" Text="{Binding Comment.UserName}">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding GoToProfilePageCommand}"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Text="{Binding Comment.Content}"/>
-                        </VerticalStackLayout>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </VerticalStackLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewModel:PostCommentViewModel">
+                        <Frame>
+                            <VerticalStackLayout>
+                                <Label TextColor="Purple" FontSize="16" Text="{Binding Comment.UserName}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding GoToProfilePageCommand}"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Text="{Binding Comment.Content}"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

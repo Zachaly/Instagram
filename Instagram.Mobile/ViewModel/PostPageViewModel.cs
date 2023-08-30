@@ -25,6 +25,9 @@ namespace Instagram.Mobile.ViewModel
         [ObservableProperty]
         private string _newCommentContent = "";
 
+        [ObservableProperty]
+        private IDictionary<string, string[]> _commentValidationErrors = null;
+
         public PostPageViewModel(IPostCommentService postCommentService, IPostService postService,
             IAuthorizationService authorizationService, IPostLikeService postLikeService) : base(null)
         {
@@ -103,7 +106,19 @@ namespace Instagram.Mobile.ViewModel
                 UserId = _authorizationService.UserData.UserId
             };
 
-            var commentId = await _postCommentService.AddAsync(request);
+            long commentId;
+
+            try
+            {
+                commentId = await _postCommentService.AddAsync(request);
+            }
+            catch(InvalidRequestException exception)
+            {
+                CommentValidationErrors = exception.Response.ValidationErrors;
+                return;
+            }
+
+            CommentValidationErrors = null;
 
             var comment = await _postCommentService.GetByIdAsync(commentId);
 
