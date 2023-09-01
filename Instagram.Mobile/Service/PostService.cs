@@ -1,6 +1,7 @@
 ﻿using Instagram.Models.Post;
 using Instagram.Models.Post.Request;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace Instagram.Mobile.Service
@@ -10,6 +11,7 @@ namespace Instagram.Mobile.Service
         Task<int> GetCountAsync(GetPostRequest request);
         Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request);
         Task<PostModel> GetByIdAsync(long id);
+        Task AddAsync(long userId, string content, IEnumerable<string> images, IEnumerable<string> tags);
     }
 
     public class PostService : IPostService
@@ -46,6 +48,34 @@ namespace Instagram.Mobile.Service
             }
 
             return await response.Content.ReadFromJsonAsync<PostModel>();
+        }
+
+        public async Task AddAsync(long userId, string content, IEnumerable<string> images, IEnumerable<string> tags)
+        {
+            using var request = new MultipartFormDataContent()
+            {
+                { new StringContent(userId.ToString()), "CreatorId" },
+                { new StringContent(content), "Content" },
+            };
+
+            foreach(var image in images)
+            {
+                var fileContent = new StreamContent(File.OpenRead(image));
+                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    FileName = image,
+                    Name = "Files"
+                };
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+                request.Add(fileContent);
+            }
+
+            foreach(var tag in tags)
+            {
+                request.Add(new StringContent(tag), "Tags");
+            }
+
+            var response = await _httpClient.PostAsync(Endpoint, request);
         }
     }
 }

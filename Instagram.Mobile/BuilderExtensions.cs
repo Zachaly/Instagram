@@ -1,8 +1,6 @@
 ﻿using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
 using Instagram.Mobile.ViewModel;
-using Mopups.Interfaces;
-using Mopups.Services;
 
 namespace Instagram.Mobile
 {
@@ -24,6 +22,8 @@ namespace Instagram.Mobile
             builder.Services.AddTransient<PostPageViewModel>();
             builder.Services.AddTransient<SearchPage>();
             builder.Services.AddTransient<SearchPageViewModel>();
+            builder.Services.AddTransient<AddPostPage>();
+            builder.Services.AddTransient<AddPostPageViewModel>();
             builder.Services.AddTransient<App>();
 
             builder.Services.AddSingleton<IAuthorizationService, AuthorizationService>();
