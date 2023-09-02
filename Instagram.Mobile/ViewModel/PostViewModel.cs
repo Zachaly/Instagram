@@ -10,6 +10,7 @@ namespace Instagram.Mobile.ViewModel
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ImageUrl))]
         [NotifyPropertyChangedFor(nameof(CurrentImage))]
+        [NotifyPropertyChangedFor(nameof(Created))]
         private PostModel _post;
 
         [ObservableProperty]

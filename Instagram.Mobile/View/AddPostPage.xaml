@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Instagram.Mobile.View.AddPostPage"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             x:DataType="viewModel:AddPostPageViewModel"
+             Title="AddPostPage"
+             x:Name="page">
+    <VerticalStackLayout>
+        <Entry Placeholder="Enter content" Text="{Binding Content, Mode=TwoWay}" HorizontalOptions="FillAndExpand"/>
+        <CollectionView
+            ItemsSource="{Binding ValidationErrors[Content]}"
+            SelectionMode="None"/>
+        <VerticalStackLayout>
+            <CollectionView ItemsSource="{Binding AddedTags}"
+                            ItemsLayout="HorizontalList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Label Text="{Binding .}" Margin="1">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={x:Reference page},
+                                    Path=BindingContext.DeleteTagCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <CollectionView
+                ItemsSource="{Binding ValidationErrors[Tags]}"
+                SelectionMode="None"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Entry Text="{Binding NewTag, Mode=TwoWay}" Grid.Column="0"/>
+                <Button Text="Add tag" Command="{Binding AddTagCommand}" Grid.Column="1"/>
+            </Grid>
+        </VerticalStackLayout>
+        <Button Text="Add photo" Command="{Binding SelectImageCommand}"/>
+        <CollectionView ItemsSource="{Binding SelectedImages}"
+                        ItemsLayout="HorizontalList">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Image Source="{Binding .}" WidthRequest="100" HeightRequest="100" Margin="5">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                  Command="{Binding Source={x:Reference page}, Path=BindingContext.DeleteImageCommand}"
+                                                  CommandParameter="{Binding .}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button Text="Add" Command="{Binding AddPostCommand}"/>
+    </VerticalStackLayout>
+</ContentPage>
