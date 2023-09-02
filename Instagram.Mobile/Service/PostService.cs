@@ -1,5 +1,7 @@
 ﻿using Instagram.Models.Post;
 using Instagram.Models.Post.Request;
+using Instagram.Models.Response;
+using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -76,6 +78,12 @@ namespace Instagram.Mobile.Service
             }
 
             var response = await _httpClient.PostAsync(Endpoint, request);
+
+            if(response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                throw new InvalidRequestException(JsonConvert.DeserializeObject<ResponseModel>(responseContent));
+            }
         }
     }
 }

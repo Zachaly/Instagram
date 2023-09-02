@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
-using Instagram.Mobile.View;
 using System.Collections.ObjectModel;
 
 namespace Instagram.Mobile.ViewModel
@@ -21,10 +20,13 @@ namespace Instagram.Mobile.ViewModel
         public ObservableCollection<string> PhotoGallery { get; set; } = new ObservableCollection<string>();
 
         [ObservableProperty]
-        private string _content;
+        private string _content = "";
 
         [ObservableProperty]
-        private string _newTag;
+        private string _newTag = "";
+
+        [ObservableProperty]
+        private IDictionary<string, string[]>? _validationErrors = null;
 
         public AddPostPageViewModel(IPostService postService, IAuthorizationService authorizationService)
         {
@@ -83,17 +85,32 @@ namespace Instagram.Mobile.ViewModel
         [RelayCommand]
         private async Task AddPostAsync()
         {
-            await _postService.AddAsync(_authorizationService.UserData.UserId,
-                Content,
-                SelectedImages,
-                _tags);
+            if (!SelectedImages.Any())
+            {
+                await Toast.Make("You must add images!").Show();
+                return;
+            }
 
+            try
+            {
+                await _postService.AddAsync(_authorizationService.UserData.UserId,
+                    Content,
+                    SelectedImages,
+                    _tags);
+            }
+            catch(InvalidRequestException exception)
+            {
+                ValidationErrors = exception.Response.ValidationErrors;
+                return;
+            }
+            
             await Toast.Make("Post added").Show();
 
             Content = "";
             SelectedImages.Clear();
             AddedTags.Clear();
             _tags.Clear();
+            ValidationErrors = null;
         }
     }
 }

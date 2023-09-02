@@ -8,6 +8,9 @@
              x:Name="page">
     <VerticalStackLayout>
         <Entry Placeholder="Enter content" Text="{Binding Content, Mode=TwoWay}" HorizontalOptions="FillAndExpand"/>
+        <CollectionView
+            ItemsSource="{Binding ValidationErrors[Content]}"
+            SelectionMode="None"/>
         <VerticalStackLayout>
             <CollectionView ItemsSource="{Binding AddedTags}"
                             ItemsLayout="HorizontalList">
@@ -23,6 +26,9 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+            <CollectionView
+                ItemsSource="{Binding ValidationErrors[Tags]}"
+                SelectionMode="None"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
