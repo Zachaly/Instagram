@@ -62,6 +62,11 @@ namespace Instagram.Mobile.Service
         public async Task UpdateAsync(UpdateUserRequest request)
         {
             var response = await _httpClient.PatchAsJsonAsync(Endpoint, request);
+
+            if(response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                throw new InvalidRequestException(JsonConvert.DeserializeObject<ResponseModel>(await response.Content.ReadAsStringAsync()));
+            }
         }
     }
 }

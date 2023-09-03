@@ -18,6 +18,9 @@ namespace Instagram.Mobile.ViewModel
         [NotifyPropertyChangedFor(nameof(IsNotLoading))]
         private bool _isLoading = true;
 
+        [ObservableProperty]
+        private IDictionary<string, string[]> _validationErrors = null;
+
         public bool IsNotLoading => !IsLoading;
 
         public UpdateProfilePageViewModel(IAuthorizationService authorizationService, IUserService userService)
@@ -33,6 +36,8 @@ namespace Instagram.Mobile.ViewModel
 
             var user = await _userService.GetByIdAsync(_authorizationService.UserData.UserId);
 
+            ValidationErrors = null;
+
             UpdateRequest = new UpdateUserRequest
             {
                 Id = user.Id,
@@ -47,9 +52,16 @@ namespace Instagram.Mobile.ViewModel
         [RelayCommand]
         private async Task UpdateProfileAsync()
         {
-            await _userService.UpdateAsync(UpdateRequest);
-
-            await Toast.Make("Profile updated").Show();
+            try
+            {
+                await _userService.UpdateAsync(UpdateRequest);
+                await Toast.Make("Profile updated").Show();
+                ValidationErrors = null;
+            }
+            catch(InvalidRequestException exception)
+            {
+                ValidationErrors = exception.Response.ValidationErrors;
+            }
         }
     }
 }

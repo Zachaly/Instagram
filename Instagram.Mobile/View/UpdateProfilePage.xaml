@@ -9,11 +9,14 @@
         <VerticalStackLayout IsVisible="{Binding IsNotLoading}">
             <Label Text="Nickname"/>
             <Entry Text="{Binding UpdateRequest.Nickname, Mode=TwoWay}"/>
+            <CollectionView ItemsSource="{Binding ValidationErrors[Nickname]}"/>
             <Label Text="Name"/>
             <Entry Text="{Binding UpdateRequest.Name, Mode=TwoWay}"/>
+            <CollectionView ItemsSource="{Binding ValidationErrors[Name]}"/>
             <Label Text="Bio"/>
             <Entry Text="{Binding UpdateRequest.Bio, Mode=TwoWay}"/>
             <Button Text="Update" Command="{Binding UpdateProfileCommand}"/>
+            <CollectionView ItemsSource="{Binding ValidationErrors[Bio]}"/>
         </VerticalStackLayout>
         <ActivityIndicator IsVisible="{Binding IsLoading}"
                    IsRunning="{Binding IsLoading}"
