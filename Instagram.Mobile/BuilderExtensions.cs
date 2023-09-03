@@ -24,6 +24,8 @@ namespace Instagram.Mobile
             builder.Services.AddTransient<SearchPageViewModel>();
             builder.Services.AddTransient<AddPostPage>();
             builder.Services.AddTransient<AddPostPageViewModel>();
+            builder.Services.AddTransient<UpdateProfilePage>();
+            builder.Services.AddTransient<UpdateProfilePageViewModel>();
             builder.Services.AddTransient<App>();
 
             builder.Services.AddSingleton<IAuthorizationService, AuthorizationService>();

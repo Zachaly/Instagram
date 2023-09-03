@@ -10,27 +10,27 @@ namespace Instagram.Mobile.Service
 
     public class HttpClientFactory : IHttpClientFactory
     {
-        private HttpClient _httpClient = null;
+        private HttpClient _httpClient;
 
         public void AddAuthToken(string token)
         {
             if(_httpClient is not null)
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer ", token);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
         }
 
         public HttpClient Create()
         {
-            if(_httpClient is not null)
+            if(_httpClient is null)
             {
-                return _httpClient;
+                _httpClient = new HttpClient
+                {
+                    BaseAddress = new Uri(Configuration.ApiUrl)
+                };
             }
 
-            return new HttpClient
-            {
-                BaseAddress = new Uri(Configuration.ApiUrl)
-            };
+            return _httpClient;
         }
     }
 }
