@@ -15,8 +15,20 @@
             <CollectionView ItemsSource="{Binding ValidationErrors[Name]}"/>
             <Label Text="Bio"/>
             <Entry Text="{Binding UpdateRequest.Bio, Mode=TwoWay}"/>
-            <Button Text="Update" Command="{Binding UpdateProfileCommand}"/>
             <CollectionView ItemsSource="{Binding ValidationErrors[Bio]}"/>
+            <Button Text="Update" Command="{Binding UpdateProfileCommand}"/>
+            
+            <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3" Margin="3, 0"/>
+
+            <HorizontalStackLayout>
+                <Image Source="{Binding CurrentProfilePicture}" HeightRequest="100" WidthRequest="100"/>
+                <Image Source="{Binding NewProfilePicture}" HeightRequest="100" WidthRequest="100"
+                       IsVisible="{Binding IsNewProfilePictureSelected}"/>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout>
+                <Button Text="Select new picture" Command="{Binding SelectPictureCommand}"/>
+                <Button Text="Update profile picture" Command="{Binding UpdateProfilePictureCommand}"/>
+            </HorizontalStackLayout>
         </VerticalStackLayout>
         <ActivityIndicator IsVisible="{Binding IsLoading}"
                    IsRunning="{Binding IsLoading}"

@@ -21,7 +21,15 @@ namespace Instagram.Mobile.ViewModel
         [ObservableProperty]
         private IDictionary<string, string[]> _validationErrors = null;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsNewProfilePictureSelected))]
+        private string _newProfilePicture = null;
+
+        public string CurrentProfilePicture => $"{Configuration.ImageUrl}profile/{_authorizationService.UserData.UserId}";
+
         public bool IsNotLoading => !IsLoading;
+
+        public bool IsNewProfilePictureSelected => NewProfilePicture is not null;
 
         public UpdateProfilePageViewModel(IAuthorizationService authorizationService, IUserService userService)
         {
@@ -62,6 +70,24 @@ namespace Instagram.Mobile.ViewModel
             {
                 ValidationErrors = exception.Response.ValidationErrors;
             }
+        }
+
+        [RelayCommand]
+        private async Task SelectPictureAsync()
+        {
+            var file = await MediaPicker.PickPhotoAsync();
+
+            if(file is not null)
+            {
+                NewProfilePicture = file.FullPath;
+            }
+        }
+
+        [RelayCommand]
+        private async Task UpdateProfilePictureAsync()
+        {
+            await _userService.UpdateProfilePictureAsync(_authorizationService.UserData.UserId, NewProfilePicture);
+            await Toast.Make("Picture updated").Show();
         }
     }
 }
