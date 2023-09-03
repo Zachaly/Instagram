@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Instagram.Mobile.View.UpdateProfilePage"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             Title="UpdateProfilePage"
+             x:DataType="viewModel:UpdateProfilePageViewModel">
+    <VerticalStackLayout>
+        <VerticalStackLayout IsVisible="{Binding IsNotLoading}">
+            <Label Text="Nickname"/>
+            <Entry Text="{Binding UpdateRequest.Nickname, Mode=TwoWay}"/>
+            <CollectionView ItemsSource="{Binding ValidationErrors[Nickname]}"/>
+            <Label Text="Name"/>
+            <Entry Text="{Binding UpdateRequest.Name, Mode=TwoWay}"/>
+            <CollectionView ItemsSource="{Binding ValidationErrors[Name]}"/>
+            <Label Text="Bio"/>
+            <Entry Text="{Binding UpdateRequest.Bio, Mode=TwoWay}"/>
+            <CollectionView ItemsSource="{Binding ValidationErrors[Bio]}"/>
+            <Button Text="Update" Command="{Binding UpdateProfileCommand}"/>
+            
+            <BoxView BackgroundColor="Gray" HorizontalOptions="Fill" HeightRequest="3" Margin="3, 0"/>
+
+            <HorizontalStackLayout>
+                <Image Source="{Binding CurrentProfilePicture}" HeightRequest="100" WidthRequest="100"/>
+                <Image Source="{Binding NewProfilePicture}" HeightRequest="100" WidthRequest="100"
+                       IsVisible="{Binding IsNewProfilePictureSelected}"/>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout>
+                <Button Text="Select new picture" Command="{Binding SelectPictureCommand}"/>
+                <Button Text="Update profile picture" Command="{Binding UpdateProfilePictureCommand}"/>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+        <ActivityIndicator IsVisible="{Binding IsLoading}"
+                   IsRunning="{Binding IsLoading}"
+                   HorizontalOptions="FillAndExpand"
+                   VerticalOptions="FillAndExpand"/>
+    </VerticalStackLayout>
+</ContentPage>

@@ -16,10 +16,12 @@
         <ShellContent Title="Add Post" Route="PostPage" ContentTemplate="{DataTemplate view:AddPostPage}"/>
         <ShellContent Title="Search" Route="SearchPage" ContentTemplate="{DataTemplate view:SearchPage}"/>
         <ShellContent Title="Profile" Route="ProfilePage/Current" ContentTemplate="{DataTemplate view:ProfilePage}"/>
+        <ShellContent Title="Update Profile" Route="UpdateProfilePage" ContentTemplate="{DataTemplate view:UpdateProfilePage}"/>
     </TabBar>
-    
+
     <MenuItem Text="Logout"
               Command="{Binding LogoutCommand}"
               IsEnabled="False"
               />
+    
 </Shell>
