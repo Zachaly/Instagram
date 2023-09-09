@@ -153,5 +153,11 @@ namespace Instagram.Mobile.ViewModel
 
             await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(likes)));
         }
+
+        [RelayCommand]
+        private async Task GoToAddStoryPageAsync()
+        {
+            await Shell.Current.GoToAsync(nameof(AddStoryPage));
+        }
     }
 }

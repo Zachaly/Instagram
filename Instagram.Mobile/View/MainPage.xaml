@@ -7,34 +7,38 @@
              x:Name="page">
     <ScrollView>
         <VerticalStackLayout>
-            <CollectionView ItemsSource="{Binding UserStories}"
+            <HorizontalStackLayout>
+                <Button Text="Add Story" Command="{Binding GoToAddStoryPageCommand}"/>
+                <CollectionView ItemsSource="{Binding UserStories}"
                             ItemsLayout="HorizontalList">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="viewModel:UserStoryViewModel">
-                        <VerticalStackLayout>
-                            <Frame CornerRadius="70"
-                               WidthRequest="50"
-                               HeightRequest="50"
-                               BorderColor="Black">
-                                <Image Source="{Binding ImageUrl}"
-                                       WidthRequest="50"
-                                       HeightRequest="50">
-                                    <Image.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={x:Reference page},
-                                            Path=BindingContext.ShowStoriesCommand}"
-                                                              CommandParameter="{Binding Story.UserId}"/>
-                                    </Image.GestureRecognizers>
-                                </Image>
-                            </Frame>
-                            <Label Text="{Binding Story.UserName}" HorizontalTextAlignment="Center">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding GoToProfileCommand}"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                        </VerticalStackLayout>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModel:UserStoryViewModel">
+                            <VerticalStackLayout>
+                                <Frame CornerRadius="70"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   BorderColor="Black">
+                                    <Image Source="{Binding ImageUrl}"
+                                           WidthRequest="50"
+                                           HeightRequest="50">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference page},
+                                                Path=BindingContext.ShowStoriesCommand}"
+                                                                  CommandParameter="{Binding Story.UserId}"/>
+                                        </Image.GestureRecognizers>
+                                    </Image>
+                                </Frame>
+                                <Label Text="{Binding Story.UserName}" HorizontalTextAlignment="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding GoToProfileCommand}"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </HorizontalStackLayout>
+            
             <CollectionView
                 ItemsSource="{Binding Posts}"
                 SelectionMode="None"
