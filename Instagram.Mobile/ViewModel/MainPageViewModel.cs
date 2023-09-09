@@ -4,6 +4,7 @@ using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
 using Instagram.Models.Post.Request;
 using Instagram.Models.PostLike.Request;
+using Instagram.Models.UserStory.Request;
 using Mopups.Services;
 using System.Collections.ObjectModel;
 
@@ -14,6 +15,7 @@ namespace Instagram.Mobile.ViewModel
         private readonly IAuthorizationService _authorizationService;
         private readonly IPostService _postService;
         private readonly IPostLikeService _postLikeService;
+        private readonly IUserStoryService _userStoryService;
         private const int PageSize = 3;
 
         public bool BlockLoading { get; set; } = false;
@@ -21,15 +23,17 @@ namespace Instagram.Mobile.ViewModel
         public bool IsAuthorized => _authorizationService.IsAuthorized;
 
         public ObservableCollection<PostViewModel> Posts { get; set; } = new ObservableCollection<PostViewModel>();
+        public ObservableCollection<UserStoryViewModel> UserStories { get; set; } = new ObservableCollection<UserStoryViewModel>();
 
         private int _pageIndex = 0;
 
         public MainPageViewModel(IAuthorizationService authorizationService, IPostService postService,
-            IPostLikeService postLikeService)
+            IPostLikeService postLikeService, IUserStoryService userStoryService)
         {
             _authorizationService = authorizationService;
             _postService = postService;
             _postLikeService = postLikeService;
+            _userStoryService = userStoryService;
         }
 
         [RelayCommand]
@@ -71,12 +75,41 @@ namespace Instagram.Mobile.ViewModel
         }
 
         [RelayCommand]
+        private async Task LoadStoriesAsync()
+        {
+            if (UserStories.Any())
+            {
+                return;
+            }
+
+            var request = new GetUserStoryRequest
+            {
+                UserIds = _authorizationService.FollowedUserIds,
+            };
+
+            var stories = await _userStoryService.GetAsync(request);
+
+            foreach(var story in stories)
+            {
+                UserStories.Add(new UserStoryViewModel(story));
+            }
+        }
+
+        [RelayCommand]
         private async Task GoToPostPageAsync(PostViewModel post)
         {
             await Shell.Current.GoToAsync(nameof(PostPage), new Dictionary<string, object>
             {
                 { "PostId", post.Post.Id }
             });
+        }
+
+        [RelayCommand]
+        private async Task ShowStoriesAsync(long startingUserId)
+        {
+            var startIndex = UserStories.IndexOf(UserStories.First(x => x.Story.UserId == startingUserId));
+
+            await MopupService.Instance.PushAsync(new UserStoryPopup(new UserStoryPopupViewModel(UserStories, startIndex)));
         }
 
         [RelayCommand]
