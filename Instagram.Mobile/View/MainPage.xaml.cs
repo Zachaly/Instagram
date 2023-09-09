@@ -21,6 +21,7 @@ namespace Instagram.Mobile.View
             }
 
             viewModel.LoadPostsCommand.Execute(null);
+            viewModel.LoadStoriesCommand.Execute(null);
         }
 
         private void PostListScroll(object sender, ItemsViewScrolledEventArgs e)
