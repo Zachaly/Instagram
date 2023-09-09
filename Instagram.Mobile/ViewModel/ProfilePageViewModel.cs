@@ -6,6 +6,7 @@ using Instagram.Mobile.View;
 using Instagram.Models.Post.Request;
 using Instagram.Models.User;
 using Instagram.Models.UserFollow.Request;
+using Instagram.Models.UserStory.Request;
 using Mopups.Services;
 using System.Collections.ObjectModel;
 
@@ -50,14 +51,16 @@ namespace Instagram.Mobile.ViewModel
         private readonly IUserFollowService _userFollowService;
         private readonly IPostService _postService;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IUserStoryService _userStoryService;
 
         public ProfilePageViewModel(IUserService userService, IUserFollowService userFollowService, IPostService postService,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService, IUserStoryService userStoryService)
         {
             _userService = userService;
             _userFollowService = userFollowService;
             _postService = postService;
             _authorizationService = authorizationService;
+            _userStoryService = userStoryService;
         }
 
         [RelayCommand]
@@ -163,6 +166,25 @@ namespace Instagram.Mobile.ViewModel
             });
 
             await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(users)));
+        }
+
+        [RelayCommand]
+        private async Task ShowStoriesAsync()
+        {
+            var request = new GetUserStoryRequest
+            {
+                UserIds = new long[] { UserId },
+            };
+
+            var stories = (await _userStoryService.GetAsync(request))
+                .Select(x => new UserStoryViewModel(x));
+
+            if (!stories.Any())
+            {
+                return;
+            }
+
+            await MopupService.Instance.PushAsync(new UserStoryPopup(new UserStoryPopupViewModel(stories, 0)));
         }
     }
 }
