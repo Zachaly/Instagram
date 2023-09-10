@@ -56,7 +56,31 @@
                 </StackLayout>
             </StackLayout>
         </Frame>
-
+        <CollectionView ItemsSource="{Binding Relations}"
+                        ItemsLayout="HorizontalList">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModel:RelationViewModel">
+                    <VerticalStackLayout Margin="5">
+                        <Frame CornerRadius="70"
+                               WidthRequest="50"
+                               HeightRequest="50"
+                               BorderColor="Black">
+                            <Image Source="{Binding FirstImageUrl}"
+                                   WidthRequest="50"
+                                   HeightRequest="50">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={x:Reference page},
+                                        Path=BindingContext.ShowRelationsCommand}"
+                                                          CommandParameter="{Binding Relation.Id}"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+                        </Frame>
+                        <Label Text="{Binding Relation.Name}" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>                    
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        
         <CollectionView SelectionMode="None"
                         ItemsSource="{Binding Posts}"
                         IsVisible="{Binding IsNotLoading}">

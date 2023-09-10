@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
 using Instagram.Models.Post.Request;
+using Instagram.Models.Relation.Request;
 using Instagram.Models.User;
 using Instagram.Models.UserFollow.Request;
 using Instagram.Models.UserStory.Request;
@@ -41,6 +42,7 @@ namespace Instagram.Mobile.ViewModel
         private bool _canFollow;
 
         public ObservableCollection<PostViewModel> Posts { get; } = new ObservableCollection<PostViewModel>();
+        public ObservableCollection<RelationViewModel> Relations { get; } = new ObservableCollection<RelationViewModel>();
 
         public bool IsNotCurrentUser => _authorizationService.UserData.UserId != UserId;
         public bool CanUnfollow => IsNotCurrentUser && !CanFollow;
@@ -52,15 +54,17 @@ namespace Instagram.Mobile.ViewModel
         private readonly IPostService _postService;
         private readonly IAuthorizationService _authorizationService;
         private readonly IUserStoryService _userStoryService;
+        private readonly IRelationService _relationService;
 
         public ProfilePageViewModel(IUserService userService, IUserFollowService userFollowService, IPostService postService,
-            IAuthorizationService authorizationService, IUserStoryService userStoryService)
+            IAuthorizationService authorizationService, IUserStoryService userStoryService, IRelationService relationService)
         {
             _userService = userService;
             _userFollowService = userFollowService;
             _postService = postService;
             _authorizationService = authorizationService;
             _userStoryService = userStoryService;
+            _relationService = relationService;
         }
 
         [RelayCommand]
@@ -96,6 +100,13 @@ namespace Instagram.Mobile.ViewModel
 
             CanFollow = !_authorizationService.FollowedUserIds.Contains(UserId)
                 && IsNotCurrentUser;
+
+            var relations = await _relationService.GetAsync(new GetRelationRequest { UserId = UserId });
+
+            foreach(var relation in relations)
+            {
+                Relations.Add(new RelationViewModel(relation));
+            }
 
             IsLoading = false;
         }
@@ -185,6 +196,14 @@ namespace Instagram.Mobile.ViewModel
             }
 
             await MopupService.Instance.PushAsync(new UserStoryPopup(new UserStoryPopupViewModel(stories, 0)));
+        }
+
+        [RelayCommand]
+        private async Task ShowRelationsAsync(long startId)
+        {
+            var startingIndex = Relations.IndexOf(Relations.First(x => x.Relation.Id == startId));
+
+            await MopupService.Instance.PushAsync(new RelationPopup(new RelationPopupViewModel(Relations, startingIndex)));
         }
     }
 }

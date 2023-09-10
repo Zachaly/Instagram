@@ -39,6 +39,7 @@ namespace Instagram.Mobile
             builder.Services.AddSingleton<IPostCommentService, PostCommentService>();
             builder.Services.AddSingleton<IPostLikeService, PostLikeService>();
             builder.Services.AddSingleton<IUserStoryService, UserStoryService>();
+            builder.Services.AddSingleton<IRelationService, RelationService>();
         }
     }
 }
