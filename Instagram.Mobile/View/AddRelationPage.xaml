@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Instagram.Mobile.View.AddRelationPage"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             Title="AddRelationPage"
+             x:DataType="viewModel:AddRelationPageViewModel"
+             x:Name="page">
+    <VerticalStackLayout>
+        <Label Text="Name"/>
+        <Entry Text="{Binding Name}"/>
+        <CollectionView ItemsSource="{Binding ValidationErrors[Name]}" SelectionMode="None"/>
+        <Button Command="{Binding SelectImageCommand}" Text="Add image"/>
+        <CollectionView ItemsSource="{Binding SelectedImages}"
+                        ItemsLayout="HorizontalList">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Image WidthRequest="100" HeightRequest="100" Source="{Binding .}">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={x:Reference page},
+                                Path=BindingContext.RemoveImageCommand}"
+                                                  CommandParameter="{Binding .}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button Text="Add" Command="{Binding AddCommand}"/>
+    </VerticalStackLayout>
+</ContentPage>

@@ -19,6 +19,7 @@ namespace Instagram.Mobile.ViewModel
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CanUnfollow))]
         [NotifyPropertyChangedFor(nameof(IsNotCurrentUser))]
+        [NotifyPropertyChangedFor(nameof(IsCurrentUser))]
         private long _userId;
 
         [ObservableProperty]
@@ -45,6 +46,8 @@ namespace Instagram.Mobile.ViewModel
         public ObservableCollection<RelationViewModel> Relations { get; } = new ObservableCollection<RelationViewModel>();
 
         public bool IsNotCurrentUser => _authorizationService.UserData.UserId != UserId;
+        public bool IsCurrentUser => !IsNotCurrentUser;
+
         public bool CanUnfollow => IsNotCurrentUser && !CanFollow;
         public bool IsNotLoading => !IsLoading;
         public string ImageUrl => $"{Configuration.ApiUrl}image/profile/{UserId}";
@@ -204,6 +207,12 @@ namespace Instagram.Mobile.ViewModel
             var startingIndex = Relations.IndexOf(Relations.First(x => x.Relation.Id == startId));
 
             await MopupService.Instance.PushAsync(new RelationPopup(new RelationPopupViewModel(Relations, startingIndex)));
+        }
+
+        [RelayCommand]
+        private async Task GoToAddRelationAsync()
+        {
+            await Shell.Current.GoToAsync(nameof(AddRelationPage));
         }
     }
 }

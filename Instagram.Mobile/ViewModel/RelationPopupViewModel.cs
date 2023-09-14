@@ -46,8 +46,8 @@ namespace Instagram.Mobile.ViewModel
             {
                 if(CurrentRelationIndex + 1 < _relations.Count())
                 {
-                    CurrentRelationIndex++;
                     CurrentImageIndex = 0;
+                    CurrentRelationIndex++;
                 } 
                 else
                 {
