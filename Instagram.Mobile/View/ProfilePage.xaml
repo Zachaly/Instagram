@@ -57,7 +57,7 @@
             </StackLayout>
         </Frame>
         <HorizontalStackLayout>
-            <Button IsVisible="{Binding IsCurrentUser}" Text="Add new" Command="{Binding GoToAddRelationCommand}"/>
+            <Button IsVisible="{Binding IsCurrentUser}" Text="Manage relations" Command="{Binding GoToRelationManagementPageCommand}"/>
             <CollectionView ItemsSource="{Binding Relations}"
                         ItemsLayout="HorizontalList">
                 <CollectionView.ItemTemplate>

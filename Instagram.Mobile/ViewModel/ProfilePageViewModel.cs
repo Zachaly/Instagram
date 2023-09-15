@@ -106,6 +106,7 @@ namespace Instagram.Mobile.ViewModel
 
             var relations = await _relationService.GetAsync(new GetRelationRequest { UserId = UserId });
 
+            Relations.Clear();
             foreach(var relation in relations)
             {
                 Relations.Add(new RelationViewModel(relation));
@@ -210,9 +211,9 @@ namespace Instagram.Mobile.ViewModel
         }
 
         [RelayCommand]
-        private async Task GoToAddRelationAsync()
+        private async Task GoToRelationManagementPageAsync()
         {
-            await Shell.Current.GoToAsync(nameof(AddRelationPage));
+            await Shell.Current.GoToAsync(nameof(RelationManagementPage));
         }
     }
 }

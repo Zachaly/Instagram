@@ -30,6 +30,8 @@ namespace Instagram.Mobile
             builder.Services.AddTransient<AddStoryPageViewModel>();
             builder.Services.AddTransient<AddRelationPage>();
             builder.Services.AddTransient<AddRelationPageViewModel>();
+            builder.Services.AddTransient<RelationManagementPage>();
+            builder.Services.AddTransient<RelationManagementPageViewModel>();
             builder.Services.AddTransient<App>();
 
             builder.Services.AddSingleton<IAuthorizationService, AuthorizationService>();
@@ -42,6 +44,7 @@ namespace Instagram.Mobile
             builder.Services.AddSingleton<IPostLikeService, PostLikeService>();
             builder.Services.AddSingleton<IUserStoryService, UserStoryService>();
             builder.Services.AddSingleton<IRelationService, RelationService>();
+            builder.Services.AddSingleton<IRelationImageService, RelationImageService>();
         }
     }
 }

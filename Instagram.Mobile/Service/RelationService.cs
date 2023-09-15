@@ -12,6 +12,7 @@ namespace Instagram.Mobile.Service
     {
         Task<IEnumerable<RelationModel>> GetAsync(GetRelationRequest request);
         Task AddAsync(long userId, string name, IEnumerable<string> filesNames);
+        Task DeleteByIdAsync(long id);
     }
 
     public class RelationService : IRelationService
@@ -57,6 +58,11 @@ namespace Instagram.Mobile.Service
             {
                 throw new InvalidRequestException(JsonConvert.DeserializeObject<ResponseModel>(await response.Content.ReadAsStringAsync()));
             }
+        }
+
+        public async Task DeleteByIdAsync(long id)
+        {
+            await _httpClient.DeleteAsync($"{Endpoint}/{id}");
         }
     }
 }

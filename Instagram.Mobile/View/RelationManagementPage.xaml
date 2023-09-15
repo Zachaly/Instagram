@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Instagram.Mobile.View.RelationManagementPage"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             Title="RelationManagementPage"
+             x:DataType="viewModel:RelationManagementPageViewModel"
+             x:Name="page">
+    <VerticalStackLayout>
+        <Button Text="Add new relation" Command="{Binding GoToAddRelationPageCommand}"/>
+        <CollectionView ItemsSource="{Binding Relations}" SelectionMode="None" ItemsLayout="HorizontalList">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModel:RelationViewModel">
+                    <VerticalStackLayout>
+                        <Frame>
+                            <Image Source="{Binding FirstImageUrl}"
+                                   WidthRequest="100"
+                                   HeightRequest="100">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={x:Reference page}, Path=BindingContext.SelectRelationCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+                        </Frame>
+                        <Label Text="{Binding Relation.Name}"/>
+                        <Button Text="Delete" BackgroundColor="PaleVioletRed" Command="{Binding Source={x:Reference page},
+                            Path=BindingContext.DeleteRelationCommand}"
+                                CommandParameter="{Binding .}"/>
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <CollectionView IsVisible="{Binding HasSelectedRelation}" ItemsSource="{Binding SelectedRelationImages}"
+                        ItemsLayout="HorizontalList">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModel:RelationImageViewModel">
+                    <VerticalStackLayout>
+                        <Image Source="{Binding Url}" WidthRequest="100" HeightRequest="100"/>
+                        <Button Command="{Binding Source={x:Reference page}, Path=BindingContext.DeleteImageCommand}" Text="Delete"
+                                BackgroundColor="DarkRed" CommandParameter="{Binding Id}"/>
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button IsVisible="{Binding HasSelectedRelation}" Text="Select new image" Command="{Binding SelectImageCommand}"/>
+        <Image IsVisible="{Binding HasSelectedImage}" Source="{Binding SelectedImage}" WidthRequest="100" HeightRequest="100"/>
+        <Button IsVisible="{Binding HasSelectedImage}" Command="{Binding AddImageCommand}" Text="Add image to relation"/>
+    </VerticalStackLayout>
+</ContentPage>
