@@ -1,4 +1,5 @@
-﻿using Instagram.Models.UserFollow;
+﻿using Instagram.Mobile.Extension;
+using Instagram.Models.UserFollow;
 using Instagram.Models.UserFollow.Request;
 using System.Net.Http.Json;
 
@@ -32,18 +33,10 @@ namespace Instagram.Mobile.Service
             await _httpClient.DeleteAsync($"{Endpoint}/{followerId}/{followedUserId}");
         }
 
-        public async Task<IEnumerable<UserFollowModel>> GetAsync(GetUserFollowRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery(Endpoint));
+        public Task<IEnumerable<UserFollowModel>> GetAsync(GetUserFollowRequest request)
+            => _httpClient.GetWithRequestAsync<UserFollowModel, GetUserFollowRequest>(Endpoint, request);
 
-            return await response.Content.ReadFromJsonAsync<IEnumerable<UserFollowModel>>();
-        }
-
-        public async Task<int> GetCountAsync(GetUserFollowRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery($"{Endpoint}/count"));
-
-            return await response.Content.ReadFromJsonAsync<int>();
-        }
+        public Task<int> GetCountAsync(GetUserFollowRequest request)
+            => _httpClient.GetCountAsync(Endpoint, request);
     }
 }

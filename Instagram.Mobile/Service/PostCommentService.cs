@@ -1,4 +1,5 @@
-﻿using Instagram.Models.PostComment;
+﻿using Instagram.Mobile.Extension;
+using Instagram.Models.PostComment;
 using Instagram.Models.PostComment.Request;
 using Instagram.Models.Response;
 using Newtonsoft.Json;
@@ -24,12 +25,8 @@ namespace Instagram.Mobile.Service
             _httpClient = httpClientFactory.Create();
         }
 
-        public async Task<IEnumerable<PostCommentModel>> GetAsync(GetPostCommentRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery(Endpoint));
-
-            return await response.Content.ReadFromJsonAsync<IEnumerable<PostCommentModel>>();
-        }
+        public Task<IEnumerable<PostCommentModel>> GetAsync(GetPostCommentRequest request)
+            => _httpClient.GetWithRequestAsync<PostCommentModel, GetPostCommentRequest>(Endpoint, request);
 
         public async Task<long> AddAsync(AddPostCommentRequest request)
         {
@@ -47,16 +44,7 @@ namespace Instagram.Mobile.Service
             return id.Value;
         }
 
-        public async Task<PostCommentModel> GetByIdAsync(long id)
-        {
-            var response = await _httpClient.GetAsync($"{Endpoint}/{id}");
-
-            if(response.StatusCode == HttpStatusCode.NotFound)
-            {
-                throw new NotFoundException("Post comment");
-            }
-
-            return await response.Content.ReadFromJsonAsync<PostCommentModel>();
-        }
+        public Task<PostCommentModel> GetByIdAsync(long id)
+            => _httpClient.GetByIdAsync<PostCommentModel>(Endpoint, id);
     }
 }

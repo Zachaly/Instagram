@@ -1,17 +1,16 @@
-﻿using Instagram.Models.Relation;
+﻿using Instagram.Mobile.Extension;
+using Instagram.Models.Relation;
 using Instagram.Models.Relation.Request;
 using Instagram.Models.Response;
 using Newtonsoft.Json;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 
 namespace Instagram.Mobile.Service
 {
     public interface IRelationService
     {
         Task<IEnumerable<RelationModel>> GetAsync(GetRelationRequest request);
-        Task AddAsync(long userId, string name, IEnumerable<string> filesNames);
+        Task AddAsync(long userId, string name, IEnumerable<string> fileNames);
         Task DeleteByIdAsync(long id);
     }
 
@@ -25,14 +24,10 @@ namespace Instagram.Mobile.Service
             _httpClient = httpClientFactory.Create();
         }
 
-        public async Task<IEnumerable<RelationModel>> GetAsync(GetRelationRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery(Endpoint));
+        public Task<IEnumerable<RelationModel>> GetAsync(GetRelationRequest request)
+            => _httpClient.GetWithRequestAsync<RelationModel, GetRelationRequest>(Endpoint, request);
 
-            return await response.Content.ReadFromJsonAsync<IEnumerable<RelationModel>>();
-        }
-
-        public async Task AddAsync(long userId, string name, IEnumerable<string> filesNames)
+        public async Task AddAsync(long userId, string name, IEnumerable<string> fileNames)
         {
             var request = new MultipartFormDataContent
             {
@@ -40,17 +35,7 @@ namespace Instagram.Mobile.Service
                 { new StringContent(name), "Name" }
             };
 
-            foreach (var image in filesNames)
-            {
-                var fileContent = new StreamContent(File.OpenRead(image));
-                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                {
-                    FileName = image,
-                    Name = "Files"
-                };
-                fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                request.Add(fileContent);
-            }
+            request.AddFileContent(fileNames, "Files");
 
             var response = await _httpClient.PostAsync(Endpoint, request);
 

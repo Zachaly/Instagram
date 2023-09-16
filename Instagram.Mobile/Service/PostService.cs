@@ -1,10 +1,9 @@
-﻿using Instagram.Models.Post;
+﻿using Instagram.Mobile.Extension;
+using Instagram.Models.Post;
 using Instagram.Models.Post.Request;
 using Instagram.Models.Response;
 using Newtonsoft.Json;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 
 namespace Instagram.Mobile.Service
 {
@@ -26,31 +25,14 @@ namespace Instagram.Mobile.Service
             _httpClient = httpClientFactory.Create();
         }
 
-        public async Task<int> GetCountAsync(GetPostRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery($"{Endpoint}/count"));
+        public Task<int> GetCountAsync(GetPostRequest request)
+            => _httpClient.GetCountAsync(Endpoint, request);
 
-            return await response.Content.ReadFromJsonAsync<int>();
-        }
+        public Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request)
+            => _httpClient.GetWithRequestAsync<PostModel, GetPostRequest>(Endpoint, request);
 
-        public async Task<IEnumerable<PostModel>> GetAsync(GetPostRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery(Endpoint));
-
-            return await response.Content.ReadFromJsonAsync<IEnumerable<PostModel>>();
-        }
-
-        public async Task<PostModel> GetByIdAsync(long id)
-        {
-            var response = await _httpClient.GetAsync($"{Endpoint}/{id}");
-
-            if(response.StatusCode == HttpStatusCode.NotFound)
-            {
-                throw new NotFoundException("Post");
-            }
-
-            return await response.Content.ReadFromJsonAsync<PostModel>();
-        }
+        public Task<PostModel> GetByIdAsync(long id)
+            => _httpClient.GetByIdAsync<PostModel>(Endpoint, id);
 
         public async Task AddAsync(long userId, string content, IEnumerable<string> images, IEnumerable<string> tags)
         {
@@ -60,17 +42,7 @@ namespace Instagram.Mobile.Service
                 { new StringContent(content), "Content" },
             };
 
-            foreach(var image in images)
-            {
-                var fileContent = new StreamContent(File.OpenRead(image));
-                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                {
-                    FileName = image,
-                    Name = "Files"
-                };
-                fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                request.Add(fileContent);
-            }
+            request.AddFileContent(images, "Files");
 
             foreach(var tag in tags)
             {

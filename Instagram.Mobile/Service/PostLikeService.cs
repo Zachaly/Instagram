@@ -1,4 +1,5 @@
-﻿using Instagram.Models.PostLike;
+﻿using Instagram.Mobile.Extension;
+using Instagram.Models.PostLike;
 using Instagram.Models.PostLike.Request;
 using System.Net.Http.Json;
 
@@ -28,18 +29,10 @@ namespace Instagram.Mobile.Service
         }
 
         public async Task<IEnumerable<PostLikeModel>> GetAsync(GetPostLikeRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery(Endpoint));
+            => await _httpClient.GetWithRequestAsync<PostLikeModel, GetPostLikeRequest>(Endpoint, request);
 
-            return await response.Content.ReadFromJsonAsync<IEnumerable<PostLikeModel>>();
-        }
-
-        public async Task<int> GetCountAsync(GetPostLikeRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery($"{Endpoint}/count"));
-
-            return await response.Content.ReadFromJsonAsync<int>();
-        }
+        public Task<int> GetCountAsync(GetPostLikeRequest request)
+            => _httpClient.GetCountAsync(Endpoint, request);
 
         public async Task DeleteAsync(long userId, long postId)
         {

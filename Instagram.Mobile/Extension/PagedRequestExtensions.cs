@@ -1,7 +1,7 @@
 ﻿using Instagram.Models;
 using System.Text;
 
-namespace Instagram.Mobile
+namespace Instagram.Mobile.Extension
 {
     public static class PagedRequestExtensions
     {
@@ -14,7 +14,7 @@ namespace Instagram.Mobile
                 .GetProperties()
                 .Where(prop => prop.GetValue(request) is not null);
 
-            foreach(var prop in props) 
+            foreach (var prop in props)
             {
                 if (typeof(IEnumerable<string>).IsAssignableFrom(prop.PropertyType))
                 {

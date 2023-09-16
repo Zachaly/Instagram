@@ -1,5 +1,4 @@
-﻿
-using System.Net.Http.Headers;
+﻿using Instagram.Mobile.Extension;
 
 namespace Instagram.Mobile.Service
 {
@@ -26,14 +25,7 @@ namespace Instagram.Mobile.Service
                 { new StringContent(relationId.ToString()), "RelationId" }
             };
 
-            var fileContent = new StreamContent(File.OpenRead(filePath));
-            fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-            {
-                FileName = filePath,
-                Name = "File"
-            };
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-            request.Add(fileContent);
+            request.AddFileContent(filePath, "File");
 
             await _httpClient.PostAsync(Endpoint, request);
         }
