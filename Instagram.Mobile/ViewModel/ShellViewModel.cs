@@ -18,7 +18,7 @@ namespace Instagram.Mobile.ViewModel
         private async Task LogoutAsync()
         {
             await _authorizationService.LogoutAsync();
-            await Shell.Current.GoToAsync(nameof(LoginPage));
+            await NavigationService.GoToPageAsync<LoginPage>();
         }
     }
 }

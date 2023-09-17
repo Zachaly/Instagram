@@ -93,14 +93,12 @@ namespace Instagram.Mobile.ViewModel
 
             SelectedImage = null;
 
-            await Toast.Make("Image added!").Show();
+            await ToastService.MakeToast("Image added!");
         }
 
         [RelayCommand]
         private async Task GoToAddRelationPageAsync()
-        {
-            await Shell.Current.GoToAsync(nameof(AddRelationPage));
-        }
+            => await NavigationService.GoToPageAsync<AddRelationPage>();
 
         [RelayCommand]
         private async Task DeleteRelationAsync(RelationViewModel relation)

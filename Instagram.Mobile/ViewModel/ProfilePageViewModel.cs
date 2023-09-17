@@ -117,12 +117,7 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToPostPageAsync(PostViewModel post)
-        {
-            await Shell.Current.GoToAsync(nameof(PostPage), new Dictionary<string, object>
-            {
-                { "PostId", post.Post.Id },
-            });
-        }
+            => await NavigationService.GoToPostPageAsync(post.Post.Id);
 
         [RelayCommand]
         private async Task FollowAsync()
@@ -212,8 +207,6 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToRelationManagementPageAsync()
-        {
-            await Shell.Current.GoToAsync(nameof(RelationManagementPage));
-        }
+            => await NavigationService.GoToPageAsync<RelationManagementPage>();
     }
 }

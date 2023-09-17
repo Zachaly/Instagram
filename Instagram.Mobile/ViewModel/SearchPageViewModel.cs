@@ -43,9 +43,6 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToProfilePageAsync(long id)
-            => await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
-            {
-                { "UserId", id }
-            });
+            => await NavigationService.GoToProfilePageAsync(id);
     }
 }

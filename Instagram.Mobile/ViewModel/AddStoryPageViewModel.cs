@@ -41,7 +41,7 @@ namespace Instagram.Mobile.ViewModel
         private async Task AddAsync()
         {
             await _userStoryService.AddAsync(SelectedImages, _authorizationService.UserData.UserId);
-            await Shell.Current.GoToAsync("..");
+            await NavigationService.GoBackAsync();
         }
     }
 }

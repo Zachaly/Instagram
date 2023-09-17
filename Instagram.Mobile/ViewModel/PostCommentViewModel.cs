@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Instagram.Mobile.View;
+using Instagram.Mobile.Service;
 using Instagram.Models.PostComment;
 
 namespace Instagram.Mobile.ViewModel
@@ -17,11 +17,6 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToProfilePageAsync()
-        {
-            await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
-            {
-                { "UserId", Comment.UserId }
-            });
-        }
+            => await NavigationService.GoToProfilePageAsync(Comment.UserId);
     }
 }

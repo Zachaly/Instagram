@@ -41,10 +41,7 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToProfilePageAsync()
-            => await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
-            {
-                { "UserId", _authorizationService.UserData.UserId }
-            });
+            => await NavigationService.GoToProfilePageAsync(_authorizationService.UserData.UserId);
 
         [RelayCommand]
         private async Task LoadPosts()
@@ -96,12 +93,7 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToPostPageAsync(PostViewModel post)
-        {
-            await Shell.Current.GoToAsync(nameof(PostPage), new Dictionary<string, object>
-            {
-                { "PostId", post.Post.Id }
-            });
-        }
+            => await NavigationService.GoToPostPageAsync(post.Post.Id);
 
         [RelayCommand]
         private async Task ShowStoriesAsync(long startingUserId)
@@ -155,8 +147,6 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToAddStoryPageAsync()
-        {
-            await Shell.Current.GoToAsync(nameof(AddStoryPage));
-        }
+            => await NavigationService.GoToPageAsync<AddStoryPage>();
     }
 }

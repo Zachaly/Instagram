@@ -2,8 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
 using Instagram.Models.User.Request;
-using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
 
 namespace Instagram.Mobile.ViewModel
 {
@@ -33,14 +31,14 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToLoginPage()
-            => await Shell.Current.GoToAsync("..");
+            => await NavigationService.GoBackAsync();
 
         [RelayCommand]
         private async Task RegisterAsync()
         {
             if(PasswordVerification != RegisterRequest.Password)
             {
-                await Toast.Make("Passwords empty or dot not match!", ToastDuration.Short, 16).Show();
+                await ToastService.MakeToast("Passwords empty or dot not match!");
                 return;
             }
 
@@ -48,7 +46,7 @@ namespace Instagram.Mobile.ViewModel
             {
                 await _userService.RegisterAsync(RegisterRequest);
 
-                await Toast.Make("Account created", ToastDuration.Short, 16).Show();
+                await ToastService.MakeToast("Account created");
                 await GoToLoginPage();
             }
             catch(InvalidRequestException ex)

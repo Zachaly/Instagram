@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
@@ -25,7 +24,7 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToRegisterPageAsync()
-            => await Shell.Current.GoToAsync(nameof(RegisterPage));
+            => await NavigationService.GoToPageAsync<RegisterPage>();
 
         [RelayCommand]
         private async Task LoginAsync()
@@ -36,12 +35,12 @@ namespace Instagram.Mobile.ViewModel
             }
             catch(InvalidRequestException ex)
             {
-                await Toast.Make(ex.Response.Error).Show();
+                await ToastService.MakeToast(ex.Message);
             }
 
             if(_authorizationService.IsAuthorized)
             {
-                await Shell.Current.GoToAsync("..");
+                await NavigationService.GoBackAsync();
             }
         }
     }

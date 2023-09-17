@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
 using Instagram.Models.UserStory;
 
@@ -19,9 +20,6 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToProfileAsync()
-            => await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
-            {
-                { "UserId", Story.UserId }
-            });
+            => await NavigationService.GoToProfilePageAsync(Story.UserId);
     }
 }
