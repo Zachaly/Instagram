@@ -9,7 +9,6 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class RegisterPageViewModel : ObservableObject
     {
-        private readonly IUserService _userService;
         [ObservableProperty]
         private RegisterRequest _registerRequest = new RegisterRequest
         {
@@ -24,6 +23,8 @@ namespace Instagram.Mobile.ViewModel
 
         [ObservableProperty]
         private IDictionary<string, string[]> _validationErrors;
+
+        private readonly IUserService _userService;
 
         public RegisterPageViewModel(IUserService userService)
         {

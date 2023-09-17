@@ -21,10 +21,6 @@ namespace Instagram.Mobile.ViewModel
 
     public partial class RelationManagementPageViewModel : ObservableObject
     {
-        private readonly IRelationService _relationService;
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IRelationImageService _relationImageService;
-
         public ObservableCollection<RelationViewModel> Relations { get; } = new ObservableCollection<RelationViewModel>();
 
         [ObservableProperty]
@@ -41,6 +37,10 @@ namespace Instagram.Mobile.ViewModel
 
         public bool HasSelectedRelation => SelectedRelation is not null;
         public bool HasSelectedImage => SelectedImage is not null;
+
+        private readonly IRelationService _relationService;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IRelationImageService _relationImageService;
 
         public RelationManagementPageViewModel(IRelationService relationService, IAuthorizationService authorizationService,
             IRelationImageService relationImageService)

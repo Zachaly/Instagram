@@ -11,10 +11,10 @@ namespace Instagram.Mobile.ViewModel
     {
         public ObservableCollection<UserViewModel> Users { get; set; } = new ObservableCollection<UserViewModel>();
 
-        private readonly IUserService _userService;
-
         [ObservableProperty]
         private string _userName;
+
+        private readonly IUserService _userService;
 
         public SearchPageViewModel(IUserService userService)
         {

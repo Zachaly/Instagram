@@ -8,9 +8,6 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class UpdateProfilePageViewModel : ObservableObject
     {
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IUserService _userService;
-
         [ObservableProperty]
         private UpdateUserRequest _updateRequest = new UpdateUserRequest();
 
@@ -30,6 +27,9 @@ namespace Instagram.Mobile.ViewModel
         public bool IsNotLoading => !IsLoading;
 
         public bool IsNewProfilePictureSelected => NewProfilePicture is not null;
+
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IUserService _userService;
 
         public UpdateProfilePageViewModel(IAuthorizationService authorizationService, IUserService userService)
         {

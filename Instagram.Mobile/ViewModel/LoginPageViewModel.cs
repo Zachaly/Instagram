@@ -9,14 +9,14 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class LoginPageViewModel : ObservableObject
     {
-        private readonly IAuthorizationService _authorizationService;
-
         [ObservableProperty]
         private LoginRequest _loginRequest = new LoginRequest
         {
             Password = "",
             Email = ""
         };
+
+        private readonly IAuthorizationService _authorizationService;
 
         public LoginPageViewModel(IAuthorizationService authorizationService)
         {

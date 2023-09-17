@@ -8,9 +8,6 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class AddPostPageViewModel : ObservableObject
     {
-        private readonly IPostService _postService;
-        private readonly IAuthorizationService _authorizationService;
-
         public ObservableCollection<string> SelectedImages { get; set; } = 
             new ObservableCollection<string>();
 
@@ -26,7 +23,10 @@ namespace Instagram.Mobile.ViewModel
         private string _newTag = "";
 
         [ObservableProperty]
-        private IDictionary<string, string[]>? _validationErrors = null;
+        private IDictionary<string, string[]> _validationErrors = null;
+
+        private readonly IPostService _postService;
+        private readonly IAuthorizationService _authorizationService;
 
         public AddPostPageViewModel(IPostService postService, IAuthorizationService authorizationService)
         {

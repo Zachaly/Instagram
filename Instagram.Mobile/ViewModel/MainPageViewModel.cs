@@ -12,20 +12,19 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class MainPageViewModel : ObservableObject
     {
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IPostService _postService;
-        private readonly IPostLikeService _postLikeService;
-        private readonly IUserStoryService _userStoryService;
-        private const int PageSize = 3;
-
         public bool BlockLoading { get; set; } = false;
-
         public bool IsAuthorized => _authorizationService.IsAuthorized;
 
         public ObservableCollection<PostViewModel> Posts { get; set; } = new ObservableCollection<PostViewModel>();
         public ObservableCollection<UserStoryViewModel> UserStories { get; set; } = new ObservableCollection<UserStoryViewModel>();
 
         private int _pageIndex = 0;
+        private const int PageSize = 3;
+
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IPostService _postService;
+        private readonly IPostLikeService _postLikeService;
+        private readonly IUserStoryService _userStoryService;
 
         public MainPageViewModel(IAuthorizationService authorizationService, IPostService postService,
             IPostLikeService postLikeService, IUserStoryService userStoryService)

@@ -13,11 +13,11 @@ namespace Instagram.Mobile.ViewModel
 
         public ObservableCollection<string> SelectedImages { get; } = new ObservableCollection<string>();
 
-        private readonly IRelationService _relationService;
-        private readonly IAuthorizationService _authorizationService;
-
         [ObservableProperty]
         private IDictionary<string, string[]> _validationErrors = null;
+
+        private readonly IRelationService _relationService;
+        private readonly IAuthorizationService _authorizationService;
 
         public AddRelationPageViewModel(IRelationService relationService, IAuthorizationService authorizationService)
         {
