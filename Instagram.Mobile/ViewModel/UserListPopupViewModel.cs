@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Instagram.Mobile.View;
+using Instagram.Mobile.Service;
 using Mopups.Services;
 using System.Collections.ObjectModel;
 
@@ -26,12 +26,9 @@ namespace Instagram.Mobile.ViewModel
         [RelayCommand]
         private async Task GoToProfileAsync(UserListItem user)
         {
-            await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
-            {
-                { "UserId", user.Id }
-            });
+            await NavigationService.GoToProfilePageAsync(user.Id);
 
-            await MopupService.Instance.PopAllAsync();
+            await PopupService.CloseAsync();
         }
     }
 }

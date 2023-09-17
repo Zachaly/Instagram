@@ -12,11 +12,6 @@ namespace Instagram.Mobile.ViewModel
     [QueryProperty(nameof(PostId), nameof(PostId))]
     public partial class PostPageViewModel : PostViewModel
     {
-        private readonly IPostCommentService _postCommentService;
-        private readonly IPostService _postService;
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IPostLikeService _postLikeService;
-
         public ObservableCollection<PostCommentViewModel> Comments { get; set; } = new ObservableCollection<PostCommentViewModel>();
 
         [ObservableProperty]
@@ -27,6 +22,11 @@ namespace Instagram.Mobile.ViewModel
 
         [ObservableProperty]
         private IDictionary<string, string[]> _commentValidationErrors = null;
+
+        private readonly IPostCommentService _postCommentService;
+        private readonly IPostService _postService;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IPostLikeService _postLikeService;
 
         public PostPageViewModel(IPostCommentService postCommentService, IPostService postService,
             IAuthorizationService authorizationService, IPostLikeService postLikeService) : base(null)
@@ -93,7 +93,7 @@ namespace Instagram.Mobile.ViewModel
                     UserName = like.UserName,
                 });
 
-            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(users)));
+            await PopupService.ShowUserListPopupAsync(users);
         }
 
         [RelayCommand]

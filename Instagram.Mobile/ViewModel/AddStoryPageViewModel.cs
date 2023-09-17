@@ -7,10 +7,10 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class AddStoryPageViewModel : ObservableObject
     {
+        public ObservableCollection<string> SelectedImages { get; set; } = new ObservableCollection<string>();
+
         private readonly IUserStoryService _userStoryService;
         private readonly IAuthorizationService _authorizationService;
-
-        public ObservableCollection<string> SelectedImages { get; set; } = new ObservableCollection<string>();
 
         public AddStoryPageViewModel(IUserStoryService userStoryService, IAuthorizationService authorizationService)
         {
@@ -41,7 +41,7 @@ namespace Instagram.Mobile.ViewModel
         private async Task AddAsync()
         {
             await _userStoryService.AddAsync(SelectedImages, _authorizationService.UserData.UserId);
-            await Shell.Current.GoToAsync("..");
+            await NavigationService.GoBackAsync();
         }
     }
 }

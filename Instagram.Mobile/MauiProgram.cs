@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using Instagram.Mobile.Extension;
 using Microsoft.Extensions.Logging;
 
 namespace Instagram.Mobile

@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
 using System.Collections.ObjectModel;
@@ -8,9 +7,6 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class AddPostPageViewModel : ObservableObject
     {
-        private readonly IPostService _postService;
-        private readonly IAuthorizationService _authorizationService;
-
         public ObservableCollection<string> SelectedImages { get; set; } = 
             new ObservableCollection<string>();
 
@@ -26,7 +22,10 @@ namespace Instagram.Mobile.ViewModel
         private string _newTag = "";
 
         [ObservableProperty]
-        private IDictionary<string, string[]>? _validationErrors = null;
+        private IDictionary<string, string[]> _validationErrors = null;
+
+        private readonly IPostService _postService;
+        private readonly IAuthorizationService _authorizationService;
 
         public AddPostPageViewModel(IPostService postService, IAuthorizationService authorizationService)
         {
@@ -52,13 +51,13 @@ namespace Instagram.Mobile.ViewModel
         {
             if (string.IsNullOrEmpty(NewTag))
             {
-                await Toast.Make("Tag cannot be empty").Show();
+                await ToastService.MakeToast("Tag cannot be empty");
                 return;
             }
 
             if (_tags.Contains(NewTag))
             {
-                await Toast.Make("Tag already added").Show();
+                await ToastService.MakeToast("Tag already added");
                 return;
             }
 
@@ -87,7 +86,7 @@ namespace Instagram.Mobile.ViewModel
         {
             if (!SelectedImages.Any())
             {
-                await Toast.Make("You must add images!").Show();
+                await ToastService.MakeToast("You must add images!");
                 return;
             }
 
@@ -104,7 +103,7 @@ namespace Instagram.Mobile.ViewModel
                 return;
             }
             
-            await Toast.Make("Post added").Show();
+            await ToastService.MakeToast("Post added");
 
             Content = "";
             SelectedImages.Clear();

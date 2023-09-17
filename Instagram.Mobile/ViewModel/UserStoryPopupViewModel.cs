@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Instagram.Mobile.Service;
 using Mopups.Services;
 
 namespace Instagram.Mobile.ViewModel
@@ -40,7 +41,7 @@ namespace Instagram.Mobile.ViewModel
                 } 
                 else
                 {
-                    await MopupService.Instance.PopAllAsync();
+                    await PopupService.CloseAsync();
                 }
                 return;
             }

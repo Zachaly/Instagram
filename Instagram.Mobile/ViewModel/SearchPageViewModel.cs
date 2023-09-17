@@ -11,10 +11,10 @@ namespace Instagram.Mobile.ViewModel
     {
         public ObservableCollection<UserViewModel> Users { get; set; } = new ObservableCollection<UserViewModel>();
 
-        private readonly IUserService _userService;
-
         [ObservableProperty]
         private string _userName;
+
+        private readonly IUserService _userService;
 
         public SearchPageViewModel(IUserService userService)
         {
@@ -43,9 +43,6 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToProfilePageAsync(long id)
-            => await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
-            {
-                { "UserId", id }
-            });
+            => await NavigationService.GoToProfilePageAsync(id);
     }
 }

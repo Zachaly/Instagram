@@ -1,9 +1,9 @@
-﻿using Instagram.Models.Response;
+﻿using Instagram.Mobile.Extension;
+using Instagram.Models.Response;
 using Instagram.Models.User;
 using Instagram.Models.User.Request;
 using Newtonsoft.Json;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace Instagram.Mobile.Service
@@ -42,24 +42,11 @@ namespace Instagram.Mobile.Service
             throw new InvalidRequestException(JsonConvert.DeserializeObject<ResponseModel>(content));
         }
 
-        public async Task<UserModel> GetByIdAsync(long id)
-        {
-            var response = await _httpClient.GetAsync($"{Endpoint}/{id}");
+        public Task<UserModel> GetByIdAsync(long id)
+            => _httpClient.GetByIdAsync<UserModel>(Endpoint, id);
 
-            if(response.StatusCode == HttpStatusCode.NotFound)
-            {
-                throw new NotFoundException("User");
-            }
-
-            return await response.Content.ReadFromJsonAsync<UserModel>();
-        }
-
-        public async Task<IEnumerable<UserModel>> GetAsync(GetUserRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery(Endpoint));
-
-            return await response.Content.ReadFromJsonAsync<IEnumerable<UserModel>>();
-        }
+        public Task<IEnumerable<UserModel>> GetAsync(GetUserRequest request)
+            => _httpClient.GetWithRequestAsync<UserModel, GetUserRequest>(Endpoint, request);
 
         public async Task UpdateAsync(UpdateUserRequest request)
         {
@@ -80,14 +67,7 @@ namespace Instagram.Mobile.Service
 
             if(filePath is not null)
             {
-                using var fileContent = new StreamContent(File.OpenRead(filePath));
-                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                {
-                    FileName = filePath,
-                    Name = "File"
-                };
-                fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                request.Add(fileContent);
+                request.AddFileContent(filePath, "File");
             }
             
             await _httpClient.PatchAsync($"{Configuration.ApiUrl}image/profile", request);

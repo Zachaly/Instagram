@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
-using Instagram.Mobile.View;
 using System.Collections.ObjectModel;
 
 namespace Instagram.Mobile.ViewModel
@@ -13,11 +12,11 @@ namespace Instagram.Mobile.ViewModel
 
         public ObservableCollection<string> SelectedImages { get; } = new ObservableCollection<string>();
 
-        private readonly IRelationService _relationService;
-        private readonly IAuthorizationService _authorizationService;
-
         [ObservableProperty]
         private IDictionary<string, string[]> _validationErrors = null;
+
+        private readonly IRelationService _relationService;
+        private readonly IAuthorizationService _authorizationService;
 
         public AddRelationPageViewModel(IRelationService relationService, IAuthorizationService authorizationService)
         {
@@ -51,7 +50,7 @@ namespace Instagram.Mobile.ViewModel
             {
                 await _relationService.AddAsync(_authorizationService.UserData.UserId, Name, SelectedImages);
 
-                await Shell.Current.GoToAsync(nameof(ProfilePage));
+                await NavigationService.GoToProfilePageAsync();
             }
             catch(InvalidRequestException exception)
             {

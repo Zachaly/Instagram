@@ -1,7 +1,6 @@
-﻿using Instagram.Models.UserStory;
+﻿using Instagram.Mobile.Extension;
+using Instagram.Models.UserStory;
 using Instagram.Models.UserStory.Request;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 
 namespace Instagram.Mobile.Service
 {
@@ -28,26 +27,12 @@ namespace Instagram.Mobile.Service
                 { new StringContent(userId.ToString()), "UserId" }
             };
 
-            foreach (var image in images)
-            {
-                var fileContent = new StreamContent(File.OpenRead(image));
-                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                {
-                    FileName = image,
-                    Name = "Images"
-                };
-                fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                request.Add(fileContent);
-            }
+            request.AddFileContent(images, "Images");
 
             await _httpClient.PostAsync(Endpoint, request);
         }
 
-        public async Task<IEnumerable<UserStoryModel>> GetAsync(GetUserStoryRequest request)
-        {
-            var response = await _httpClient.GetAsync(request.BuildQuery(Endpoint));
-
-            return await response.Content.ReadFromJsonAsync<IEnumerable<UserStoryModel>>();
-        }
+        public Task<IEnumerable<UserStoryModel>> GetAsync(GetUserStoryRequest request)
+            => _httpClient.GetWithRequestAsync<UserStoryModel, GetUserStoryRequest>(Endpoint, request);
     }
 }

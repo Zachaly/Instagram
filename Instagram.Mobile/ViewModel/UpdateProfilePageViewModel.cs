@@ -8,9 +8,6 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class UpdateProfilePageViewModel : ObservableObject
     {
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IUserService _userService;
-
         [ObservableProperty]
         private UpdateUserRequest _updateRequest = new UpdateUserRequest();
 
@@ -30,6 +27,9 @@ namespace Instagram.Mobile.ViewModel
         public bool IsNotLoading => !IsLoading;
 
         public bool IsNewProfilePictureSelected => NewProfilePicture is not null;
+
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IUserService _userService;
 
         public UpdateProfilePageViewModel(IAuthorizationService authorizationService, IUserService userService)
         {
@@ -63,7 +63,7 @@ namespace Instagram.Mobile.ViewModel
             try
             {
                 await _userService.UpdateAsync(UpdateRequest);
-                await Toast.Make("Profile updated").Show();
+                await ToastService.MakeToast("Profile updated");
                 ValidationErrors = null;
             }
             catch(InvalidRequestException exception)
@@ -87,7 +87,7 @@ namespace Instagram.Mobile.ViewModel
         private async Task UpdateProfilePictureAsync()
         {
             await _userService.UpdateProfilePictureAsync(_authorizationService.UserData.UserId, NewProfilePicture);
-            await Toast.Make("Picture updated").Show();
+            await ToastService.MakeToast("Picture updated");
         }
     }
 }

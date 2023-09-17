@@ -12,20 +12,19 @@ namespace Instagram.Mobile.ViewModel
 {
     public partial class MainPageViewModel : ObservableObject
     {
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IPostService _postService;
-        private readonly IPostLikeService _postLikeService;
-        private readonly IUserStoryService _userStoryService;
-        private const int PageSize = 3;
-
         public bool BlockLoading { get; set; } = false;
-
         public bool IsAuthorized => _authorizationService.IsAuthorized;
 
         public ObservableCollection<PostViewModel> Posts { get; set; } = new ObservableCollection<PostViewModel>();
         public ObservableCollection<UserStoryViewModel> UserStories { get; set; } = new ObservableCollection<UserStoryViewModel>();
 
         private int _pageIndex = 0;
+        private const int PageSize = 3;
+
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IPostService _postService;
+        private readonly IPostLikeService _postLikeService;
+        private readonly IUserStoryService _userStoryService;
 
         public MainPageViewModel(IAuthorizationService authorizationService, IPostService postService,
             IPostLikeService postLikeService, IUserStoryService userStoryService)
@@ -42,10 +41,7 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToProfilePageAsync()
-            => await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
-            {
-                { "UserId", _authorizationService.UserData.UserId }
-            });
+            => await NavigationService.GoToProfilePageAsync(_authorizationService.UserData.UserId);
 
         [RelayCommand]
         private async Task LoadPosts()
@@ -97,19 +93,14 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToPostPageAsync(PostViewModel post)
-        {
-            await Shell.Current.GoToAsync(nameof(PostPage), new Dictionary<string, object>
-            {
-                { "PostId", post.Post.Id }
-            });
-        }
+            => await NavigationService.GoToPostPageAsync(post.Post.Id);
 
         [RelayCommand]
         private async Task ShowStoriesAsync(long startingUserId)
         {
             var startIndex = UserStories.IndexOf(UserStories.First(x => x.Story.UserId == startingUserId));
 
-            await MopupService.Instance.PushAsync(new UserStoryPopup(new UserStoryPopupViewModel(UserStories, startIndex)));
+            await PopupService.ShowUserStoriesPopup(UserStories, startIndex);
         }
 
         [RelayCommand]
@@ -151,13 +142,11 @@ namespace Instagram.Mobile.ViewModel
                     UserName = like.UserName,
                 });
 
-            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(likes)));
+            await PopupService.ShowUserListPopupAsync(likes);
         }
 
         [RelayCommand]
         private async Task GoToAddStoryPageAsync()
-        {
-            await Shell.Current.GoToAsync(nameof(AddStoryPage));
-        }
+            => await NavigationService.GoToPageAsync<AddStoryPage>();
     }
 }

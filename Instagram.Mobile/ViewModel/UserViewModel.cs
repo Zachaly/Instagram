@@ -10,7 +10,6 @@ namespace Instagram.Mobile.ViewModel
 
         public string ImageUrl => $"{Configuration.ImageUrl}profile/{User.Id}";
         
-
         public UserViewModel(UserModel user)
         {
             _user = user;

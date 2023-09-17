@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Instagram.Mobile.View;
+using Instagram.Mobile.Service;
 using Instagram.Models.Post;
 
 namespace Instagram.Mobile.ViewModel
@@ -49,11 +49,6 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToCreatorProfileAsync()
-        {
-            await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
-            {
-                { "UserId", Post.CreatorId }
-            });
-        }
+            => await NavigationService.GoToProfilePageAsync(Post.CreatorId);
     }
 }

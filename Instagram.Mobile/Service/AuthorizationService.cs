@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Instagram.Models.Response;
 using Instagram.Models.UserFollow.Request;
 using Instagram.Models.UserFollow;
+using Instagram.Mobile.Extension;
 
 namespace Instagram.Mobile.Service
 {

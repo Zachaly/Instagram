@@ -2,7 +2,7 @@
 using Instagram.Mobile.View;
 using Instagram.Mobile.ViewModel;
 
-namespace Instagram.Mobile
+namespace Instagram.Mobile.Extension
 {
     public static class BuilderExtensions
     {

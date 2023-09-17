@@ -8,7 +8,6 @@ using Instagram.Models.Relation.Request;
 using Instagram.Models.User;
 using Instagram.Models.UserFollow.Request;
 using Instagram.Models.UserStory.Request;
-using Mopups.Services;
 using System.Collections.ObjectModel;
 
 namespace Instagram.Mobile.ViewModel
@@ -85,7 +84,7 @@ namespace Instagram.Mobile.ViewModel
             }
             catch(NotFoundException ex)
             {
-                await Toast.Make(ex.Message).Show();
+                await ToastService.MakeToast(ex.Message);
                 await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
                 return;
             }
@@ -117,12 +116,7 @@ namespace Instagram.Mobile.ViewModel
 
         [RelayCommand]
         private async Task GoToPostPageAsync(PostViewModel post)
-        {
-            await Shell.Current.GoToAsync(nameof(PostPage), new Dictionary<string, object>
-            {
-                { "PostId", post.Post.Id },
-            });
-        }
+            => await NavigationService.GoToPostPageAsync(post.Post.Id);
 
         [RelayCommand]
         private async Task FollowAsync()
@@ -163,7 +157,7 @@ namespace Instagram.Mobile.ViewModel
                 UserName = follow.UserName
             });
 
-            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(users)));
+            await PopupService.ShowUserListPopupAsync(users);
         }
 
 
@@ -180,7 +174,7 @@ namespace Instagram.Mobile.ViewModel
                 UserName = follow.UserName
             });
 
-            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(users)));
+            await PopupService.ShowUserListPopupAsync(users);
         }
 
         [RelayCommand]
@@ -199,7 +193,7 @@ namespace Instagram.Mobile.ViewModel
                 return;
             }
 
-            await MopupService.Instance.PushAsync(new UserStoryPopup(new UserStoryPopupViewModel(stories, 0)));
+            await PopupService.ShowUserStoriesPopup(stories, 0);
         }
 
         [RelayCommand]
@@ -207,13 +201,11 @@ namespace Instagram.Mobile.ViewModel
         {
             var startingIndex = Relations.IndexOf(Relations.First(x => x.Relation.Id == startId));
 
-            await MopupService.Instance.PushAsync(new RelationPopup(new RelationPopupViewModel(Relations, startingIndex)));
+            await PopupService.ShowRelationsPopup(Relations, startingIndex);
         }
 
         [RelayCommand]
         private async Task GoToRelationManagementPageAsync()
-        {
-            await Shell.Current.GoToAsync(nameof(RelationManagementPage));
-        }
+            => await NavigationService.GoToPageAsync<RelationManagementPage>();
     }
 }
