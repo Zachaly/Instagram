@@ -28,7 +28,7 @@ namespace Instagram.Mobile.ViewModel
         {
             await NavigationService.GoToProfilePageAsync(user.Id);
 
-            await MopupService.Instance.PopAllAsync();
+            await PopupService.CloseAsync();
         }
     }
 }

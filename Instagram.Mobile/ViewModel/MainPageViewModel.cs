@@ -100,7 +100,7 @@ namespace Instagram.Mobile.ViewModel
         {
             var startIndex = UserStories.IndexOf(UserStories.First(x => x.Story.UserId == startingUserId));
 
-            await MopupService.Instance.PushAsync(new UserStoryPopup(new UserStoryPopupViewModel(UserStories, startIndex)));
+            await PopupService.ShowUserStoriesPopup(UserStories, startIndex);
         }
 
         [RelayCommand]
@@ -142,7 +142,7 @@ namespace Instagram.Mobile.ViewModel
                     UserName = like.UserName,
                 });
 
-            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(likes)));
+            await PopupService.ShowUserListPopupAsync(likes);
         }
 
         [RelayCommand]

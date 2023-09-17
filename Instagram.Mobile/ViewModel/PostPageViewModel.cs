@@ -93,7 +93,7 @@ namespace Instagram.Mobile.ViewModel
                     UserName = like.UserName,
                 });
 
-            await MopupService.Instance.PushAsync(new UserListPopup(new UserListPopupViewModel(users)));
+            await PopupService.ShowUserListPopupAsync(users);
         }
 
         [RelayCommand]
