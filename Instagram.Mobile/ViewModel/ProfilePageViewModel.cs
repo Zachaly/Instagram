@@ -207,5 +207,9 @@ namespace Instagram.Mobile.ViewModel
         [RelayCommand]
         private async Task GoToRelationManagementPageAsync()
             => await NavigationService.GoToPageAsync<RelationManagementPage>();
+
+        [RelayCommand]
+        private async Task GoToChatPageAsync()
+            => await NavigationService.GoToChatPageAsync(UserId);
     }
 }
