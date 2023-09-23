@@ -32,6 +32,8 @@ namespace Instagram.Mobile.Extension
             builder.Services.AddTransient<AddRelationPageViewModel>();
             builder.Services.AddTransient<RelationManagementPage>();
             builder.Services.AddTransient<RelationManagementPageViewModel>();
+            builder.Services.AddTransient<ChatPage>();
+            builder.Services.AddTransient<ChatPageViewModel>();
             builder.Services.AddTransient<App>();
 
             builder.Services.AddSingleton<IAuthorizationService, AuthorizationService>();
@@ -45,6 +47,7 @@ namespace Instagram.Mobile.Extension
             builder.Services.AddSingleton<IUserStoryService, UserStoryService>();
             builder.Services.AddSingleton<IRelationService, RelationService>();
             builder.Services.AddSingleton<IRelationImageService, RelationImageService>();
+            builder.Services.AddSingleton<IDirectMessageService, DirectMessageService>();
         }
     }
 }

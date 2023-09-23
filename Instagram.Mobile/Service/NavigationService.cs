@@ -22,6 +22,12 @@ namespace Instagram.Mobile.Service
                 { "PostId", postId }
             });
 
+        public static Task GoToChatPageAsync(long userId)
+            => Shell.Current.GoToAsync(nameof(ChatPage), new Dictionary<string, object>
+            {
+                { "UserId", userId }
+            });
+
         public static Task GoBackAsync()
             => Shell.Current.GoToAsync("..");
     }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             x:Class="Instagram.Mobile.View.ChatPage"
+             Title="ChatPage"
+             x:DataType="viewModel:ChatPageViewModel">
+    <VerticalStackLayout>
+        <ScrollView>
+            <VerticalStackLayout>
+                <Label Text="{Binding Receiver.Nickname}" HorizontalTextAlignment="Center"
+                       FontSize="30"/>
+                <CollectionView ItemsSource="{Binding Messages}" Scrolled="OnScroll">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModel:MessageViewModel">
+                            <Frame Margin="5">
+                                <Frame.Resources>
+                                    <Style TargetType="Frame">
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Frame" Binding="{Binding Message.Read}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="CadetBlue"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Frame.Resources>
+                                <VerticalStackLayout>
+                                    <VerticalStackLayout.Resources>
+                                        <Style TargetType="VerticalStackLayout">
+                                            <Style.Triggers>
+                                                <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding Message.Read}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="CadetBlue"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsSender}" Value="True">
+                                                    <Setter Property="HorizontalOptions" Value="End"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsSender}" Value="False">
+                                                    <Setter Property="HorizontalOptions" Value="Start"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </VerticalStackLayout.Resources>
+                                    <Label Text="{Binding Created}"/>
+                                    <Label Text="{Binding Message.Content}"/>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <Entry Text="{Binding NewMessageContent, Mode=TwoWay}"/>
+                <Button Text="Send message" Command="{Binding AddMessageCommand}"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </VerticalStackLayout>
+</ContentPage>

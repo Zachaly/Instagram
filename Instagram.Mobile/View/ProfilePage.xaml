@@ -24,6 +24,8 @@
                                 Command="{Binding FollowCommand}"/>
                         <Button Text="Unfollow" BackgroundColor="IndianRed" IsVisible="{Binding CanUnfollow}"
                                 Command="{Binding DeleteFollowCommand}"/>
+                        <Button Text="Chat" BackgroundColor="BlueViolet" IsVisible="{Binding IsNotCurrentUser}"
+                                Command="{Binding GoToChatPageCommand}"/>
                     </HorizontalStackLayout>
                     
                     <Label Text="{Binding UserModel.Name}"/>
