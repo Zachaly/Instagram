@@ -28,9 +28,6 @@ namespace Instagram.Mobile.ViewModel
     [QueryProperty(nameof(UserId), nameof(UserId))]
     public partial class ChatPageViewModel : ObservableObject
     {
-        private readonly IDirectMessageService _directMessageService;
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IUserService _userService;
         [ObservableProperty]
         private long _userId;
 
@@ -45,6 +42,10 @@ namespace Instagram.Mobile.ViewModel
         private int _pageIndex = 0;
         private int _pageSize = 5;
         private bool _blockLoadingMessages = false;
+
+        private readonly IDirectMessageService _directMessageService;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IUserService _userService;
 
         public ChatPageViewModel(IDirectMessageService directMessageService, IAuthorizationService authorizationService,
             IUserService userService)
@@ -106,7 +107,7 @@ namespace Instagram.Mobile.ViewModel
         }
 
         [RelayCommand]
-        private async Task AddAsync()
+        private async Task AddMessageAsync()
         {
             try
             {

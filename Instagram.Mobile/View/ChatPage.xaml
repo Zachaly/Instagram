@@ -47,7 +47,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
                 <Entry Text="{Binding NewMessageContent, Mode=TwoWay}"/>
-                <Button Text="Send message" Command="{Binding AddCommand}"/>
+                <Button Text="Send message" Command="{Binding AddMessageCommand}"/>
             </VerticalStackLayout>
         </ScrollView>
     </VerticalStackLayout>
