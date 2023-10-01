@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+             xmlns:viewModel="clr-namespace:Instagram.Mobile.ViewModel"
+             x:Class="Instagram.Mobile.View.NotificationPopup"
+             x:DataType="viewModel:NotificationPopupViewModel"
+             x:Name="popup">
+    <VerticalStackLayout>
+        <Label Text="X" HorizontalTextAlignment="Center" FontSize="30">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseCommand}"/>
+            </Label.GestureRecognizers>
+        </Label>
+        <CollectionView SelectionMode="None" ItemsSource="{Binding Notifications}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModel:NotificationViewModel">
+                    <Frame>
+                        <Frame.Resources>
+                            <ResourceDictionary>
+                                <Style TargetType="Frame">
+                                    <Style.Triggers>
+                                        <DataTrigger TargetType="Frame" Binding="{Binding IsRead}" Value="False">
+                                            <Setter Property="BackgroundColor" Value="CadetBlue"/>
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Frame" Binding="{Binding IsRead}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="AntiqueWhite"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ResourceDictionary>
+                        </Frame.Resources>
+                        <VerticalStackLayout>
+                            <VerticalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={x:Reference popup}, 
+                                                                Path=BindingContext.ReadNotificationCommand}"
+                                                      CommandParameter="{Binding .}"/>
+                            </VerticalStackLayout.GestureRecognizers>
+                            <Label Text="X" HorizontalTextAlignment="Center" FontSize="30">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={x:Reference popup}, 
+                                                                    Path=BindingContext.DeleteNotificationCommand}"
+                                                          CommandParameter="{Binding .}"/>  
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Text="{Binding Created}" FontSize="20"/>
+                            <Label Text="{Binding Notification.Message}" FontSize="28"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</mopups:PopupPage>

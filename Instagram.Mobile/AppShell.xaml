@@ -11,6 +11,22 @@
         <BackButtonBehavior IsVisible="False" IsEnabled="False"/>
     </Shell.BackButtonBehavior>
 
+    <Shell.TitleView>
+        <HorizontalStackLayout HorizontalOptions="End" IsVisible="{Binding IsAuthorized}">
+            <Border VerticalOptions="Center"
+                   HorizontalOptions="End" Margin="5" StrokeShape="Ellipse">
+                <Label TextColor="OrangeRed"  FontSize="26" Padding="10,0"
+                   BackgroundColor="AliceBlue"
+                   Text="{Binding NotificationCount}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ShowNotificationsCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Border>
+            
+        </HorizontalStackLayout>
+    </Shell.TitleView>
+
     <TabBar>
         <ShellContent Title="Home" Route="MainPage" ContentTemplate="{DataTemplate view:MainPage}"/>
         <ShellContent Title="Add Post" Route="PostPage" ContentTemplate="{DataTemplate view:AddPostPage}"/>

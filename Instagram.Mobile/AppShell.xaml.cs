@@ -36,5 +36,11 @@ namespace Instagram.Mobile
                 }
             }
         }
+
+        public void UpdateAuthorizedStatus()
+        {
+            (BindingContext as ShellViewModel).UpdateAuthorizedStatusCommand.Execute(null);
+            (BindingContext as ShellViewModel).GetNotificationCountCommand.Execute(null);
+        }
     }
 }
