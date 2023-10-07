@@ -49,6 +49,8 @@ namespace Instagram.Mobile.Extension
             builder.Services.AddSingleton<IRelationImageService, RelationImageService>();
             builder.Services.AddSingleton<IDirectMessageService, DirectMessageService>();
             builder.Services.AddSingleton<INotificationService, NotificationService>();
+
+            builder.Services.AddTransient<IWebsocketService, WebsocketService>();
         }
     }
 }

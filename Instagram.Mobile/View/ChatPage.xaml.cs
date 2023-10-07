@@ -15,15 +15,12 @@ public partial class ChatPage : ContentPage
         base.OnAppearing();
 		(BindingContext as ChatPageViewModel).LoadUserCommand.Execute(null);
 		(BindingContext as ChatPageViewModel).LoadMessagesCommand.Execute(null);
+        (BindingContext as ChatPageViewModel).StartListeningCommand.Execute(null);
     }
 
-    private void OnScroll(object sender, ItemsViewScrolledEventArgs e)
+    protected override void OnDisappearing()
     {
-        var viewModel = (ChatPageViewModel)BindingContext;
-
-        if (e.FirstVisibleItemIndex == 0)
-        {
-            viewModel.LoadMessagesCommand.Execute(null);
-        }
+        base.OnDisappearing();
+        (BindingContext as ChatPageViewModel).StopListeningCommand.Execute(null);
     }
 }

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Instagram.Mobile.Service;
 using Instagram.Mobile.View;
+using Instagram.Models.Notification;
 using Instagram.Models.Notification.Request;
 
 namespace Instagram.Mobile.ViewModel
@@ -15,11 +16,14 @@ namespace Instagram.Mobile.ViewModel
 
         private readonly IAuthorizationService _authorizationService;
         private readonly INotificationService _notificationService;
+        private readonly IWebsocketService _websocketService;
 
-        public ShellViewModel(IAuthorizationService authorizationService, INotificationService notificationService) 
+        public ShellViewModel(IAuthorizationService authorizationService, INotificationService notificationService,
+            IWebsocketService websocketService)
         {
             _authorizationService = authorizationService;
             _notificationService = notificationService;
+            _websocketService = websocketService;
         }
 
         [RelayCommand]
@@ -30,7 +34,18 @@ namespace Instagram.Mobile.ViewModel
         }
 
         [RelayCommand]
-        private void UpdateAuthorizedStatus() => OnPropertyChanged(nameof(IsAuthorized));
+        private async Task UpdateAuthorizedStatus() 
+        {
+            if(IsAuthorized)
+            {
+                await _websocketService.StartConnection("notification");
+
+                _websocketService.AddListener("NotificationReceived", (NotificationModel notification) => NotificationCount++);
+            }
+
+            OnPropertyChanged(nameof(IsAuthorized));
+
+        }
 
         [RelayCommand]
         private async Task GetNotificationCountAsync()

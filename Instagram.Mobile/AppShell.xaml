@@ -23,7 +23,6 @@
                     </Label.GestureRecognizers>
                 </Label>
             </Border>
-            
         </HorizontalStackLayout>
     </Shell.TitleView>
 
