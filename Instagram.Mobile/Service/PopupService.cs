@@ -1,5 +1,6 @@
 ﻿using Instagram.Mobile.View;
 using Instagram.Mobile.ViewModel;
+using Instagram.Models.Notification;
 using Instagram.Models.User;
 using Mopups.Services;
 
@@ -26,6 +27,9 @@ namespace Instagram.Mobile.Service
 
         public static async Task ShowRelationsPopup(IEnumerable<RelationViewModel> relations, int startingIndex)
             => await MopupService.Instance.PushAsync(new RelationPopup(new RelationPopupViewModel(relations, startingIndex)));
+
+        public static async Task ShowNotificationPopupAsync(IEnumerable<NotificationModel> notifications, INotificationService notificationService)
+            => await MopupService.Instance.PushAsync(new NotificationPopup(new NotificationPopupViewModel(notifications, notificationService)));
 
         public static async Task CloseAsync()
             => await MopupService.Instance.PopAllAsync();

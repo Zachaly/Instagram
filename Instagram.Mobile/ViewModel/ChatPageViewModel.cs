@@ -18,10 +18,14 @@ namespace Instagram.Mobile.ViewModel
 
         public bool IsSender { get; }
 
+        [ObservableProperty]
+        private bool _isRead = false;
+
         public MessageViewModel(DirectMessageModel message, bool isSender)
         {
             _message = message;
             IsSender = isSender;
+            IsRead = message.Read;
         }
     }
 
@@ -41,18 +45,44 @@ namespace Instagram.Mobile.ViewModel
 
         private int _pageIndex = 0;
         private int _pageSize = 5;
-        private bool _blockLoadingMessages = false;
 
         private readonly IDirectMessageService _directMessageService;
         private readonly IAuthorizationService _authorizationService;
         private readonly IUserService _userService;
+        private readonly IWebsocketService _websocketService;
 
         public ChatPageViewModel(IDirectMessageService directMessageService, IAuthorizationService authorizationService,
-            IUserService userService)
+            IUserService userService, IWebsocketService websocketService)
         {
             _directMessageService = directMessageService;
             _authorizationService = authorizationService;
             _userService = userService;
+            _websocketService = websocketService;
+        }
+
+        [RelayCommand]
+        private async Task StartListening()
+        {
+            await _websocketService.StartConnection("direct-message");
+
+            _websocketService.AddListener("MessageReceived", async (DirectMessageModel message) => await ReadMessage(message));
+
+            _websocketService.AddListener("MessageRead", (long id, bool isRead) =>
+            {
+                var msg = Messages.FirstOrDefault(m => m.Message.Id == id);
+                if (msg is null)
+                {
+                    return;
+                }
+                msg.Message.Read = isRead;
+                msg.IsRead = isRead;
+            });
+        }
+
+        [RelayCommand]
+        private async Task StopListening()
+        {
+            await _websocketService.StopConnection();
         }
 
         [RelayCommand]
@@ -64,11 +94,6 @@ namespace Instagram.Mobile.ViewModel
         [RelayCommand]
         private async Task LoadMessagesAsync()
         {
-            if (_blockLoadingMessages)
-            {
-                return;
-            }
-
             var messages = await _directMessageService.GetAsync(new GetDirectMessageRequest
             {
                 PageIndex = _pageIndex,
@@ -81,7 +106,7 @@ namespace Instagram.Mobile.ViewModel
                 await ReadMessage(message, false);
             }
 
-            _blockLoadingMessages = messages.Count() < _pageSize;
+            _pageIndex++;
         }
 
         private async Task ReadMessage(DirectMessageModel message, bool addOnEnd = true)

@@ -41,6 +41,7 @@ namespace Instagram.Mobile.ViewModel
             if(_authorizationService.IsAuthorized)
             {
                 await NavigationService.GoBackAsync();
+                (Shell.Current as AppShell).UpdateAuthorizedStatus();
             }
         }
     }
